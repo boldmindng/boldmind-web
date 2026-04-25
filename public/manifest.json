@@ -1,0 +1,23 @@
+{
+  "name": "BoldMind Technology Solution Enterprise",
+  "short_name": "BoldMind",
+  "description": "Naija-authentic. AI-first. Execution-focused. Empowering 1M Nigerian entrepreneurs.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A1D37",
+  "theme_color": "#FFC107",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["business", "productivity", "education"]
+}

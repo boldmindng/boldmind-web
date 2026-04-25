@@ -1,0 +1,107 @@
+
+
+@import '@boldmind-tech/ui/styles/globals.css';
+
+/* ── Hub-specific animations ──────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0%   { background-position: -1000px 0; }
+  100% { background-position:  1000px 0; }
+}
+
+@keyframes particle-rise {
+  0%   { transform: translateY(0) translateX(0);    opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+}
+
+/* ── Auth form components ──────────────────────────────────────────────── */
+
+.auth-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--product-muted);
+  background-color: var(--product-background);
+  color: var(--product-foreground);
+  font-family: var(--font-active, var(--font-primary));
+  transition: border-color var(--transition-quick), box-shadow var(--transition-quick);
+}
+
+.auth-input:focus {
+  border-color: var(--product-primary);
+  box-shadow: 0 0 0 3px var(--product-highlight);
+  outline: none;
+}
+
+.auth-input.error {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-error) 20%, transparent);
+}
+
+.auth-input.success {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-success) 20%, transparent);
+}
+
+/* Primary auth button — uses hub primary (#2B4D87) with gold accent */
+.auth-btn-primary {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-weight: 700;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  /* Gradient: hub navy → gold */
+  background: linear-gradient(135deg, var(--product-primary), var(--product-secondary));
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.auth-btn-primary:hover:not(:disabled) {
+  transform: translateY(-0.125rem);
+  box-shadow: var(--shadow-xl);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--product-primary) 90%, black),
+    color-mix(in srgb, var(--product-secondary) 90%, black)
+  );
+}
+
+.auth-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.auth-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Social auth buttons (Google, GitHub, etc.) */
+.auth-btn-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg);
+  font-weight: 500;
+  font-family: var(--font-active, var(--font-primary));
+  transition: all var(--transition-base);
+  border: 2px solid var(--product-muted);
+  background: var(--product-background);
+  color: var(--product-foreground);
+  cursor: pointer;
+}
+
+.auth-btn-social:hover {
+  transform: translateY(-0.125rem);
+  box-shadow: var(--shadow-md);
+  border-color: var(--product-primary);
+}
