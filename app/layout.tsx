@@ -1,6 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// apps/boldmind-hub/app/layout.tsx  [ROOT — Server Component]
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
@@ -23,38 +20,47 @@ const BASE_URL =
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'BoldMind — Empowering 1M Nigerian Entrepreneurs by 2030',
+    default: 'BoldMind — Building Systems That Shift Nations | Nigerian Tech Ecosystem',
     template: '%s | BoldMind',
   },
   description:
-    "Nigeria's premier tech ecosystem: AmeboGist, EduCenter, PlanAI Suite, BoldMind OS, and 28+ products empowering entrepreneurs through AI, education, and authentic media.",
+    'BoldMind is Nigeria\'s AI-first tech ecosystem — four pillars, one account. AmeboGist (Pidgin media, 12K+ readers), VillageCircle (conviction & venture studio), EduCenter (JAMB/WAEC prep + AI skills, 50K+ students), PlanAI (AI business tools, 650+ businesses). Built in Lagos.',
   keywords: [
-    'Nigerian entrepreneurs',
     'BoldMind',
-    'AI Nigeria',
-    'PlanAI Suite',
+    'Nigerian entrepreneurs',
+    'AI tools Nigeria',
     'AmeboGist',
-    'EduCenter Nigeria',
     'VillageCircle',
-    'vibe coders',
-    'BoldMind OS',
+    'EduCenter Nigeria',
+    'PlanAI Suite',
+    'Vibe Coders Nigeria',
     'Nigerian tech ecosystem',
-    'African technology',
+    'JAMB past questions 2026',
+    'WAEC prep Nigeria',
+    'pidgin English news Nigeria',
+    'AI business tools Nigeria',
+    'digital storefronts Nigeria',
+    'AI receptionist Nigeria',
+    'Nigerian SME tools',
+    'BoldMind OS',
+    'NaijaFit',
+    'Nigerian startup',
+    'African AI technology',
     'business tools Nigeria',
-    'startup Nigeria',
-    'tech company Nigeria',
-    'Nigerian innovation',
-    'entrepreneurship Nigeria',
-    'BoldMind Technology',
-    'digital transformation Nigeria',
+    'tech company Lagos Nigeria',
     'Nigerian digital economy',
-    'AI tools Africa',
+    'pan-African technology',
+    'Paystack Nigeria business',
+    'WhatsApp business automation Nigeria',
+    'Nigerian ed-tech platform',
+    'ViralKit social media Nigeria',
+    'Nigerian content creator tools',
   ],
   authors: [
-    { name: 'BoldMind Technology Solution Enterprise', url: BASE_URL },
+    { name: 'Boldmind Technology Solution Enterprise', url: BASE_URL },
     { name: 'Charles Uche Chijuka' },
   ],
-  creator: 'BoldMind Technology Solution Enterprise',
+  creator: 'Boldmind Technology Solution Enterprise',
   publisher: 'BoldMind Technology Solution Enterprise',
   formatDetection: { email: false, telephone: false },
   robots: {
@@ -75,22 +81,24 @@ export const metadata: Metadata = {
     title: 'BoldMind — Building Systems That Shift Nations',
     siteName: 'BoldMind',
     description:
-      'Empowering 1 million Nigerian Entrepreneurs by 2030 through 31+ innovative AI and tech products.',
+      'One account. Four pillars. AmeboGist · VillageCircle · EduCenter · PlanAI. 650+ businesses, 50K+ students, 12K+ readers. Built in Lagos.',
     images: [
       {
         url: `${BASE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'BoldMind — Nigerian Tech Ecosystem',
+        alt: 'BoldMind — Nigerian Tech Ecosystem: AmeboGist, VillageCircle, EduCenter, PlanAI',
         type: 'image/png',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@boldmindtech',
-    title: 'BoldMind — Empowering Nigerian Entrepreneurs',
-    description: 'AmeboGist, EduCenter, PlanAI and 28+ products transforming Nigeria.',
+    site: '@boldmindng',
+    creator: '@boldmindng',
+    title: 'BoldMind — Building Systems That Shift Nations',
+    description:
+      'One account. Four pillars. AmeboGist · VillageCircle · EduCenter · PlanAI. 650+ businesses running. Built in Lagos. 🇳🇬',
     images: [`${BASE_URL}/og-image.png`],
   },
   verification: { google: process.env['NEXT_PUBLIC_GOOGLE_SITE_VERIFY'] },
@@ -131,8 +139,11 @@ const orgSchema = {
   name: 'BoldMind Technology Solution Enterprise',
   url: BASE_URL,
   logo: `${BASE_URL}/logo.webp`,
-  description: 'Empowering 1 million Nigerian Entrepreneurs by 2030',
+  description:
+    'Nigerian-built AI ecosystem with four pillars: AmeboGist (Pidgin media), VillageCircle (conviction & venture studio), EduCenter (ed-tech), and PlanAI (AI business tools). Empowering 1 million Nigerian entrepreneurs by 2030.',
   foundingDate: '2025',
+  foundingLocation: 'Lagos, Nigeria',
+  numberOfEmployees: { '@type': 'QuantitativeValue', value: 10 },
   address: {
     '@type': 'PostalAddress',
     addressCountry: 'NG',
@@ -145,16 +156,22 @@ const orgSchema = {
     contactType: 'customer service',
     email: 'hello@boldmind.ng',
     telephone: '+2349138349271',
-    availableLanguage: ['English'],
+    availableLanguage: ['English', 'Pidgin English'],
   },
+  subOrganization: [
+    { '@type': 'Organization', name: 'AmeboGist',     url: 'https://amebogist.ng' },
+    { '@type': 'Organization', name: 'VillageCircle', url: 'https://villagecircle.ng' },
+    { '@type': 'Organization', name: 'EduCenter',     url: 'https://educenter.com.ng' },
+    { '@type': 'Organization', name: 'PlanAI',        url: 'https://planai.boldmind.ng' },
+  ],
   sameAs: [
-    'https://x.com/villagecircleng',
+    'https://x.com/boldmindng',
     'https://facebook.com/boldmindng',
     'https://instagram.com/boldmindng',
     'https://linkedin.com/company/boldmind-technology-solution-enterprise',
     'https://github.com/boldmind-tech',
     'https://youtube.com/@BoldMindTech',
-    'https://tiktok.com/@villagecircle',
+    'https://tiktok.com/@boldmindng',
   ],
 };
 
@@ -197,6 +214,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="geo.placename" content="Lagos, Nigeria" />
         <meta name="geo.position" content="6.5244;3.3792" />
         <meta name="ICBM" content="6.5244, 3.3792" />
+        <meta name="facebook-domain-verification" content="s3gyrqwl3bo41hl1hp21ez9rd324w1" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}

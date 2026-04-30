@@ -1,4 +1,3 @@
-// apps/boldmind-hub/app/(public)/products/page.tsx
 'use client';
 
 import { useState, useMemo } from 'react';

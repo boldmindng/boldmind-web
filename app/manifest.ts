@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Naija-authentic. AI-first. Execution-focused. Empowering 1M Nigerian entrepreneurs.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#0A1D37',
-    theme_color: '#FFC107',
+    background_color: '#FAFAF9',
+    theme_color: '#2B4D87',
     orientation: 'portrait-primary',
     icons: [
       {

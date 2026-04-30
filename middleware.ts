@@ -5,7 +5,6 @@ const HUB_URL =
   process.env['NEXT_PUBLIC_HUB_URL'] ||
   (process.env.NODE_ENV === 'production' ? 'https://boldmind.ng' : 'http://localhost:4001');
  
-// Must match service/src/modules/auth/sso.service.ts
 const SSO_COOKIE = 'boldmind_sso';
  
 export function middlewareSSOGuard(request: NextRequest): NextResponse {
@@ -13,7 +12,6 @@ export function middlewareSSOGuard(request: NextRequest): NextResponse {
  
   if (token) return NextResponse.next();
  
-  // Build hub login URL with the current URL as return destination
   const loginUrl = new URL(`${HUB_URL}/login`);
   loginUrl.searchParams.set('return_url', request.nextUrl.href);
   return NextResponse.redirect(loginUrl);

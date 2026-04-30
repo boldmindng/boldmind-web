@@ -1,6 +1,5 @@
 'use client';
 
-// apps/boldmind-hub/app/(public)/about/page.tsx
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';

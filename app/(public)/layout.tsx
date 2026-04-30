@@ -4,25 +4,26 @@ import type { ReactNode } from 'react';
 
 // Navigation links shown on all public hub pages
 const NAV_LINKS = [
-  { href: '/',                         label: 'Home'       },
-  { href: '/products',                 label: 'Products'   },
-  { href: '/pricing',                  label: 'Pricing'    },
-  { href: 'https://amebogist.ng',      label: 'AmeboGist', isExternal: true },
-  { href: 'https://educenter.com.ng',  label: 'EduCenter', isExternal: true },
-  { href: '/about',                    label: 'About'      },
-  { href: '/contact',                  label: 'Contact'    },
+  { href: '/',                          label: 'Home'           },
+  { href: 'https://amebogist.ng',       label: 'AmeboGist',     isExternal: true },
+  { href: 'https://villagecircle.ng',   label: 'VillageCircle', isExternal: true },
+  { href: 'https://educenter.com.ng',   label: 'EduCenter',     isExternal: true },
+  { href: 'https://planai.boldmind.ng', label: 'PlanAI',        isExternal: true },
+  { href: '/pricing',                   label: 'Pricing'        },
+  { href: '/about',                     label: 'About'          },
 ];
 
 const FOOTER_SECTIONS = [
   {
     title: '🚀 Ecosystem',
     links: [
-      { href: 'https://amebogist.ng',         label: 'AmeboGist',      isExternal: true },
-      { href: 'https://educenter.com.ng',      label: 'EduCenter',      isExternal: true },
-      { href: 'https://planai.boldmind.ng',    label: 'PlanAI Suite',   isExternal: true },
-      { href: 'https://fit.boldmind.ng',       label: 'NaijaFit',       isExternal: true },
-      { href: 'https://os.boldmind.ng',        label: 'BoldMind OS',    isExternal: true },
-      { href: 'https://villagecircle.ng',   label: 'Concept Hub',    isExternal: true },
+      { href: 'https://amebogist.ng',           label: 'AmeboGist',       isExternal: true },
+      { href: 'https://villagecircle.ng',        label: 'VillageCircle',   isExternal: true },
+      { href: 'https://villagecircle.ng/vibe-coders', label: 'Vibe Coders', isExternal: true },
+      { href: 'https://educenter.com.ng',        label: 'EduCenter',       isExternal: true },
+      { href: 'https://planai.boldmind.ng',      label: 'PlanAI Suite',    isExternal: true },
+      { href: 'https://fit.boldmind.ng',         label: 'NaijaFit',        isExternal: true },
+      { href: 'https://os.boldmind.ng',          label: 'BoldMind OS',     isExternal: true },
     ],
   },
   {
