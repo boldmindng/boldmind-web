@@ -1,3 +1,6 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: [
@@ -44,6 +47,10 @@ const nextConfig = {
       config.resolve.alias[`@boldmind-tech/${pkg}`] =
         `${process.cwd()}/node_modules/@boldmind-tech/${pkg}/dist/index.js`;
     }
+    // Force single instance of zustand to prevent useSyncExternalStore conflicts during SSR
+    try {
+      config.resolve.alias['zustand'] = require.resolve('zustand');
+    } catch (_) {}
     return config;
   },
 
