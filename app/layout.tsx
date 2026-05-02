@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 import { BoldMindLayout } from './boldmindLayout';
 import { CookieConsent } from '@boldmind-tech/ui';
 import { ClientErrorBoundary } from './components/ClientErrorBoundary';
-import { AuthProvider } from '@boldmind-tech/auth';
+import { AuthProvider } from './components/ClientAuthProvider';
 import './globals.css';
 
 const inter = Inter({
@@ -208,7 +208,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="//api.boldmind.ng" />
         <link rel="dns-prefetch" href="//cdn.boldmind.ng" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 
         <meta name="application-name" content="BoldMind" />
         <meta name="description" content="Building systems that shift nations" />

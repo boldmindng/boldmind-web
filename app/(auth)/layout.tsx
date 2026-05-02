@@ -1,13 +1,19 @@
 'use client';
 
-
-
-import { useEffect, Suspense } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@boldmind-tech/auth';
 import { motion } from 'framer-motion';
+
+const brand = {
+  primary:   'var(--product-primary)',
+  secondary: 'var(--product-secondary)',
+  bg:        'var(--product-background)',
+  fg:        'var(--product-foreground)',
+  muted:     'var(--product-muted)',
+} as const;
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -15,7 +21,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   const searchParams = useSearchParams();
   const returnUrl = searchParams.get('return_url');
 
-  // Already logged in → redirect away from auth pages
   useEffect(() => {
     if (!isLoading && user) {
       const destination = returnUrl ?? '/dashboard';
@@ -27,34 +32,44 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     }
   }, [user, isLoading, router, returnUrl]);
 
-  // Loading spinner — matches the dark bg so there's no flash
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#080C14]">
-        <div className="w-8 h-8 rounded-full border-2 border-t-amber-400 border-white/10 animate-spin" />
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: brand.bg }}
+      >
+        <div
+          className="w-8 h-8 rounded-full border-2 animate-spin"
+          style={{
+            borderColor: `color-mix(in srgb, ${brand.fg} 10%, transparent)`,
+            borderTopColor: brand.secondary,
+          }}
+        />
       </div>
     );
   }
 
-  // Already logged in — don't render the form while redirect fires
   if (user) return null;
 
   return (
-    <div className="min-h-screen flex bg-[#080C14] text-white">
-
-      {/* ────────────────────────────────────────────────────────────────────
-          LEFT PANEL — branding (desktop only, hidden on mobile)
-      ──────────────────────────────────────────────────────────────────── */}
+    <div
+      className="min-h-screen flex"
+      style={{ background: brand.bg, color: brand.fg }}
+    >
+      {/* ── LEFT PANEL — branding (desktop only) ── */}
       <div
         className="hidden lg:flex lg:flex-col lg:w-[480px] lg:flex-shrink-0 relative overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, #00143C 0%, #001A4A 60%, #00102E 100%)',
+          background: `linear-gradient(135deg, ${brand.primary} 0%, color-mix(in srgb, ${brand.primary} 80%, #1a2a5e) 60%, color-mix(in srgb, ${brand.primary} 90%, black) 100%)`,
         }}
       >
         {/* Ambient glows */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-amber-500/8 rounded-full blur-[100px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-500/8 rounded-full blur-[80px]" />
+          <div
+            className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full blur-[100px]"
+            style={{ background: `color-mix(in srgb, ${brand.secondary} 8%, transparent)` }}
+          />
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full blur-[80px] bg-blue-500/8" />
         </div>
 
         {/* Subtle grid texture */}
@@ -73,7 +88,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <div className="relative w-10 h-10">
               <Image src="/logo.webp" alt="BoldMind" fill className="object-contain" />
             </div>
-            <span className="text-white font-black text-xl tracking-tight group-hover:text-amber-400 transition-colors">
+            <span
+              className="font-black text-xl tracking-tight transition-colors"
+              style={{ color: brand.fg }}
+            >
               BoldMind
             </span>
           </Link>
@@ -84,18 +102,20 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl font-black text-white leading-tight mb-6"
+              className="text-4xl font-black leading-tight mb-6"
+              style={{ color: brand.fg }}
             >
               One account.
               <br />
-              <span className="text-amber-400">32+ products.</span>
+              <span style={{ color: brand.secondary }}>32+ products.</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-base text-white/60 leading-relaxed mb-10"
+              className="text-base leading-relaxed mb-10"
+              style={{ color: `color-mix(in srgb, ${brand.fg} 60%, transparent)` }}
             >
               Sign in once, access every BoldMind product — AmeboGist, EduCenter,
               PlanAI Suite, BoldMind OS and more.
@@ -113,9 +133,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                   key={p.slug}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
                   style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    color: 'rgba(255,255,255,0.75)',
-                    border: '1px solid rgba(255,255,255,0.12)',
+                    background: `color-mix(in srgb, ${brand.fg} 6%, transparent)`,
+                    color: `color-mix(in srgb, ${brand.fg} 75%, transparent)`,
+                    border: `1px solid color-mix(in srgb, ${brand.fg} 12%, transparent)`,
                   }}
                 >
                   <span>{p.icon}</span>
@@ -137,35 +157,47 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 { value: '100%',    label: 'Nigerian-built' },
               ].map(stat => (
                 <div key={stat.label}>
-                  <p className="text-xl font-black text-amber-400">{stat.value}</p>
-                  <p className="text-xs text-white/40 mt-0.5">{stat.label}</p>
+                  <p className="text-xl font-black" style={{ color: brand.secondary }}>{stat.value}</p>
+                  <p
+                    className="text-xs mt-0.5"
+                    style={{ color: `color-mix(in srgb, ${brand.fg} 40%, transparent)` }}
+                  >
+                    {stat.label}
+                  </p>
                 </div>
               ))}
             </motion.div>
           </div>
 
           {/* Footer */}
-          <p className="text-white/25 text-xs">
+          <p
+            className="text-xs"
+            style={{ color: `color-mix(in srgb, ${brand.fg} 25%, transparent)` }}
+          >
             © {new Date().getFullYear()} BoldMind Technology Solution Enterprise
           </p>
         </div>
       </div>
 
-      {/* ────────────────────────────────────────────────────────────────────
-          RIGHT PANEL — auth form
-      ──────────────────────────────────────────────────────────────────── */}
+      {/* ── RIGHT PANEL — auth form ── */}
       <div className="flex-1 flex flex-col min-h-screen">
 
-        {/* Mobile logo bar — only visible on < lg */}
-        <div className="lg:hidden flex items-center justify-between px-6 py-5 border-b border-white/5">
+        {/* Mobile logo bar */}
+        <div
+          className="lg:hidden flex items-center justify-between px-6 py-5"
+          style={{ borderBottom: `1px solid color-mix(in srgb, ${brand.fg} 5%, transparent)` }}
+        >
           <Link href="/" className="flex items-center gap-2 no-underline">
             <div className="relative w-8 h-8">
               <Image src="/logo.webp" alt="BoldMind" fill className="object-contain" />
             </div>
-            <span className="font-black text-base text-white">BoldMind</span>
+            <span className="font-black text-base" style={{ color: brand.fg }}>BoldMind</span>
           </Link>
           {returnUrl && (
-            <span className="text-xs text-white/30">
+            <span
+              className="text-xs"
+              style={{ color: `color-mix(in srgb, ${brand.fg} 30%, transparent)` }}
+            >
               ↳ {getAppNameFromUrl(returnUrl)}
             </span>
           )}
@@ -182,29 +214,55 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-6 flex items-center gap-3 px-4 py-3 rounded-xl border"
                 style={{
-                  backgroundColor: 'rgba(251,191,36,0.06)',
-                  borderColor: 'rgba(251,191,36,0.2)',
+                  background: `color-mix(in srgb, ${brand.secondary} 6%, transparent)`,
+                  borderColor: `color-mix(in srgb, ${brand.secondary} 20%, transparent)`,
                 }}
               >
-                <span className="text-amber-400 text-lg">🔐</span>
-                <p className="text-sm text-white/60">
+                <span className="text-lg">🔐</span>
+                <p
+                  className="text-sm"
+                  style={{ color: `color-mix(in srgb, ${brand.fg} 60%, transparent)` }}
+                >
                   Sign in to continue to{' '}
-                  <span className="text-amber-400 font-semibold">{getAppNameFromUrl(returnUrl)}</span>
+                  <span className="font-semibold" style={{ color: brand.secondary }}>
+                    {getAppNameFromUrl(returnUrl)}
+                  </span>
                 </p>
               </motion.div>
             )}
 
-            {/* The auth form (login / register / etc.) */}
-            <div className="bg-white/3 border border-white/8 rounded-2xl p-8 backdrop-blur-sm">
+            {/* Auth form card */}
+            <div
+              className="rounded-2xl p-8 backdrop-blur-sm"
+              style={{
+                background: `color-mix(in srgb, ${brand.fg} 3%, transparent)`,
+                border: `1px solid color-mix(in srgb, ${brand.fg} 8%, transparent)`,
+              }}
+            >
               {children}
             </div>
 
             {/* Terms footer */}
-            <p className="text-center text-white/20 text-xs mt-5">
+            <p
+              className="text-center text-xs mt-5"
+              style={{ color: `color-mix(in srgb, ${brand.fg} 20%, transparent)` }}
+            >
               By continuing, you agree to our{' '}
-              <Link href="/terms"   className="text-white/35 hover:text-white/55 transition-colors">Terms</Link>
+              <Link
+                href="/terms"
+                className="transition-colors hover:underline"
+                style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}
+              >
+                Terms
+              </Link>
               {' & '}
-              <Link href="/privacy" className="text-white/35 hover:text-white/55 transition-colors">Privacy Policy</Link>
+              <Link
+                href="/privacy"
+                className="transition-colors hover:underline"
+                style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}
+              >
+                Privacy Policy
+              </Link>
             </p>
           </div>
         </div>
@@ -215,7 +273,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** Only BoldMind-owned domains are allowed as return_url to prevent open redirect. */
 const BOLDMIND_DOMAINS = [
   'boldmind.ng',
   'amebogist.ng',

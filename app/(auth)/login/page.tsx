@@ -1,6 +1,5 @@
 'use client';
 
-
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLogin, useRegister } from '../../../lib/hooks';
@@ -11,22 +10,24 @@ type Flow     = 'login' | 'register';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.boldmind.ng';
 const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'https://boldmind.ng';
 
+const brand = {
+  primary:   'var(--product-primary)',
+  secondary: 'var(--product-secondary)',
+  fg:        'var(--product-foreground)',
+} as const;
+
 function LoginContent() {
   const router      = useRouter();
   const params      = useSearchParams();
-  // 'return_url' is set by middleware (cross-app SSO); 'redirect' kept for compat
   const redirectUrl = params.get('return_url') || params.get('redirect') || `${HUB_URL}/dashboard`;
   const isExternal  = params.get('external') === '1';
 
-  // ── UI state ────────────────────────────────────────────────────────────
   const [mode, setMode] = useState<AuthMode>('choose');
   const [flow, setFlow] = useState<Flow>('login');
 
-  // Email form
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
 
-  // WhatsApp OTP
   const [phone,          setPhone]          = useState('');
   const [verificationId, setVerificationId] = useState('');
   const [otp,            setOtp]            = useState(['', '', '', '', '', '']);
@@ -35,27 +36,23 @@ function LoginContent() {
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError,   setOtpError]   = useState('');
 
-  // ── API hooks ────────────────────────────────────────────────────────────
   const loginMutation    = useLogin();
   const registerMutation = useRegister();
   const isLoading        = loginMutation.loading || registerMutation.loading;
   const apiError         = loginMutation.error?.message || registerMutation.error?.message || '';
 
-  // OTP countdown timer
   useEffect(() => {
     if (otpTimer <= 0) return;
     const id = setTimeout(() => setOtpTimer(t => t - 1), 1000);
     return () => clearTimeout(id);
   }, [otpTimer]);
 
-  // Reset API errors whenever the user switches modes or login/register flow
   useEffect(() => {
     loginMutation.reset();
     registerMutation.reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, flow]);
 
-  // ── Post-auth redirect ───────────────────────────────────────────────────
   const handleRedirect = (user: { profile?: { onboardingDone?: boolean } }) => {
     if (!user.profile?.onboardingDone) {
       router.push('/onboarding');
@@ -64,8 +61,6 @@ function LoginContent() {
     window.location.href = redirectUrl;
   };
 
-  // ── Social OAuth ─────────────────────────────────────────────────────────
-  // These are server-redirect flows — just build the URL and navigate.
   const loginWithGoogle = () => {
     const url = new URL(`${API_URL}/auth/google`);
     url.searchParams.set('redirect', redirectUrl);
@@ -80,7 +75,6 @@ function LoginContent() {
     window.location.href = url.toString();
   };
 
-  // ── Email auth ───────────────────────────────────────────────────────────
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const mutation = flow === 'login' ? loginMutation : registerMutation;
@@ -88,13 +82,11 @@ function LoginContent() {
     if (user) handleRedirect(user as any);
   };
 
-  // ── WhatsApp OTP ─────────────────────────────────────────────────────────
   const sendWhatsAppOTP = async () => {
     if (!phone) return;
     setOtpError('');
     setOtpLoading(true);
 
-    // Normalise to E.164 Nigerian format
     let normalised = phone.replace(/\s/g, '');
     if (normalised.startsWith('0'))  normalised = `+234${normalised.slice(1)}`;
     if (!normalised.startsWith('+')) normalised = `+234${normalised}`;
@@ -163,7 +155,6 @@ function LoginContent() {
     }
   };
 
-  // Auto-submit when all 6 OTP digits are entered
   useEffect(() => {
     if (otp.every(d => d !== '') && mode === 'whatsapp-otp') {
       verifyOTP();
@@ -171,132 +162,126 @@ function LoginContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [otp]);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // RENDER — each mode returns only the card content; the shell is in layout.tsx
-  // ─────────────────────────────────────────────────────────────────────────
-
-  // ── Mode: choose auth method ─────────────────────────────────────────────
+  // ── Mode: choose ──────────────────────────────────────────────────────────
   if (mode === 'choose') {
     return (
       <>
         <div className="text-center mb-7">
-          <h1 className="text-2xl font-bold mb-1.5">
+          <h1 className="text-2xl font-bold mb-1.5" style={{ color: brand.fg }}>
             {flow === 'login' ? 'Welcome back' : 'Create your account'}
           </h1>
-          <p className="text-white/45 text-sm">
+          <p className="text-sm" style={{ color: `color-mix(in srgb, ${brand.fg} 45%, transparent)` }}>
             {flow === 'login'
               ? 'Log in to access all your BoldMind products'
               : 'One account. 32+ products. All yours.'}
           </p>
         </div>
 
-        {/* Social buttons */}
         <div className="space-y-2.5 mb-6">
           <button
             onClick={loginWithGoogle}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-white/10 bg-white/4 hover:bg-white/8 hover:border-white/20 transition-all font-medium text-sm"
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl text-sm font-medium transition-all"
+            style={{
+              border: `1px solid color-mix(in srgb, ${brand.fg} 10%, transparent)`,
+              background: `color-mix(in srgb, ${brand.fg} 4%, transparent)`,
+              color: brand.fg,
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = `color-mix(in srgb, ${brand.fg} 8%, transparent)`)}
+            onMouseLeave={e => (e.currentTarget.style.background = `color-mix(in srgb, ${brand.fg} 4%, transparent)`)}
           >
             <GoogleIcon /> Continue with Google
           </button>
           <button
             onClick={loginWithFacebook}
             className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-blue-500/30 bg-blue-500/8 hover:bg-blue-500/15 hover:border-blue-500/50 transition-all font-medium text-sm"
+            style={{ color: brand.fg }}
           >
             <FacebookIcon /> Continue with Facebook
           </button>
           <button
             onClick={() => setMode('whatsapp-phone')}
             className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-green-500/30 bg-green-500/8 hover:bg-green-500/15 hover:border-green-500/50 transition-all font-medium text-sm"
+            style={{ color: brand.fg }}
           >
             <WhatsAppIcon /> Continue with WhatsApp
           </button>
         </div>
 
-        {/* Divider */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="flex-1 h-px bg-white/8" />
-          <span className="text-white/25 text-xs">or</span>
-          <div className="flex-1 h-px bg-white/8" />
+          <div className="flex-1 h-px" style={{ background: `color-mix(in srgb, ${brand.fg} 8%, transparent)` }} />
+          <span className="text-xs" style={{ color: `color-mix(in srgb, ${brand.fg} 25%, transparent)` }}>or</span>
+          <div className="flex-1 h-px" style={{ background: `color-mix(in srgb, ${brand.fg} 8%, transparent)` }} />
         </div>
 
         <button
           onClick={() => setMode('email')}
-          className="w-full py-3 px-4 rounded-xl border border-white/8 bg-white/2 hover:bg-white/5 text-white/60 hover:text-white text-sm font-medium transition-all"
+          className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all"
+          style={{
+            border: `1px solid color-mix(in srgb, ${brand.fg} 8%, transparent)`,
+            background: `color-mix(in srgb, ${brand.fg} 2%, transparent)`,
+            color: `color-mix(in srgb, ${brand.fg} 60%, transparent)`,
+          }}
         >
           Continue with Email
         </button>
 
-        {/* Login ↔ Register toggle */}
-        <p className="text-center text-white/35 text-sm mt-5">
+        <p className="text-center text-sm mt-5" style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}>
           {flow === 'login' ? "Don't have an account? " : 'Already have an account? '}
           <button
             onClick={() => setFlow(f => f === 'login' ? 'register' : 'login')}
-            className="text-amber-400 hover:text-amber-300 font-medium transition-colors"
+            className="font-medium transition-colors"
+            style={{ color: brand.secondary }}
           >
             {flow === 'login' ? 'Sign up' : 'Log in'}
           </button>
         </p>
 
-        {/* Show destination when coming from another app */}
         {redirectUrl !== `${HUB_URL}/dashboard` && (
-          <p className="text-center text-white/20 text-xs mt-4">
+          <p className="text-center text-xs mt-4" style={{ color: `color-mix(in srgb, ${brand.fg} 20%, transparent)` }}>
             After login, you'll be taken to{' '}
-            <span className="text-white/35">{new URL(redirectUrl).hostname}</span>
+            <span style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}>
+              {new URL(redirectUrl).hostname}
+            </span>
           </p>
         )}
       </>
     );
   }
 
-  // ── Mode: email form ─────────────────────────────────────────────────────
+  // ── Mode: email form ──────────────────────────────────────────────────────
   if (mode === 'email') {
     return (
       <>
         <button
           onClick={() => setMode('choose')}
-          className="text-white/35 text-sm hover:text-white/60 transition-colors mb-5 flex items-center gap-1"
+          className="text-sm mb-5 flex items-center gap-1 transition-colors"
+          style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}
         >
           ← Back
         </button>
 
-        <h2 className="text-xl font-bold mb-5">
+        <h2 className="text-xl font-bold mb-5" style={{ color: brand.fg }}>
           {flow === 'login' ? 'Log in with email' : 'Sign up with email'}
         </h2>
 
         <form onSubmit={handleEmailSubmit} className="space-y-3">
-          <div>
-            <label className="text-white/50 text-xs font-medium mb-1.5 block">
-              Email address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/25 focus:outline-none focus:border-amber-400/50 text-sm transition-colors"
-            />
-          </div>
-
-          <div>
-            <label className="text-white/50 text-xs font-medium mb-1.5 block">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/25 focus:outline-none focus:border-amber-400/50 text-sm transition-colors"
-            />
-          </div>
+          <InputField
+            label="Email address" type="email"
+            value={email} onChange={e => setEmail(e.target.value)}
+            placeholder="you@example.com"
+          />
+          <InputField
+            label="Password" type="password"
+            value={password} onChange={e => setPassword(e.target.value)}
+            placeholder="••••••••"
+          />
 
           {flow === 'login' && (
             <div className="text-right">
               <a
                 href="/forgot-password"
-                className="text-white/35 text-xs hover:text-amber-400 transition-colors"
+                className="text-xs transition-colors"
+                style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}
               >
                 Forgot password?
               </a>
@@ -312,7 +297,11 @@ function LoginContent() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 rounded-xl font-semibold bg-amber-400 text-black hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-sm"
+            className="w-full py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-sm"
+            style={{
+              background: brand.secondary,
+              color: brand.primary,
+            }}
           >
             {isLoading
               ? <span className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
@@ -321,11 +310,12 @@ function LoginContent() {
           </button>
         </form>
 
-        <p className="text-center text-white/30 text-xs mt-4">
+        <p className="text-center text-xs mt-4" style={{ color: `color-mix(in srgb, ${brand.fg} 30%, transparent)` }}>
           {flow === 'login' ? 'No account? ' : 'Have an account? '}
           <button
             onClick={() => setFlow(f => f === 'login' ? 'register' : 'login')}
-            className="text-amber-400 hover:text-amber-300"
+            className="transition-colors"
+            style={{ color: brand.secondary }}
           >
             {flow === 'login' ? 'Sign up' : 'Log in'}
           </button>
@@ -334,13 +324,14 @@ function LoginContent() {
     );
   }
 
-  // ── Mode: WhatsApp — enter phone ─────────────────────────────────────────
+  // ── Mode: WhatsApp — enter phone ──────────────────────────────────────────
   if (mode === 'whatsapp-phone') {
     return (
       <>
         <button
           onClick={() => setMode('choose')}
-          className="text-white/35 text-sm hover:text-white/60 transition-colors mb-5 flex items-center gap-1"
+          className="text-sm mb-5 flex items-center gap-1 transition-colors"
+          style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}
         >
           ← Back
         </button>
@@ -351,21 +342,32 @@ function LoginContent() {
           </div>
         </div>
 
-        <h2 className="text-xl font-bold text-center mb-1.5">Enter your number</h2>
-        <p className="text-white/40 text-sm text-center mb-6">
+        <h2 className="text-xl font-bold text-center mb-1.5" style={{ color: brand.fg }}>Enter your number</h2>
+        <p className="text-sm text-center mb-6" style={{ color: `color-mix(in srgb, ${brand.fg} 40%, transparent)` }}>
           We'll send a 6-digit code to your WhatsApp
         </p>
 
         <div className="flex gap-2 mb-4">
-          <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-sm text-white/60 whitespace-nowrap">
+          <div
+            className="flex items-center gap-2 rounded-xl px-3 py-3 text-sm whitespace-nowrap"
+            style={{
+              background: `color-mix(in srgb, ${brand.fg} 5%, transparent)`,
+              border: `1px solid color-mix(in srgb, ${brand.fg} 10%, transparent)`,
+              color: `color-mix(in srgb, ${brand.fg} 60%, transparent)`,
+            }}
+          >
             🇳🇬 +234
           </div>
           <input
-            type="tel"
-            value={phone}
+            type="tel" value={phone}
             onChange={e => setPhone(e.target.value)}
             placeholder="08012345678"
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/25 focus:outline-none focus:border-green-400/50 text-sm transition-colors"
+            className="flex-1 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
+            style={{
+              background: `color-mix(in srgb, ${brand.fg} 5%, transparent)`,
+              border: `1px solid color-mix(in srgb, ${brand.fg} 10%, transparent)`,
+              color: brand.fg,
+            }}
           />
         </div>
 
@@ -389,34 +391,33 @@ function LoginContent() {
     );
   }
 
-  // ── Mode: WhatsApp — enter OTP ───────────────────────────────────────────
+  // ── Mode: WhatsApp — enter OTP ────────────────────────────────────────────
   return (
     <>
       <div className="text-center mb-6">
         <div className="w-14 h-14 bg-green-500/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <WhatsAppIcon size={28} />
         </div>
-        <h2 className="text-xl font-bold mb-1.5">Check your WhatsApp</h2>
-        <p className="text-white/40 text-sm">
-          Sent a 6-digit code to <span className="text-white/70">{phone}</span>
+        <h2 className="text-xl font-bold mb-1.5" style={{ color: brand.fg }}>Check your WhatsApp</h2>
+        <p className="text-sm" style={{ color: `color-mix(in srgb, ${brand.fg} 40%, transparent)` }}>
+          Sent a 6-digit code to <span style={{ color: `color-mix(in srgb, ${brand.fg} 70%, transparent)` }}>{phone}</span>
         </p>
       </div>
 
-      {/* OTP boxes */}
       <div className="flex gap-2 justify-center mb-5">
         {otp.map((digit, i) => (
           <input
             key={i}
             ref={el => { otpRefs.current[i] = el; }}
-            type="text"
-            inputMode="numeric"
-            maxLength={1}
-            value={digit}
+            type="text" inputMode="numeric" maxLength={1} value={digit}
             onChange={e => handleOTPChange(i, e.target.value)}
             onKeyDown={e => handleOTPKeyDown(i, e)}
-            className={`w-11 h-14 text-center text-xl font-bold bg-white/5 border rounded-xl focus:outline-none transition-all text-white ${
-              digit ? 'border-amber-400/60' : 'border-white/10'
-            } focus:border-amber-400/80`}
+            className="w-11 h-14 text-center text-xl font-bold rounded-xl outline-none transition-all"
+            style={{
+              background: `color-mix(in srgb, ${brand.fg} 5%, transparent)`,
+              border: `1px solid ${digit ? brand.secondary : `color-mix(in srgb, ${brand.fg} 10%, transparent)`}`,
+              color: brand.fg,
+            }}
           />
         ))}
       </div>
@@ -429,19 +430,26 @@ function LoginContent() {
 
       {otpLoading && (
         <div className="flex justify-center mb-3">
-          <span className="w-5 h-5 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+          <span
+            className="w-5 h-5 border-2 rounded-full animate-spin"
+            style={{
+              borderColor: `color-mix(in srgb, ${brand.secondary} 30%, transparent)`,
+              borderTopColor: brand.secondary,
+            }}
+          />
         </div>
       )}
 
       <div className="text-center">
         {otpTimer > 0 ? (
-          <p className="text-white/35 text-sm">
-            Resend in <span className="text-white/60 tabular-nums">{otpTimer}s</span>
+          <p className="text-sm" style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}>
+            Resend in <span className="tabular-nums" style={{ color: `color-mix(in srgb, ${brand.fg} 60%, transparent)` }}>{otpTimer}s</span>
           </p>
         ) : (
           <button
             onClick={() => { setOtp(['', '', '', '', '', '']); sendWhatsAppOTP(); }}
-            className="text-amber-400 hover:text-amber-300 text-sm transition-colors"
+            className="text-sm transition-colors"
+            style={{ color: brand.secondary }}
           >
             Resend code
           </button>
@@ -450,11 +458,43 @@ function LoginContent() {
 
       <button
         onClick={() => { setMode('whatsapp-phone'); setOtp(['', '', '', '', '', '']); }}
-        className="text-white/30 text-xs hover:text-white/50 transition-colors mt-4 w-full text-center"
+        className="text-xs transition-colors mt-4 w-full text-center"
+        style={{ color: `color-mix(in srgb, ${brand.fg} 30%, transparent)` }}
       >
         Wrong number? Change it
       </button>
     </>
+  );
+}
+
+// ─── Shared input field ───────────────────────────────────────────────────────
+
+function InputField({
+  label, type, value, onChange, placeholder,
+}: {
+  label: string; type: string;
+  value: string; onChange: React.ChangeEventHandler<HTMLInputElement>;
+  placeholder?: string;
+}) {
+  const fg = 'var(--product-foreground)';
+  return (
+    <div>
+      <label
+        className="text-xs font-medium mb-1.5 block"
+        style={{ color: `color-mix(in srgb, ${fg} 50%, transparent)` }}
+      >
+        {label}
+      </label>
+      <input
+        type={type} value={value} onChange={onChange} placeholder={placeholder}
+        className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors"
+        style={{
+          background: `color-mix(in srgb, ${fg} 5%, transparent)`,
+          border: `1px solid color-mix(in srgb, ${fg} 10%, transparent)`,
+          color: fg,
+        }}
+      />
+    </div>
   );
 }
 
@@ -491,7 +531,7 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="text-center text-white/50">Loading...</div>}>
+    <Suspense fallback={<div className="text-center" style={{ color: 'var(--product-foreground)' }}>Loading...</div>}>
       <LoginContent />
     </Suspense>
   );

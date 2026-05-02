@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import HomeContent from './HomeContent';
 
 export const metadata: Metadata = {
@@ -59,17 +59,16 @@ export const metadata: Metadata = {
     description: 'Building systems that shift nations',
     images: ['/social/twitter-card.jpg'],
   },
+};
 
+export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#2B4D87' },
     { media: '(prefers-color-scheme: dark)',  color: '#2B4D87' },
   ],
-
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function BoldMindHomePage() {

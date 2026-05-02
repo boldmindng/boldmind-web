@@ -3,16 +3,26 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronRight, ExternalLink } from 'lucide-react';
+import { cn, Card, CardContent } from '@boldmind-tech/ui';
+
+// CSS vars set on [data-product=boldmind-hub] by @boldmind-tech/ui index.css
+const brand = {
+  primary:   'var(--product-primary)',
+  secondary: 'var(--product-secondary)',
+  accent:    'var(--product-accent)',
+  bg:        'var(--product-background)',
+  fg:        'var(--product-foreground)',
+  muted:     'var(--product-muted)',
+  highlight: 'var(--product-highlight)',
+} as const;
 
 const PILLARS = [
   {
     icon: '📰',
     name: 'AmeboGist',
     tagline: 'Amebo Wey Make Sense!',
-    description:
-      "Nigeria's #1 Pidgin English platform. AI, Tech, Politics & Entertainment in pure Pidgin. 12K+ readers daily.",
+    description: "Nigeria's #1 Pidgin English platform. AI, Tech, Politics & Entertainment in pure Pidgin. 12K+ readers daily.",
     color: '#065F46',
-    accentBg: '#FFFBEB',
     step: 'Awareness',
     journey: 'Stranger → Reader',
     stat: '12,000+',
@@ -23,10 +33,8 @@ const PILLARS = [
     icon: '🌱',
     name: 'VillageCircle',
     tagline: 'Where Conviction Becomes Code',
-    description:
-      'A venture studio rooted in African sovereignty. Daily philosophical drops, 12 concepts in motion, Vibe Coders Cohort 1 open.',
+    description: 'A venture studio rooted in African sovereignty. Daily philosophical drops, 12 concepts in motion, Vibe Coders Cohort 1 open.',
     color: '#3B1F0A',
-    accentBg: '#FDFAF6',
     step: 'Conviction',
     journey: 'Reader → Believer',
     stat: '12',
@@ -37,10 +45,8 @@ const PILLARS = [
     icon: '🎓',
     name: 'EduCenter',
     tagline: 'Pass Exams. Build Business. Master AI.',
-    description:
-      "Nigeria's most complete ed-tech. JAMB/WAEC/NECO prep, Business Mastery, AI Skills Certification. ₦3k/month.",
+    description: "Nigeria's most complete ed-tech. JAMB/WAEC/NECO prep, Business Mastery, AI Skills Certification. ₦3k/month.",
     color: '#1E40AF',
-    accentBg: '#F8FAFC',
     step: 'Education',
     journey: 'Believer → Student',
     stat: '50,000+',
@@ -51,10 +57,8 @@ const PILLARS = [
     icon: '⚡',
     name: 'PlanAI',
     tagline: 'One Suite. Every Tool Your Business Needs.',
-    description:
-      'AI Receptionist, Digital Storefronts, Branding Tools, ViralKit, Financial Forecasting & more. 650+ businesses running.',
+    description: 'AI Receptionist, Digital Storefronts, Branding Tools, ViralKit, Financial Forecasting & more. 650+ businesses running.',
     color: '#5B21B6',
-    accentBg: '#F5F3FF',
     step: 'Enablement',
     journey: 'Student → Builder',
     stat: '650+',
@@ -63,18 +67,19 @@ const PILLARS = [
   },
 ] as const;
 
+// gold: true = highlight with secondary colour; otherwise white in the dark hero
 const STATS = [
-  { value: '650+', label: 'Businesses on PlanAI', color: '#5B21B6' },
-  { value: '50K+', label: 'EduCenter Students', color: '#1E40AF' },
-  { value: '12K+', label: 'AmeboGist Readers', color: '#065F46' },
-  { value: '35+', label: 'Live Products', color: '#E9A825' },
-];
+  { value: '650+', label: 'Businesses on PlanAI', gold: false },
+  { value: '50K+', label: 'EduCenter Students',   gold: false },
+  { value: '12K+', label: 'AmeboGist Readers',    gold: false },
+  { value: '35+',  label: 'Live Products',        gold: true  },
+] as const;
 
 const DASHBOARD_TOOLS = [
-  { label: 'PlanAI', status: 'Active', icon: '⚡', color: '#5B21B6' },
-  { label: 'EduCenter', status: '73% done', icon: '🎓', color: '#1E40AF' },
-  { label: 'Vibe Coders', status: 'Week 4', icon: '💻', color: '#1D4ED8' },
-  { label: 'AmeboGist', status: 'Reading', icon: '📰', color: '#065F46' },
+  { label: 'PlanAI',       status: 'Active',    icon: '⚡', color: '#5B21B6' },
+  { label: 'EduCenter',   status: '73% done',  icon: '🎓', color: '#1E40AF' },
+  { label: 'Vibe Coders', status: 'Week 4',    icon: '💻', color: '#1D4ED8' },
+  { label: 'AmeboGist',   status: 'Reading',   icon: '📰', color: '#065F46' },
 ];
 
 const OPERATOR_FEATURES = [
@@ -88,12 +93,12 @@ const OPERATOR_FEATURES = [
 
 export default function HomeContent() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FAFAF9' }}>
+    <div className="min-h-screen" style={{ backgroundColor: brand.bg }}>
 
-      {/* ─── HERO ───────────────────────────────────────────────────────────── */}
+      {/* ─── HERO ─────────────────────────────────────────────────────────── */}
       <section
-        className="relative py-20 pt-32 pb-28 overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #2B4D87 0%, #1A3460 100%)' }}
+        className="relative pt-24 pb-20 overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, var(--product-primary) 0%, #1A3460 100%)' }}
       >
         <div
           className="absolute inset-0 pointer-events-none opacity-30"
@@ -103,11 +108,11 @@ export default function HomeContent() {
         />
         <div
           className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none"
-          style={{ backgroundColor: '#E9A825', opacity: 0.07 }}
+          style={{ backgroundColor: brand.secondary, opacity: 0.07 }}
         />
         <div
           className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none"
-          style={{ backgroundColor: '#5B8ADE', opacity: 0.1 }}
+          style={{ backgroundColor: brand.accent, opacity: 0.1 }}
         />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -121,11 +126,14 @@ export default function HomeContent() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[11px] sm:text-xs font-bold tracking-widest uppercase"
               style={{
                 borderColor: 'rgba(233,168,37,0.35)',
-                backgroundColor: 'rgba(233,168,37,0.1)',
-                color: '#E9A825',
+                backgroundColor: brand.highlight,
+                color: brand.secondary,
               }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#E9A825] animate-pulse" />
+              <span
+                className="w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ backgroundColor: brand.secondary }}
+              />
               Nigerian-Built · AI-First · 4 Pillars · Lagos 🇳🇬
             </div>
           </motion.div>
@@ -138,7 +146,7 @@ export default function HomeContent() {
           >
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-black leading-tight text-white mb-6">
               Building Systems<br />
-              <span style={{ color: '#E9A825' }}>That Shift Nations</span>
+              <span style={{ color: brand.secondary }}>That Shift Nations</span>
             </h1>
             <p className="text-base sm:text-xl text-white/75 max-w-2xl mx-auto leading-relaxed">
               One ecosystem. Four pillars. From stranger to builder —
@@ -159,7 +167,7 @@ export default function HomeContent() {
               <div key={stat.label} className="text-center">
                 <div
                   className="text-2xl sm:text-3xl font-black"
-                  style={{ color: stat.color === '#E9A825' ? '#E9A825' : '#FFFFFF' }}
+                  style={{ color: stat.gold ? brand.secondary : '#FFFFFF' }}
                 >
                   {stat.value}
                 </div>
@@ -231,11 +239,11 @@ export default function HomeContent() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/register"
+              href="/start"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-base transition-all hover:opacity-90 hover:-translate-y-0.5 shadow-lg"
-              style={{ backgroundColor: '#E9A825', color: '#1A202C' }}
+              style={{ backgroundColor: brand.secondary, color: brand.fg }}
             >
-              Get One BoldMind Account — Free
+              Explore the Ecosystem
               <ArrowRight size={16} />
             </Link>
             <Link
@@ -243,23 +251,29 @@ export default function HomeContent() {
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-base border-2 text-white transition-all hover:bg-white/10"
               style={{ borderColor: 'rgba(255,255,255,0.25)' }}
             >
-              Sign In to Operator Zone
+              Sign In
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ─── FLYWHEEL ───────────────────────────────────────────────────────── */}
-      <section className="py-16 sm:py-24" style={{ backgroundColor: '#FAFAF9' }}>
+      {/* ─── FLYWHEEL ──────────────────────────────────────────────────────── */}
+      <section className="py-16 sm:py-24" style={{ backgroundColor: brand.bg }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <p className="text-[11px] font-black uppercase tracking-widest mb-3" style={{ color: '#E9A825' }}>
+            <p
+              className="text-[11px] font-black uppercase tracking-widest mb-3"
+              style={{ color: brand.secondary }}
+            >
               How It Works
             </p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4" style={{ color: '#1A202C' }}>
-              The <span style={{ color: '#2B4D87' }}>BoldMind Flywheel</span>
+            <h2
+              className="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
+              style={{ color: brand.fg }}
+            >
+              The <span style={{ color: brand.primary }}>BoldMind Flywheel</span>
             </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1A202C', opacity: 0.6 }}>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: brand.fg, opacity: 0.6 }}>
               Every Nigerian starts somewhere. We take them the full distance —
               from first gist to running a funded business.
             </p>
@@ -278,7 +292,7 @@ export default function HomeContent() {
                 {i < PILLARS.length - 1 && (
                   <div
                     className="hidden lg:block absolute top-10 left-full w-full h-0.5 -translate-y-1/2 z-0"
-                    style={{ backgroundColor: '#E7E5E4', width: '100%' }}
+                    style={{ backgroundColor: brand.muted }}
                   />
                 )}
                 <div className="relative z-10">
@@ -291,7 +305,7 @@ export default function HomeContent() {
                     </div>
                     <span
                       className="absolute -top-2 -right-2 w-6 h-6 rounded-full text-[11px] font-black flex items-center justify-center text-white shadow"
-                      style={{ backgroundColor: '#2B4D87' }}
+                      style={{ backgroundColor: brand.primary }}
                     >
                       {i + 1}
                     </span>
@@ -302,9 +316,13 @@ export default function HomeContent() {
                   >
                     {pillar.journey}
                   </div>
-                  <h3 className="font-black text-lg mb-1" style={{ color: '#1A202C' }}>{pillar.name}</h3>
-                  <p className="text-sm italic mb-3" style={{ color: '#2B4D87' }}>{pillar.tagline}</p>
-                  <p className="text-sm leading-relaxed mb-4" style={{ color: '#1A202C', opacity: 0.62 }}>
+                  <h3 className="font-black text-lg mb-1" style={{ color: brand.fg }}>
+                    {pillar.name}
+                  </h3>
+                  <p className="text-sm italic mb-3" style={{ color: brand.primary }}>
+                    {pillar.tagline}
+                  </p>
+                  <p className="text-sm leading-relaxed mb-4" style={{ color: brand.fg, opacity: 0.62 }}>
                     {pillar.description}
                   </p>
                   <a
@@ -323,29 +341,31 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* ─── OPERATOR ZONE ──────────────────────────────────────────────────── */}
+      {/* ─── OPERATOR ZONE ─────────────────────────────────────────────────── */}
+      {/* Section bg is VillageCircle muted (#F0E6D3) — intentional contrast */}
       <section className="py-16 sm:py-24" style={{ backgroundColor: '#F0E6D3' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
+              {/* Label uses VillageCircle primary (#3B1F0A) intentionally */}
               <p className="text-[11px] font-black uppercase tracking-widest mb-3" style={{ color: '#3B1F0A' }}>
                 The Operator Zone
               </p>
-              <h2 className="text-3xl sm:text-4xl font-black mb-5" style={{ color: '#1A202C' }}>
+              <h2 className="text-3xl sm:text-4xl font-black mb-5" style={{ color: brand.fg }}>
                 One login.<br />
-                <span style={{ color: '#2B4D87' }}>Every tool you pay for.</span>
+                <span style={{ color: brand.primary }}>Every tool you pay for.</span>
               </h2>
-              <p className="text-base sm:text-lg mb-8" style={{ color: '#1A202C', opacity: 0.7 }}>
+              <p className="text-base sm:text-lg mb-8" style={{ color: brand.fg, opacity: 0.7 }}>
                 Your BoldMind account is the cockpit for everything. PlanAI subscriptions,
                 EduCenter progress, Vibe Coders cohort status, and cross-pillar upsells —
                 all in one dashboard. No re-logging. No friction.
               </p>
               <ul className="space-y-3 mb-8">
                 {OPERATOR_FEATURES.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm" style={{ color: '#1A202C' }}>
+                  <li key={item} className="flex items-start gap-3 text-sm" style={{ color: brand.fg }}>
                     <span
                       className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-[10px] font-black text-white"
-                      style={{ backgroundColor: '#2B4D87' }}
+                      style={{ backgroundColor: brand.primary }}
                     >
                       ✓
                     </span>
@@ -355,18 +375,21 @@ export default function HomeContent() {
               </ul>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
-                  href="/register"
+                  href="/start"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all hover:opacity-90 hover:-translate-y-0.5"
-                  style={{ backgroundColor: '#2B4D87' }}
+                  style={{ backgroundColor: brand.primary }}
                 >
-                  Create Free Account <ArrowRight size={15} />
+                  Get Started — Free <ArrowRight size={15} />
                 </Link>
                 <Link
                   href="/login"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold border-2 transition-all hover:bg-[#2B4D87]/5"
-                  style={{ borderColor: '#2B4D87', color: '#2B4D87' }}
+                  className={cn(
+                    'inline-flex items-center justify-center gap-2 px-6 py-3',
+                    'rounded-xl font-bold border-2 transition-all hover:bg-black/5',
+                  )}
+                  style={{ borderColor: brand.primary, color: brand.primary }}
                 >
-                  Go to Dashboard
+                  Sign In
                 </Link>
               </div>
             </div>
@@ -375,76 +398,91 @@ export default function HomeContent() {
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="rounded-3xl border-2 shadow-xl overflow-hidden"
-              style={{ backgroundColor: '#FAFAF9', borderColor: '#E7E5E4' }}
             >
-              <div className="p-5" style={{ backgroundColor: '#2B4D87' }}>
-                <div className="flex items-center gap-3 mb-5">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center font-black text-[#1A202C]"
-                    style={{ backgroundColor: '#E9A825' }}
-                  >
-                    B
-                  </div>
-                  <div>
-                    <div className="text-white font-bold text-sm">Good morning, Builder 👋</div>
-                    <div className="text-xs" style={{ color: '#E9A825' }}>Pro Plan · Active</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {DASHBOARD_TOOLS.map((tool) => (
+              <Card
+                variant="elevated"
+                padding="none"
+                className="rounded-3xl overflow-hidden border-2"
+                style={{ backgroundColor: brand.bg, borderColor: brand.muted }}
+              >
+                {/* Dashboard header */}
+                <div className="p-5" style={{ backgroundColor: brand.primary }}>
+                  <div className="flex items-center gap-3 mb-5">
                     <div
-                      key={tool.label}
-                      className="rounded-xl p-3"
-                      style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                      className="w-10 h-10 rounded-full flex items-center justify-center font-black"
+                      style={{ backgroundColor: brand.secondary, color: brand.fg }}
                     >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm">{tool.icon}</span>
-                        <span className="text-white text-xs font-bold">{tool.label}</span>
-                      </div>
-                      <span className="text-[11px] font-semibold" style={{ color: '#E9A825' }}>
-                        {tool.status}
-                      </span>
+                      B
                     </div>
-                  ))}
+                    <div>
+                      <div className="text-white font-bold text-sm">Good morning, Builder 👋</div>
+                      <div className="text-xs" style={{ color: brand.secondary }}>Pro Plan · Active</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {DASHBOARD_TOOLS.map((tool) => (
+                      <div
+                        key={tool.label}
+                        className="rounded-xl p-3"
+                        style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm">{tool.icon}</span>
+                          <span className="text-white text-xs font-bold">{tool.label}</span>
+                        </div>
+                        <span className="text-[11px] font-semibold" style={{ color: brand.secondary }}>
+                          {tool.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div className="p-5 space-y-3">
-                <div
-                  className="rounded-xl p-4 border-l-4"
-                  style={{ backgroundColor: '#E9A82512', borderLeftColor: '#E9A825' }}
-                >
-                  <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: '#E9A825' }}>
-                    💡 Referral Earnings
+                {/* Dashboard body */}
+                <CardContent className="p-5 space-y-3">
+                  <div
+                    className="rounded-xl p-4 border-l-4"
+                    style={{ backgroundColor: brand.highlight, borderLeftColor: brand.secondary }}
+                  >
+                    <div
+                      className="text-[10px] font-black uppercase tracking-widest mb-1"
+                      style={{ color: brand.secondary }}
+                    >
+                      💡 Referral Earnings
+                    </div>
+                    <div className="text-2xl font-black" style={{ color: brand.fg }}>₦47,500</div>
+                    <div className="text-xs" style={{ color: brand.fg, opacity: 0.55 }}>
+                      19 conversions this month
+                    </div>
                   </div>
-                  <div className="text-2xl font-black" style={{ color: '#1A202C' }}>₦47,500</div>
-                  <div className="text-xs" style={{ color: '#1A202C', opacity: 0.55 }}>19 conversions this month</div>
-                </div>
-                <div
-                  className="rounded-xl p-4 border-l-4"
-                  style={{ backgroundColor: '#2B4D8710', borderLeftColor: '#2B4D87' }}
-                >
-                  <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: '#2B4D87' }}>
-                    ⚡ Cross-sell
+                  <div
+                    className="rounded-xl p-4 border-l-4"
+                    style={{ backgroundColor: 'rgba(43,77,135,0.063)', borderLeftColor: brand.primary }}
+                  >
+                    <div
+                      className="text-[10px] font-black uppercase tracking-widest mb-1"
+                      style={{ color: brand.primary }}
+                    >
+                      ⚡ Cross-sell
+                    </div>
+                    <div className="text-sm font-bold" style={{ color: brand.fg }}>
+                      ViralKit Pro — 50% off for 90 days
+                    </div>
+                    <div className="text-xs" style={{ color: brand.fg, opacity: 0.55 }}>
+                      For EduCenter AI Specialist graduates
+                    </div>
                   </div>
-                  <div className="text-sm font-bold" style={{ color: '#1A202C' }}>
-                    ViralKit Pro — 50% off for 90 days
-                  </div>
-                  <div className="text-xs" style={{ color: '#1A202C', opacity: 0.55 }}>
-                    For EduCenter AI Specialist graduates
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ─── FINAL CTA ──────────────────────────────────────────────────────── */}
+      {/* ─── FINAL CTA ─────────────────────────────────────────────────────── */}
       <section
         className="py-16 sm:py-24"
-        style={{ background: 'linear-gradient(135deg, #2B4D87 0%, #1A3460 60%, #0F1F40 100%)' }}
+        style={{ background: 'linear-gradient(135deg, var(--product-primary) 0%, #1A3460 60%, #0F1F40 100%)' }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
@@ -454,7 +492,7 @@ export default function HomeContent() {
           >
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
               One account.<br />
-              <span style={{ color: '#E9A825' }}>Four doors. Built in Lagos.</span>
+              <span style={{ color: brand.secondary }}>Four doors. Built in Lagos.</span>
             </h2>
             <p className="text-base sm:text-lg text-white/65 max-w-xl mx-auto mb-2">
               AmeboGist · VillageCircle · EduCenter · PlanAI
@@ -464,9 +502,9 @@ export default function HomeContent() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Link
-                href="/register"
+                href="/start"
                 className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-xl font-bold text-lg transition-all hover:opacity-90 hover:-translate-y-0.5 shadow-xl"
-                style={{ backgroundColor: '#E9A825', color: '#1A202C' }}
+                style={{ backgroundColor: brand.secondary, color: brand.fg }}
               >
                 Get Started — Free <ArrowRight size={18} />
               </Link>

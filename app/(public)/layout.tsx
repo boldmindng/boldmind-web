@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { href: 'https://villagecircle.ng',   label: 'VillageCircle', isExternal: true },
   { href: 'https://educenter.com.ng',   label: 'EduCenter',     isExternal: true },
   { href: 'https://planai.boldmind.ng', label: 'PlanAI',        isExternal: true },
+  { href: '/start',                      label: 'Get Started'    },
   { href: '/pricing',                   label: 'Pricing'        },
   { href: '/about',                     label: 'About'          },
 ];
@@ -30,7 +31,7 @@ const FOOTER_SECTIONS = [
     title: '🏢 Company',
     links: [
       { href: '/about',    label: 'About BoldMind' },
-      { href: '/products', label: 'All 32+ Products' },
+      { href: '/start',    label: 'All Platforms' },
       { href: '/pricing',  label: 'Pricing' },
       { href: '/contact',  label: 'Contact' },
       { href: '/privacy',  label: 'Privacy Policy' },
@@ -52,8 +53,7 @@ export default function PublicHubLayout({ children }: { children: ReactNode }) {
     <div className="flex flex-col min-h-screen">
       <SuperNavbar
         links={NAV_LINKS}
-        cta={{ href: '/register', label: 'Get Started Free', variant: 'secondary' }}
-        logoSrc="/logo.webp"
+        logoSrc="/logo.png"
         sticky
         showThemeControls
       />
@@ -61,7 +61,7 @@ export default function PublicHubLayout({ children }: { children: ReactNode }) {
         {children}
       </main>
       <SuperFooter
-        logoSrc="/logo.webp"
+        logoSrc="/logo.png"
         sections={FOOTER_SECTIONS}
         contactInfo={{
           email:    'hello@boldmind.ng',

@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useState, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -9,6 +8,12 @@ import Link from 'next/link';
 import { useRegister } from '../../../lib/hooks';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.boldmind.ng';
+
+const brand = {
+  primary:   'var(--product-primary)',
+  secondary: 'var(--product-secondary)',
+  fg:        'var(--product-foreground)',
+} as const;
 
 // ─── Password strength ────────────────────────────────────────────────────────
 
@@ -26,11 +31,14 @@ function getPasswordStrength(password: string) {
       strength <= 2  ? 'Weak' :
       strength <= 3  ? 'Fair' :
       strength <= 4  ? 'Good' : 'Strong',
-    color:
-      strength === 0 ? 'bg-gray-200'   :
-      strength <= 2  ? 'bg-red-500'    :
+    barColor:
+      strength === 0 ? 'bg-white/10'  :
+      strength <= 2  ? 'bg-red-500'   :
       strength <= 3  ? 'bg-yellow-500' :
-      strength <= 4  ? 'bg-blue-500'   : 'bg-green-500',
+      strength <= 4  ? 'bg-blue-500'  : 'bg-green-500',
+    textColor:
+      strength <= 2  ? '#f87171' :
+      strength <= 3  ? '#facc15' : '#4ade80',
   };
 }
 
@@ -76,14 +84,12 @@ function RegisterContent() {
   const passwordStrength = getPasswordStrength(formData.password);
   const isLoading        = registerMutation.loading;
 
-  // ── Google OAuth (same pattern as login — no SDK needed) ─────────────────
   const loginWithGoogle = () => {
     const url = new URL(`${API_URL}/auth/google`);
     url.searchParams.set('redirect', `${window.location.origin}/dashboard`);
     window.location.href = url.toString();
   };
 
-  // ── Form handlers ────────────────────────────────────────────────────────
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
@@ -115,7 +121,6 @@ function RegisterContent() {
     e.preventDefault();
     if (!validate()) return;
 
-    // Split fullName → firstName / lastName for the API payload
     const [firstName, ...rest] = formData.fullName.trim().split(' ');
     const lastName = rest.join(' ') || undefined;
 
@@ -134,15 +139,15 @@ function RegisterContent() {
     }
   };
 
-  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <div className="w-full">
-      {/* Header */}
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-white mb-1.5 leading-tight">
+        <h1 className="text-2xl font-bold mb-1.5 leading-tight" style={{ color: brand.fg }}>
           Create Account
         </h1>
-        <p className="text-white/45 text-sm">Join 10,000+ Nigerian entrepreneurs</p>
+        <p className="text-sm" style={{ color: `color-mix(in srgb, ${brand.fg} 45%, transparent)` }}>
+          Join 10,000+ Nigerian entrepreneurs
+        </p>
       </div>
 
       {/* Google */}
@@ -151,31 +156,32 @@ function RegisterContent() {
         disabled={isLoading}
         whileHover={{ scale: isLoading ? 1 : 1.01 }}
         whileTap={{ scale: isLoading ? 1 : 0.99 }}
-        className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-white/10 bg-white/4 hover:bg-white/8 hover:border-white/20 transition-all font-medium text-sm mb-5 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl text-sm font-medium mb-5 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+        style={{
+          border: `1px solid color-mix(in srgb, ${brand.fg} 10%, transparent)`,
+          background: `color-mix(in srgb, ${brand.fg} 4%, transparent)`,
+          color: brand.fg,
+        }}
       >
         <GoogleSVG />
         Continue with Google
       </motion.button>
 
-      {/* Divider */}
       <div className="flex items-center gap-3 mb-5">
-        <div className="flex-1 h-px bg-white/8" />
-        <span className="text-white/25 text-xs">or</span>
-        <div className="flex-1 h-px bg-white/8" />
+        <div className="flex-1 h-px" style={{ background: `color-mix(in srgb, ${brand.fg} 8%, transparent)` }} />
+        <span className="text-xs" style={{ color: `color-mix(in srgb, ${brand.fg} 25%, transparent)` }}>or</span>
+        <div className="flex-1 h-px" style={{ background: `color-mix(in srgb, ${brand.fg} 8%, transparent)` }} />
       </div>
 
-      {/* Registration form */}
       <form onSubmit={handleSubmit} className="space-y-4">
 
-        {/* Full Name */}
-        <Field
+        <RegField
           label="Full Name" id="fullName" name="fullName" type="text"
           value={formData.fullName} onChange={handleChange}
           placeholder="Charles Okonkwo" error={errors['fullName']}
         />
 
-        {/* Email */}
-        <Field
+        <RegField
           label="Email Address" id="email" name="email" type="email"
           value={formData.email} onChange={handleChange}
           placeholder="you@example.com" error={errors['email']}
@@ -183,7 +189,11 @@ function RegisterContent() {
 
         {/* Password */}
         <div>
-          <label htmlFor="password" className="text-white/50 text-xs font-medium mb-1.5 block">
+          <label
+            htmlFor="password"
+            className="text-xs font-medium mb-1.5 block"
+            style={{ color: `color-mix(in srgb, ${brand.fg} 50%, transparent)` }}
+          >
             Password
           </label>
           <div className="relative">
@@ -192,7 +202,12 @@ function RegisterContent() {
               type={showPassword ? 'text' : 'password'}
               value={formData.password} onChange={handleChange}
               placeholder="Create a strong password"
-              className={inputCls(!!errors['password'])}
+              className="w-full rounded-xl px-4 py-3 pr-11 text-sm outline-none transition-colors"
+              style={{
+                background: `color-mix(in srgb, ${brand.fg} 5%, transparent)`,
+                border: `1px solid ${errors['password'] ? 'rgba(248,113,113,0.6)' : `color-mix(in srgb, ${brand.fg} 10%, transparent)`}`,
+                color: brand.fg,
+              }}
             />
             <ToggleEye show={showPassword} onToggle={() => setShowPassword(v => !v)} />
           </div>
@@ -203,17 +218,16 @@ function RegisterContent() {
                   <div
                     key={bar}
                     className={`h-1 flex-1 rounded-full transition-colors ${
-                      bar <= passwordStrength.score ? passwordStrength.color : 'bg-white/10'
+                      bar <= passwordStrength.score ? passwordStrength.barColor : 'bg-white/10'
                     }`}
                   />
                 ))}
               </div>
-              <p className={`text-xs mt-1 ${
-                passwordStrength.score <= 2 ? 'text-red-400' :
-                passwordStrength.score <= 3 ? 'text-yellow-400' : 'text-green-400'
-              }`}>
-                {passwordStrength.label}
-              </p>
+              {passwordStrength.label && (
+                <p className="text-xs mt-1" style={{ color: passwordStrength.textColor }}>
+                  {passwordStrength.label}
+                </p>
+              )}
             </div>
           )}
           {errors['password'] && <p className="text-red-400 text-xs mt-1">{errors['password']}</p>}
@@ -221,7 +235,11 @@ function RegisterContent() {
 
         {/* Confirm Password */}
         <div>
-          <label htmlFor="confirmPassword" className="text-white/50 text-xs font-medium mb-1.5 block">
+          <label
+            htmlFor="confirmPassword"
+            className="text-xs font-medium mb-1.5 block"
+            style={{ color: `color-mix(in srgb, ${brand.fg} 50%, transparent)` }}
+          >
             Confirm Password
           </label>
           <div className="relative">
@@ -230,7 +248,12 @@ function RegisterContent() {
               type={showConfirmPassword ? 'text' : 'password'}
               value={formData.confirmPassword} onChange={handleChange}
               placeholder="Confirm your password"
-              className={inputCls(!!errors['confirmPassword'])}
+              className="w-full rounded-xl px-4 py-3 pr-11 text-sm outline-none transition-colors"
+              style={{
+                background: `color-mix(in srgb, ${brand.fg} 5%, transparent)`,
+                border: `1px solid ${errors['confirmPassword'] ? 'rgba(248,113,113,0.6)' : `color-mix(in srgb, ${brand.fg} 10%, transparent)`}`,
+                color: brand.fg,
+              }}
             />
             <ToggleEye show={showConfirmPassword} onToggle={() => setShowConfirmPassword(v => !v)} />
           </div>
@@ -245,13 +268,17 @@ function RegisterContent() {
             <input
               type="checkbox" name="agreeTerms"
               checked={formData.agreeTerms} onChange={handleChange}
-              className="w-4 h-4 mt-0.5 rounded border-white/20 bg-white/5 text-amber-400 focus:ring-amber-400 focus:ring-offset-0"
+              className="w-4 h-4 mt-0.5 rounded accent-[var(--product-secondary)]"
             />
-            <span className="text-xs text-white/50 leading-relaxed">
+            <span className="text-xs leading-relaxed" style={{ color: `color-mix(in srgb, ${brand.fg} 50%, transparent)` }}>
               I agree to the{' '}
-              <Link href="/terms"   className="text-white/70 hover:text-amber-400 underline transition-colors">Terms of Service</Link>
+              <Link href="/terms" className="underline transition-colors" style={{ color: `color-mix(in srgb, ${brand.fg} 70%, transparent)` }}>
+                Terms of Service
+              </Link>
               {' '}and{' '}
-              <Link href="/privacy" className="text-white/70 hover:text-amber-400 underline transition-colors">Privacy Policy</Link>
+              <Link href="/privacy" className="underline transition-colors" style={{ color: `color-mix(in srgb, ${brand.fg} 70%, transparent)` }}>
+                Privacy Policy
+              </Link>
             </span>
           </label>
           {errors['agreeTerms'] && (
@@ -262,28 +289,30 @@ function RegisterContent() {
             <input
               type="checkbox" name="subscribeNewsletter"
               checked={formData.subscribeNewsletter} onChange={handleChange}
-              className="w-4 h-4 rounded border-white/20 bg-white/5 text-amber-400 focus:ring-amber-400 focus:ring-offset-0"
+              className="w-4 h-4 rounded accent-[var(--product-secondary)]"
             />
-            <span className="text-xs text-white/50">
+            <span className="text-xs" style={{ color: `color-mix(in srgb, ${brand.fg} 50%, transparent)` }}>
               Send me tips and product updates via email
             </span>
           </label>
         </div>
 
-        {/* API error */}
         {registerMutation.error && (
           <p className="text-red-400 text-xs bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2">
             {registerMutation.error.message}
           </p>
         )}
 
-        {/* Submit */}
         <motion.button
           type="submit"
           disabled={isLoading}
           whileHover={{ scale: isLoading ? 1 : 1.01 }}
           whileTap={{ scale: isLoading ? 1 : 0.99 }}
-          className="w-full py-3 rounded-xl font-semibold bg-amber-400 text-black hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-sm"
+          className="w-full py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-sm"
+          style={{
+            background: brand.secondary,
+            color: brand.primary,
+          }}
         >
           {isLoading ? (
             <>
@@ -294,10 +323,13 @@ function RegisterContent() {
         </motion.button>
       </form>
 
-      {/* Sign-in link */}
-      <p className="text-center mt-5 text-white/35 text-sm">
+      <p className="text-center mt-5 text-sm" style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}>
         Already have an account?{' '}
-        <Link href="/login" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">
+        <Link
+          href="/login"
+          className="font-medium transition-colors"
+          style={{ color: brand.secondary }}
+        >
           Sign in
         </Link>
       </p>
@@ -307,27 +339,28 @@ function RegisterContent() {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const inputCls = (hasError: boolean) =>
-  `w-full px-4 py-3 rounded-xl border ${
-    hasError ? 'border-red-500/60' : 'border-white/10'
-  } bg-white/5 text-white placeholder:text-white/25 focus:outline-none focus:border-amber-400/50 text-sm transition-colors`;
-
-function Field({
+function RegField({
   label, id, name, type, value, onChange, placeholder, error,
 }: {
   label: string; id: string; name: string; type: string;
   value: string; onChange: React.ChangeEventHandler<HTMLInputElement>;
   placeholder?: string; error?: string;
 }) {
+  const fg = 'var(--product-foreground)';
   return (
     <div>
-      <label htmlFor={id} className="text-white/50 text-xs font-medium mb-1.5 block">
+      <label htmlFor={id} className="text-xs font-medium mb-1.5 block" style={{ color: `color-mix(in srgb, ${fg} 50%, transparent)` }}>
         {label}
       </label>
       <input
         id={id} name={name} type={type} value={value}
         onChange={onChange} placeholder={placeholder}
-        className={inputCls(!!error)}
+        className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors"
+        style={{
+          background: `color-mix(in srgb, ${fg} 5%, transparent)`,
+          border: `1px solid ${error ? 'rgba(248,113,113,0.6)' : `color-mix(in srgb, ${fg} 10%, transparent)`}`,
+          color: fg,
+        }}
       />
       {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
     </div>
@@ -338,7 +371,8 @@ function ToggleEye({ show, onToggle }: { show: boolean; onToggle: () => void }) 
   return (
     <button
       type="button" onClick={onToggle}
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+      className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+      style={{ color: `color-mix(in srgb, var(--product-foreground) 30%, transparent)` }}
     >
       {show ? <EyeOff /> : <EyeOn />}
     </button>
@@ -358,7 +392,7 @@ function GoogleSVG() {
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div className="text-center text-white/50">Loading...</div>}>
+    <Suspense fallback={<div className="text-center" style={{ color: 'var(--product-foreground)' }}>Loading...</div>}>
       <RegisterContent />
     </Suspense>
   );
