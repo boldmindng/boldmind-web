@@ -38,6 +38,12 @@ const nextConfig = {
 
   webpack: (config) => {
     config.resolve.symlinks = true;
+    // Fix packages whose package.json exports point to .mjs but only .js was built
+    const brokenMjsPackages = ['analytics', 'auth', 'pwa'];
+    for (const pkg of brokenMjsPackages) {
+      config.resolve.alias[`@boldmind-tech/${pkg}`] =
+        `${process.cwd()}/node_modules/@boldmind-tech/${pkg}/dist/index.js`;
+    }
     return config;
   },
 

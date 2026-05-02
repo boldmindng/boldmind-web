@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SuperNavbar, Card, CardHeader, CardTitle, CardContent, Button, Input } from '@boldmind-tech/ui';
 import { hubAPIAdapter, type Announcement } from '../../../../lib/hub-api-adapter';
-import { useAuth } from '@boldmind/auth';
+import { useAuth } from '@boldmind-tech/auth';
 import { useRouter } from 'next/navigation';
 import { DashboardSidebar } from '../../Sidebar';
 import { toast } from 'sonner';
