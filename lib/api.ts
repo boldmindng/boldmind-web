@@ -484,25 +484,54 @@ export const paymentAPI = {
 // ═════════════════════════════════════════════════════════════════════════════
 
 export const notificationAPI = {
-  /** GET /notification — paginated user notifications */
+  /** GET /notifications — paginated user notifications */
   list: (page = 1, limit = 20) =>
-    apiFetch<PaginatedResponse<unknown>>(`/notification?page=${page}&limit=${limit}`, {
+    apiFetch<PaginatedResponse<unknown>>(`/notifications?page=${page}&limit=${limit}`, {
       next: { revalidate: 0 },
     }),
 
-  /** PATCH /notification/:id/read */
-  markRead: (id: string) =>
-    apiFetch<void>(`/notification/${id}/read`, { method: 'PATCH' }),
-
-  /** PATCH /notification/read-all */
-  markAllRead: () =>
-    apiFetch<void>('/notification/read-all', { method: 'PATCH' }),
-
-  /** GET /notification/count — unread count */
-  unreadCount: () =>
-    apiFetch<ApiResponse<{ count: number }>>('/notification/count', {
-      next: { revalidate: 0 },
+  /** POST /notifications/read — mark notifications as read (pass ids or omit for all) */
+  markRead: (ids?: string[]) =>
+    apiFetch<void>('/notifications/read', {
+      method: 'POST',
+      body: JSON.stringify(ids ? { ids } : {}),
     }),
+
+  /** DELETE /notifications/:id — delete a notification */
+  delete: (id: string) =>
+    apiFetch<void>(`/notifications/${id}`, { method: 'DELETE' }),
+
+  push: {
+    /** POST /notifications/push/subscribe */
+    subscribe: (subscription: PushSubscription) =>
+      apiFetch<void>('/notifications/push/subscribe', {
+        method: 'POST',
+        body: JSON.stringify(subscription),
+      }),
+
+    /** POST /notifications/push/unsubscribe */
+    unsubscribe: (endpoint: string) =>
+      apiFetch<void>('/notifications/push/unsubscribe', {
+        method: 'POST',
+        body: JSON.stringify({ endpoint }),
+      }),
+  },
+
+  admin: {
+    /** POST /notifications/broadcast/push — admin */
+    broadcastPush: (data: { title: string; body: string; url?: string }) =>
+      apiFetch<ApiResponse<void>>('/notifications/broadcast/push', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
+    /** POST /notifications/broadcast/email — admin */
+    broadcastEmail: (data: { subject: string; html: string; userIds?: string[] }) =>
+      apiFetch<ApiResponse<void>>('/notifications/broadcast/email', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+  },
 };
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -530,6 +559,38 @@ export const mediaAPI = {
   /** DELETE /media/:key */
   delete: (key: string) =>
     apiFetch<void>(`/media/${key}`, { method: 'DELETE' }),
+};
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ANALYTICS  (/analytics/*)
+// ═════════════════════════════════════════════════════════════════════════════
+
+export const analyticsAPI = {
+  /** POST /analytics/track (public) */
+  track: (event: string, properties?: Record<string, unknown>) =>
+    apiFetch<void>('/analytics/track', {
+      method: 'POST',
+      body: JSON.stringify({ event, properties }),
+    }),
+
+  /** POST /analytics/pageview (public) */
+  pageview: (path: string, referrer?: string) =>
+    apiFetch<void>('/analytics/pageview', {
+      method: 'POST',
+      body: JSON.stringify({ path, referrer }),
+    }),
+
+  /** GET /analytics/me */
+  me: () =>
+    apiFetch<ApiResponse<unknown>>('/analytics/me', { next: { revalidate: 0 } }),
+
+  /** GET /analytics/dashboard — admin */
+  dashboard: () =>
+    apiFetch<ApiResponse<unknown>>('/analytics/dashboard', { next: { revalidate: 300 } }),
+
+  /** GET /analytics/products — admin */
+  products: () =>
+    apiFetch<ApiResponse<unknown[]>>('/analytics/products', { next: { revalidate: 300 } }),
 };
 
 // ─── Re-export ApiError so consumers can instanceof check ────────────────────
