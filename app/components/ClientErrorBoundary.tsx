@@ -1,6 +1,6 @@
 'use client';
 
-import { ErrorBoundary } from '@boldmind-tech/ui';
+import { ErrorBoundary } from '@boldmindng/ui';
 import type { ReactNode, ComponentType } from 'react';
 
 interface ClientErrorBoundaryProps {

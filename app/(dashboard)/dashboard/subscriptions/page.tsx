@@ -3,11 +3,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import {
-  useSubscriptions,
-  useInitializePayment,
-  useVerifyPayment,
-} from '../../../../lib/hooks';
+
 import {
   CreditCard, CheckCircle2, XCircle, Loader2,
   ExternalLink, RefreshCw, Zap, Package2,

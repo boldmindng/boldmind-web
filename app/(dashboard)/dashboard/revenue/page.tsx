@@ -1,13 +1,9 @@
 'use client';
 
-
-
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { DollarSign, TrendingUp, ArrowUpRight, RefreshCw, BarChart3 } from 'lucide-react';
-import { DashboardSidebar } from '../../Sidebar';
-import { SuperNavbar } from '@boldmind-tech/ui';
-import { hubAPIAdapter, type RevenueAnalytics } from '../../../../lib/hub-api-adapter';
+import { SuperNavbar } from '@boldmindng/ui';
 import { toast } from 'sonner';
 
 // ─── StatCard (local) ─────────────────────────────────────────────────────────

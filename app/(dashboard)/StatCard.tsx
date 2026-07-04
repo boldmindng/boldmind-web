@@ -1,7 +1,7 @@
 "use client";
 
 import { LucideIcon } from 'lucide-react';
-import { cn } from '@boldmind-tech/ui';
+import { cn } from '@boldmindng/ui';
 
 interface StatCardProps {
   icon: LucideIcon;

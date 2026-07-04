@@ -7,7 +7,7 @@ import {
   LayoutDashboard, TrendingUp, Users, Calendar,
   BookOpen, DollarSign, Globe, Target, Loader2,
 } from 'lucide-react';
-import { useHubProducts, useDashboardStats } from '../../../../lib/hooks';
+import { useDashboardStats } from '../../../../lib/hooks';
 
 // ─── Feature definitions (static meta, data filled from API) ─────────────────
 

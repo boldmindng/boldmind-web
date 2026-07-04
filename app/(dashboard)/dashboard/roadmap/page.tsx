@@ -1,10 +1,8 @@
 'use client';
 
-
 import { motion } from 'framer-motion';
 import { Target, Calendar, Clock, CheckCircle2 } from 'lucide-react';
-import { DashboardSidebar } from '../../Sidebar';
-import { SuperNavbar } from '@boldmind-tech/ui';
+import { SuperNavbar } from '@boldmindng/ui';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

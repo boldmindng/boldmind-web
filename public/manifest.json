@@ -1,10 +1,10 @@
 {
-  "name": "BoldMind Technology Solution Enterprise",
-  "short_name": "BoldMind",
+  "name": "Boldmind Technology Solution Enterprise",
+  "short_name": "BoldmindNG",
   "description": "Naija-authentic. AI-first. Execution-focused. Empowering 1M Nigerian entrepreneurs.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0A1D37",
+  "background_color": "#FAFAF9",
   "theme_color": "#FFC107",
   "orientation": "portrait-primary",
   "icons": [

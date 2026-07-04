@@ -1,7 +1,5 @@
 'use client';
 
-
-
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -9,9 +7,7 @@ import {
   Download, CalendarDays, ArrowUpRight, ArrowDownRight,
   Loader2, RefreshCw,
 } from 'lucide-react';
-import { DashboardSidebar } from '../../Sidebar';
-import { SuperNavbar } from '@boldmind-tech/ui';
-import { hubAPIAdapter, type AnalyticsOverview } from '../../../../lib/hub-api-adapter';
+import { SuperNavbar } from '@boldmindng/ui';
 import { toast } from 'sonner';
 
 // ─── KPI card ─────────────────────────────────────────────────────────────────

@@ -1,36 +1,388 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+boldmind-web
+├─ app
+│  ├─ (admin)
+│  │  └─ admin
+│  │     ├─ AdminOverviewClient.tsx
+│  │     ├─ dashboard
+│  │     │  └─ page.tsx
+│  │     ├─ layout.tsx
+│  │     ├─ page.tsx
+│  │     └─ users
+│  │        └─ page.tsx
+│  ├─ (auth)
+│  │  ├─ change-password
+│  │  │  └─ page.tsx
+│  │  ├─ forgot-password
+│  │  │  └─ page.tsx
+│  │  ├─ layout.tsx
+│  │  ├─ login
+│  │  │  └─ page.tsx
+│  │  ├─ onboarding
+│  │  │  └─ page.tsx
+│  │  ├─ register
+│  │  │  └─ page.tsx
+│  │  └─ verify-email
+│  │     └─ page.tsx
+│  ├─ (dashboard)
+│  │  ├─ account
+│  │  │  └─ page.tsx
+│  │  ├─ components
+│  │  │  ├─ BusinessDiscovery.tsx
+│  │  │  ├─ CommunityFeed.tsx
+│  │  │  ├─ dashboard
+│  │  │  │  └─ HubDashboardPage.tsx
+│  │  │  ├─ FlywheelMetrics.tsx
+│  │  │  ├─ IdentitySection.tsx
+│  │  │  └─ layout
+│  │  │     └─ ProtectedLayout.tsx
+│  │  ├─ dashboard
+│  │  │  ├─ analytics
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ announcements
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ features
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ layout.tsx
+│  │  │  ├─ notifications
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  ├─ products
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ revenue
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ roadmap
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ subscriptions
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ team
+│  │  │  │  └─ page.tsx
+│  │  │  └─ wallet
+│  │  │     └─ page.tsx
+│  │  ├─ referral
+│  │  │  └─ page.tsx
+│  │  └─ StatCard.tsx
+│  ├─ (public)
+│  │  ├─ about
+│  │  │  └─ page.tsx
+│  │  ├─ contact
+│  │  │  └─ page.tsx
+│  │  ├─ HomeContent.tsx
+│  │  ├─ page.tsx
+│  │  ├─ pricing
+│  │  │  └─ page.tsx
+│  │  ├─ privacy
+│  │  │  └─ page.tsx
+│  │  ├─ PublicLayout.tsx
+│  │  ├─ start
+│  │  │  └─ page.tsx
+│  │  └─ terms
+│  │     └─ page.tsx
+│  ├─ api
+│  │  └─ auth
+│  │     ├─ google
+│  │     │  └─ callback
+│  │     │     └─ route.ts
+│  │     ├─ logout
+│  │     │  └─ route.ts
+│  │     └─ sso
+│  │        └─ relay
+│  │           └─ route.ts
+│  ├─ boldmindLayout.tsx
+│  ├─ components
+│  │  ├─ AnalyticsInit.tsx
+│  │  ├─ ClientAuthProvider.tsx
+│  │  └─ ClientErrorBoundary.tsx
+│  ├─ example.tsx
+│  ├─ globals.css
+│  ├─ layout.tsx
+│  ├─ manifest.ts
+│  ├─ robots.ts
+│  ├─ sitemap.ts
+│  └─ sso
+│     └─ route.ts
+├─ boldmind-system-design-v2-alignment-addendum.md
+├─ boldmind-web-architecture-plan.md
+├─ boldmind-web-project-tree.md
+├─ eslint.config.mjs
+├─ global.d.ts
+├─ lib
+│  ├─ api
+│  │  └─ index.ts
+│  ├─ hooks
+│  │  └─ index.ts
+│  └─ user-api-adapter.ts
+├─ next.config.mjs
+├─ package.json
+├─ pnpm-lock.yaml
+├─ postcss.config.js
+├─ project-tree.md
+├─ proxy.ts
+├─ public
+│  ├─ about-story-bg.jpg
+│  ├─ apple-touch-icon.png
+│  ├─ browserconfig.xml
+│  ├─ favicon.ico
+│  ├─ favicon.png
+│  ├─ founder.jpg
+│  ├─ hero-bg.jpg
+│  ├─ icon-192x192-maskable.png
+│  ├─ icon-192x192.png
+│  ├─ icon-512x512-maskable.png
+│  ├─ icon-512x512.png
+│  ├─ icons
+│  │  ├─ apple
+│  │  │  ├─ apple-touch-icon-114x114.png
+│  │  │  ├─ apple-touch-icon-120x120.png
+│  │  │  ├─ apple-touch-icon-144x144.png
+│  │  │  ├─ apple-touch-icon-152x152.png
+│  │  │  ├─ apple-touch-icon-167x167.png
+│  │  │  ├─ apple-touch-icon-57x57.png
+│  │  │  ├─ apple-touch-icon-60x60.png
+│  │  │  ├─ apple-touch-icon-72x72.png
+│  │  │  ├─ apple-touch-icon-76x76.png
+│  │  │  └─ apple-touch-icon.png
+│  │  ├─ favicon-128x128.png
+│  │  ├─ favicon-16x16.png
+│  │  ├─ favicon-256x256.png
+│  │  ├─ favicon-32x32.png
+│  │  ├─ favicon-48x48.png
+│  │  ├─ favicon-64x64.png
+│  │  ├─ favicon-96x96.png
+│  │  ├─ pwa
+│  │  │  ├─ icon-128x128-maskable.png
+│  │  │  ├─ icon-128x128.png
+│  │  │  ├─ icon-144x144-maskable.png
+│  │  │  ├─ icon-144x144.png
+│  │  │  ├─ icon-152x152-maskable.png
+│  │  │  ├─ icon-152x152.png
+│  │  │  ├─ icon-192x192-maskable.png
+│  │  │  ├─ icon-192x192.png
+│  │  │  ├─ icon-384x384-maskable.png
+│  │  │  ├─ icon-384x384.png
+│  │  │  ├─ icon-512x512-maskable.png
+│  │  │  ├─ icon-512x512.png
+│  │  │  ├─ icon-72x72-maskable.png
+│  │  │  ├─ icon-72x72.png
+│  │  │  ├─ icon-96x96-maskable.png
+│  │  │  └─ icon-96x96.png
+│  │  └─ windows
+│  │     ├─ mstile-144x144.png
+│  │     ├─ mstile-150x150.png
+│  │     ├─ mstile-310x150.png
+│  │     ├─ mstile-310x310.png
+│  │     └─ mstile-70x70.png
+│  ├─ logo.png
+│  ├─ logo.webp
+│  ├─ manifest.json
+│  ├─ site.webmanifest
+│  ├─ social
+│  │  ├─ facebook-cover.jpg
+│  │  ├─ linkedin-banner.jpg
+│  │  ├─ og-image.jpg
+│  │  ├─ og-image.webp
+│  │  ├─ twitter-card.jpg
+│  │  ├─ whatsapp-preview.jpg
+│  │  └─ youtube-art.jpg
+│  ├─ social-media-banner.png
+│  └─ sw.js
+├─ README.md
+├─ system.md
+├─ tailwind.config.ts
+└─ tsconfig.json
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```
+```
+boldmind-web
+├─ app
+│  ├─ (admin)
+│  │  └─ admin
+│  │     ├─ AdminOverviewClient.tsx
+│  │     ├─ dashboard
+│  │     │  └─ page.tsx
+│  │     ├─ layout.tsx
+│  │     ├─ page.tsx
+│  │     └─ users
+│  │        └─ page.tsx
+│  ├─ (auth)
+│  │  ├─ change-password
+│  │  │  └─ page.tsx
+│  │  ├─ forgot-password
+│  │  │  └─ page.tsx
+│  │  ├─ layout.tsx
+│  │  ├─ login
+│  │  │  └─ page.tsx
+│  │  ├─ onboarding
+│  │  │  └─ page.tsx
+│  │  ├─ register
+│  │  │  └─ page.tsx
+│  │  └─ verify-email
+│  │     └─ page.tsx
+│  ├─ (dashboard)
+│  │  ├─ account
+│  │  │  └─ page.tsx
+│  │  ├─ components
+│  │  │  ├─ BusinessDiscovery.tsx
+│  │  │  ├─ CommunityFeed.tsx
+│  │  │  ├─ dashboard
+│  │  │  │  └─ HubDashboardPage.tsx
+│  │  │  ├─ FlywheelMetrics.tsx
+│  │  │  ├─ IdentitySection.tsx
+│  │  │  └─ layout
+│  │  │     └─ ProtectedLayout.tsx
+│  │  ├─ dashboard
+│  │  │  ├─ analytics
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ announcements
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ features
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ layout.tsx
+│  │  │  ├─ notifications
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  ├─ products
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ revenue
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ roadmap
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ subscriptions
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ team
+│  │  │  │  └─ page.tsx
+│  │  │  └─ wallet
+│  │  │     └─ page.tsx
+│  │  ├─ referral
+│  │  │  └─ page.tsx
+│  │  └─ StatCard.tsx
+│  ├─ (public)
+│  │  ├─ about
+│  │  │  └─ page.tsx
+│  │  ├─ contact
+│  │  │  └─ page.tsx
+│  │  ├─ HomeContent.tsx
+│  │  ├─ page.tsx
+│  │  ├─ pricing
+│  │  │  └─ page.tsx
+│  │  ├─ privacy
+│  │  │  └─ page.tsx
+│  │  ├─ PublicLayout.tsx
+│  │  ├─ start
+│  │  │  └─ page.tsx
+│  │  └─ terms
+│  │     └─ page.tsx
+│  ├─ api
+│  │  └─ auth
+│  │     ├─ google
+│  │     │  └─ callback
+│  │     │     └─ route.ts
+│  │     ├─ logout
+│  │     │  └─ route.ts
+│  │     └─ sso
+│  │        └─ relay
+│  │           └─ route.ts
+│  ├─ boldmindLayout.tsx
+│  ├─ components
+│  │  ├─ AnalyticsInit.tsx
+│  │  ├─ ClientAuthProvider.tsx
+│  │  └─ ClientErrorBoundary.tsx
+│  ├─ example.tsx
+│  ├─ globals.css
+│  ├─ layout.tsx
+│  ├─ manifest.ts
+│  ├─ robots.ts
+│  ├─ sitemap.ts
+│  └─ sso
+│     └─ route.ts
+├─ boldmind-system-design-v2-alignment-addendum.md
+├─ boldmind-web-architecture-plan.md
+├─ boldmind-web-project-tree.md
+├─ eslint.config.mjs
+├─ global.d.ts
+├─ lib
+│  ├─ api
+│  │  └─ index.ts
+│  ├─ hooks
+│  │  └─ index.ts
+│  └─ user-api-adapter.ts
+├─ next.config.mjs
+├─ package.json
+├─ pnpm-lock.yaml
+├─ postcss.config.js
+├─ proxy.ts
+├─ public
+│  ├─ about-story-bg.jpg
+│  ├─ apple-touch-icon.png
+│  ├─ browserconfig.xml
+│  ├─ favicon.ico
+│  ├─ favicon.png
+│  ├─ founder.jpg
+│  ├─ hero-bg.jpg
+│  ├─ icon-192x192-maskable.png
+│  ├─ icon-192x192.png
+│  ├─ icon-512x512-maskable.png
+│  ├─ icon-512x512.png
+│  ├─ icons
+│  │  ├─ apple
+│  │  │  ├─ apple-touch-icon-114x114.png
+│  │  │  ├─ apple-touch-icon-120x120.png
+│  │  │  ├─ apple-touch-icon-144x144.png
+│  │  │  ├─ apple-touch-icon-152x152.png
+│  │  │  ├─ apple-touch-icon-167x167.png
+│  │  │  ├─ apple-touch-icon-57x57.png
+│  │  │  ├─ apple-touch-icon-60x60.png
+│  │  │  ├─ apple-touch-icon-72x72.png
+│  │  │  ├─ apple-touch-icon-76x76.png
+│  │  │  └─ apple-touch-icon.png
+│  │  ├─ favicon-128x128.png
+│  │  ├─ favicon-16x16.png
+│  │  ├─ favicon-256x256.png
+│  │  ├─ favicon-32x32.png
+│  │  ├─ favicon-48x48.png
+│  │  ├─ favicon-64x64.png
+│  │  ├─ favicon-96x96.png
+│  │  ├─ pwa
+│  │  │  ├─ icon-128x128-maskable.png
+│  │  │  ├─ icon-128x128.png
+│  │  │  ├─ icon-144x144-maskable.png
+│  │  │  ├─ icon-144x144.png
+│  │  │  ├─ icon-152x152-maskable.png
+│  │  │  ├─ icon-152x152.png
+│  │  │  ├─ icon-192x192-maskable.png
+│  │  │  ├─ icon-192x192.png
+│  │  │  ├─ icon-384x384-maskable.png
+│  │  │  ├─ icon-384x384.png
+│  │  │  ├─ icon-512x512-maskable.png
+│  │  │  ├─ icon-512x512.png
+│  │  │  ├─ icon-72x72-maskable.png
+│  │  │  ├─ icon-72x72.png
+│  │  │  ├─ icon-96x96-maskable.png
+│  │  │  └─ icon-96x96.png
+│  │  └─ windows
+│  │     ├─ mstile-144x144.png
+│  │     ├─ mstile-150x150.png
+│  │     ├─ mstile-310x150.png
+│  │     ├─ mstile-310x310.png
+│  │     └─ mstile-70x70.png
+│  ├─ logo.png
+│  ├─ logo.webp
+│  ├─ manifest.json
+│  ├─ site.webmanifest
+│  ├─ social
+│  │  ├─ facebook-cover.jpg
+│  │  ├─ linkedin-banner.jpg
+│  │  ├─ og-image.jpg
+│  │  ├─ og-image.webp
+│  │  ├─ twitter-card.jpg
+│  │  ├─ whatsapp-preview.jpg
+│  │  └─ youtube-art.jpg
+│  ├─ social-media-banner.png
+│  └─ sw.js
+├─ README.md
+├─ system.md
+├─ tailwind.config.ts
+└─ tsconfig.json
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```

@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronRight, ExternalLink } from 'lucide-react';
-import { cn, Card, CardContent } from '@boldmind-tech/ui';
 
-// CSS vars set on [data-product=boldmind-hub] by @boldmind-tech/ui index.css
+// ─── CSS variable aliases (all live in globals.css :root / [data-product=boldmind-hub]) ───
+// Never hardcode hex here — the hub token set is the single source of truth.
 const brand = {
   primary:   'var(--product-primary)',
   secondary: 'var(--product-secondary)',
@@ -14,8 +14,10 @@ const brand = {
   fg:        'var(--product-foreground)',
   muted:     'var(--product-muted)',
   highlight: 'var(--product-highlight)',
+  glow:      'var(--product-glow)',
 } as const;
 
+// ─── Pillar data (mirrors PILLAR_METADATA from products.ts) ─────────────────
 const PILLARS = [
   {
     icon: '📰',
@@ -67,12 +69,11 @@ const PILLARS = [
   },
 ] as const;
 
-// gold: true = highlight with secondary colour; otherwise white in the dark hero
 const STATS = [
-  { value: '650+', label: 'Businesses on PlanAI', gold: false },
-  { value: '50K+', label: 'EduCenter Students',   gold: false },
-  { value: '12K+', label: 'AmeboGist Readers',    gold: false },
-  { value: '35+',  label: 'Live Products',        gold: true  },
+  { value: '650+',  label: 'Businesses on PlanAI', gold: false },
+  { value: '50K+',  label: 'EduCenter Students',   gold: false },
+  { value: '12K+',  label: 'AmeboGist Readers',    gold: false },
+  { value: '35+',   label: 'Live Products',         gold: true  },
 ] as const;
 
 const DASHBOARD_TOOLS = [
@@ -93,29 +94,29 @@ const OPERATOR_FEATURES = [
 
 export default function HomeContent() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: brand.bg }}>
+    // Intentionally no max-w on this wrapper — sections control their own width.
+    // overflow-x hidden prevents horizontal bleed from absolute decorative blobs.
+    <div style={{ backgroundColor: brand.bg, overflowX: 'hidden' }}>
 
-      {/* ─── HERO ─────────────────────────────────────────────────────────── */}
+      {/* ─────────────────────────────────────────────────────────── HERO */}
       <section
-        className="relative pt-24 pb-20 overflow-hidden"
+        className="relative pt-24 pb-20"
         style={{ background: 'linear-gradient(135deg, var(--product-primary) 0%, #1A3460 100%)' }}
       >
+        {/* Decorative blobs */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-30"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")`,
-          }}
-        />
-        <div
+          aria-hidden="true"
           className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none"
           style={{ backgroundColor: brand.secondary, opacity: 0.07 }}
         />
         <div
+          aria-hidden="true"
           className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none"
           style={{ backgroundColor: brand.accent, opacity: 0.1 }}
         />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -138,30 +139,40 @@ export default function HomeContent() {
             </div>
           </motion.div>
 
+          {/* Headline */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
             className="text-center mb-6"
           >
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black leading-tight text-white mb-6">
+            {/* h1 intentionally overrides globals.css clamp — hero needs full control */}
+            <h1
+              className="font-black leading-tight text-white mb-6"
+              style={{ fontSize: 'clamp(2.25rem, 7vw, 4.25rem)', color: 'white', marginBottom: '1.5rem' }}
+            >
               Building Systems<br />
               <span style={{ color: brand.secondary }}>That Shift Nations</span>
             </h1>
-            <p className="text-base sm:text-xl text-white/75 max-w-2xl mx-auto leading-relaxed">
+            {/* p deliberately does NOT have max-width here; container constrains it */}
+            <p
+              className="text-base sm:text-xl leading-relaxed mx-auto"
+              style={{ color: 'rgba(255,255,255,0.75)', maxWidth: '38rem', marginBottom: 0 }}
+            >
               One ecosystem. Four pillars. From stranger to builder —
               we take Nigerians the full distance.{' '}
-              <span className="text-white font-semibold">
+              <span className="font-semibold text-white">
                 One BoldMind account unlocks everything.
               </span>
             </p>
           </motion.div>
 
+          {/* Stats row */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-8 sm:gap-12 mb-12"
+            className="flex flex-wrap justify-center gap-8 sm:gap-12 mb-12 mt-8"
           >
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center">
@@ -171,11 +182,17 @@ export default function HomeContent() {
                 >
                   {stat.value}
                 </div>
-                <div className="text-[11px] text-white/55 font-medium mt-0.5">{stat.label}</div>
+                <div
+                  className="text-[11px] font-medium mt-0.5"
+                  style={{ color: 'rgba(255,255,255,0.55)' }}
+                >
+                  {stat.label}
+                </div>
               </div>
             ))}
           </motion.div>
 
+          {/* Pillar cards */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -222,21 +239,37 @@ export default function HomeContent() {
                     {pillar.step}
                   </span>
                 </div>
-                <h3 className="font-black text-white text-sm mb-0.5">{pillar.name}</h3>
-                <p className="text-[11px] text-white/45 mb-3 italic">{pillar.tagline}</p>
+                <h3 className="font-black text-sm mb-0.5" style={{ color: 'white', marginBottom: '0.125rem' }}>
+                  {pillar.name}
+                </h3>
+                <p
+                  className="text-[11px] mb-3 italic"
+                  style={{ color: 'rgba(255,255,255,0.45)', maxWidth: 'none', marginBottom: '0.75rem' }}
+                >
+                  {pillar.tagline}
+                </p>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-sm font-black" style={{ color: pillar.color }}>
                     {pillar.stat}
                   </span>
-                  <span className="text-[11px] text-white/40 font-medium">{pillar.statLabel}</span>
+                  <span
+                    className="text-[11px] font-medium"
+                    style={{ color: 'rgba(255,255,255,0.40)' }}
+                  >
+                    {pillar.statLabel}
+                  </span>
                 </div>
-                <div className="flex items-center gap-1 mt-3 text-[11px] font-bold text-white/50 group-hover:text-white/90 transition-colors">
+                <div
+                  className="flex items-center gap-1 mt-3 text-[11px] font-bold transition-colors group-hover:opacity-90"
+                  style={{ color: 'rgba(255,255,255,0.50)' }}
+                >
                   Open <ChevronRight size={11} />
                 </div>
               </motion.a>
             ))}
           </motion.div>
 
+          {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
@@ -257,7 +290,7 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* ─── FLYWHEEL ──────────────────────────────────────────────────────── */}
+      {/* ─────────────────────────────────────────────────── FLYWHEEL */}
       <section className="py-16 sm:py-24" style={{ backgroundColor: brand.bg }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
@@ -268,12 +301,20 @@ export default function HomeContent() {
               How It Works
             </p>
             <h2
-              className="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
-              style={{ color: brand.fg }}
+              className="font-black mb-4"
+              style={{
+                fontSize: 'clamp(1.875rem, 5vw, 3rem)',
+                color: brand.fg,
+                marginBottom: '1rem',
+              }}
             >
               The <span style={{ color: brand.primary }}>BoldMind Flywheel</span>
             </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: brand.fg, opacity: 0.6 }}>
+            {/* p inside section — constrain with inline style, not Tailwind prose util */}
+            <p
+              className="text-lg mx-auto"
+              style={{ color: brand.fg, opacity: 0.6, maxWidth: '38rem', marginBottom: 0 }}
+            >
               Every Nigerian starts somewhere. We take them the full distance —
               from first gist to running a funded business.
             </p>
@@ -289,9 +330,11 @@ export default function HomeContent() {
                 transition={{ delay: i * 0.12 }}
                 className="relative text-center"
               >
+                {/* Connector line between cards (desktop only) */}
                 {i < PILLARS.length - 1 && (
                   <div
-                    className="hidden lg:block absolute top-10 left-full w-full h-0.5 -translate-y-1/2 z-0"
+                    aria-hidden="true"
+                    className="hidden lg:block absolute top-10 left-full w-full h-px -translate-y-1/2 z-0"
                     style={{ backgroundColor: brand.muted }}
                   />
                 )}
@@ -316,20 +359,29 @@ export default function HomeContent() {
                   >
                     {pillar.journey}
                   </div>
-                  <h3 className="font-black text-lg mb-1" style={{ color: brand.fg }}>
+                  <h3
+                    className="font-black text-lg mb-1"
+                    style={{ fontSize: '1.125rem', color: brand.fg, marginBottom: '0.25rem' }}
+                  >
                     {pillar.name}
                   </h3>
-                  <p className="text-sm italic mb-3" style={{ color: brand.primary }}>
+                  <p
+                    className="text-sm italic mb-3"
+                    style={{ color: brand.primary, maxWidth: 'none', marginBottom: '0.75rem' }}
+                  >
                     {pillar.tagline}
                   </p>
-                  <p className="text-sm leading-relaxed mb-4" style={{ color: brand.fg, opacity: 0.62 }}>
+                  <p
+                    className="text-sm leading-relaxed mb-4"
+                    style={{ color: brand.fg, opacity: 0.62, maxWidth: 'none', marginBottom: '1rem' }}
+                  >
                     {pillar.description}
                   </p>
                   <a
                     href={pillar.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-sm font-bold hover:gap-3 transition-all"
+                    className="inline-flex items-center gap-1.5 text-sm font-bold transition-all hover:gap-3"
                     style={{ color: pillar.color }}
                   >
                     Visit {pillar.name} <ExternalLink size={12} />
@@ -341,21 +393,36 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* ─── OPERATOR ZONE ─────────────────────────────────────────────────── */}
-      {/* Section bg is VillageCircle muted (#F0E6D3) — intentional contrast */}
+      {/* ─────────────────────────────────────────── OPERATOR ZONE */}
+      {/*
+        Background intentionally uses VillageCircle's muted token value (#F0E6D3).
+        This is the only place in boldmind-web where we deliberately step outside
+        the hub's own --product-background to signal a "chapter break" in the page.
+        It is NOT a globals.css token override — it is a section-level design decision.
+      */}
       <section className="py-16 sm:py-24" style={{ backgroundColor: '#F0E6D3' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+            {/* Left: copy */}
             <div>
-              {/* Label uses VillageCircle primary (#3B1F0A) intentionally */}
-              <p className="text-[11px] font-black uppercase tracking-widest mb-3" style={{ color: '#3B1F0A' }}>
+              <p
+                className="text-[11px] font-black uppercase tracking-widest mb-3"
+                style={{ color: '#3B1F0A' }}
+              >
                 The Operator Zone
               </p>
-              <h2 className="text-3xl sm:text-4xl font-black mb-5" style={{ color: brand.fg }}>
+              <h2
+                className="font-black mb-5"
+                style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: brand.fg, marginBottom: '1.25rem' }}
+              >
                 One login.<br />
                 <span style={{ color: brand.primary }}>Every tool you pay for.</span>
               </h2>
-              <p className="text-base sm:text-lg mb-8" style={{ color: brand.fg, opacity: 0.7 }}>
+              <p
+                className="text-base sm:text-lg mb-8"
+                style={{ color: brand.fg, opacity: 0.7, maxWidth: 'none', marginBottom: '2rem' }}
+              >
                 Your BoldMind account is the cockpit for everything. PlanAI subscriptions,
                 EduCenter progress, Vibe Coders cohort status, and cross-pillar upsells —
                 all in one dashboard. No re-logging. No friction.
@@ -364,8 +431,8 @@ export default function HomeContent() {
                 {OPERATOR_FEATURES.map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm" style={{ color: brand.fg }}>
                     <span
-                      className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-[10px] font-black text-white"
-                      style={{ backgroundColor: brand.primary }}
+                      className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-black text-white"
+                      style={{ backgroundColor: brand.primary, marginTop: '0.125rem' }}
                     >
                       ✓
                     </span>
@@ -383,10 +450,7 @@ export default function HomeContent() {
                 </Link>
                 <Link
                   href="/login"
-                  className={cn(
-                    'inline-flex items-center justify-center gap-2 px-6 py-3',
-                    'rounded-xl font-bold border-2 transition-all hover:bg-black/5',
-                  )}
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold border-2 transition-all hover:bg-black/5"
                   style={{ borderColor: brand.primary, color: brand.primary }}
                 >
                   Sign In
@@ -394,14 +458,17 @@ export default function HomeContent() {
               </div>
             </div>
 
+            {/* Right: mock dashboard card */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <Card
-                variant="elevated"
-                padding="none"
+              {/*
+                Using a plain div styled to match the .card pattern from globals.css
+                instead of @boldmindng/ui <Card> (which has no CardContent subcomponent).
+              */}
+              <div
                 className="rounded-3xl overflow-hidden border-2"
                 style={{ backgroundColor: brand.bg, borderColor: brand.muted }}
               >
@@ -439,7 +506,7 @@ export default function HomeContent() {
                 </div>
 
                 {/* Dashboard body */}
-                <CardContent className="p-5 space-y-3">
+                <div className="p-5 space-y-3">
                   <div
                     className="rounded-xl p-4 border-l-4"
                     style={{ backgroundColor: brand.highlight, borderLeftColor: brand.secondary }}
@@ -472,14 +539,14 @@ export default function HomeContent() {
                       For EduCenter AI Specialist graduates
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ─── FINAL CTA ─────────────────────────────────────────────────────── */}
+      {/* ──────────────────────────────────────────────── FINAL CTA */}
       <section
         className="py-16 sm:py-24"
         style={{ background: 'linear-gradient(135deg, var(--product-primary) 0%, #1A3460 60%, #0F1F40 100%)' }}
@@ -490,14 +557,23 @@ export default function HomeContent() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
+            <h2
+              className="font-black text-white mb-4"
+              style={{ fontSize: 'clamp(1.875rem, 5vw, 3rem)', marginBottom: '1rem' }}
+            >
               One account.<br />
               <span style={{ color: brand.secondary }}>Four doors. Built in Lagos.</span>
             </h2>
-            <p className="text-base sm:text-lg text-white/65 max-w-xl mx-auto mb-2">
+            <p
+              className="text-base sm:text-lg mx-auto mb-2"
+              style={{ color: 'rgba(255,255,255,0.65)', maxWidth: '30rem', marginBottom: '0.5rem' }}
+            >
               AmeboGist · VillageCircle · EduCenter · PlanAI
             </p>
-            <p className="text-sm text-white/45 mb-10">
+            <p
+              className="text-sm mb-10"
+              style={{ color: 'rgba(255,255,255,0.45)', marginBottom: '2.5rem' }}
+            >
               650+ businesses · 50K+ students · 12K+ readers · 35+ live products
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -521,7 +597,7 @@ export default function HomeContent() {
                 Questions? WhatsApp Us
               </a>
             </div>
-            <p className="text-xs text-white/35">
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
               NDPA Compliant · No card required · Paystack Payments · Built in Nigeria
             </p>
           </motion.div>

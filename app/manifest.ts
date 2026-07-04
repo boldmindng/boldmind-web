@@ -2,9 +2,9 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'BoldMind Technology Solution Enterprise',
-    short_name: 'BoldMind',
-    description: 'Naija-authentic. AI-first. Execution-focused. Empowering 1M Nigerian entrepreneurs.',
+    name: 'Boldmind Technology Solution Enterprise',
+    short_name: 'BoldmindNG',
+    description: 'One ecosystem. Four pillars. Built in Lagos.',
     start_url: '/',
     display: 'standalone',
     background_color: '#FAFAF9',
@@ -42,5 +42,7 @@ export default function manifest(): MetadataRoute.Manifest {
         type: 'image/png',
       },
     ],
+    lang: 'en',
+    dir: 'ltr',
   }
 }

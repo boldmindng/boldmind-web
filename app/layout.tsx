@@ -1,17 +1,17 @@
-
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
-import { BoldMindLayout } from './boldmindLayout';
-import { CookieConsent } from '@boldmind-tech/ui';
+import { CookieConsent } from '@boldmindng/ui';
 import { ClientErrorBoundary } from './components/ClientErrorBoundary';
-import { AuthProvider } from './components/ClientAuthProvider';
+import { ClientAuthProvider } from './components/ClientAuthProvider';
+// import { AnalyticsInit }  from './components/AnalyticsInit';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
-  preload: false, 
+  preload: false,
 });
 
 const BASE_URL =
@@ -20,13 +20,13 @@ const BASE_URL =
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'BoldMind — Building Systems That Shift Nations | Nigerian Tech Ecosystem',
-    template: '%s | BoldMind',
+    default: 'BoldmindNG — Building Systems That Shift Nations | Nigerian Tech Ecosystem',
+    template: '%s | BoldmindNG',
   },
   description:
-    'BoldMind is Nigeria\'s AI-first tech ecosystem — four pillars, one account. AmeboGist (Pidgin media, 12K+ readers), VillageCircle (conviction & venture studio), EduCenter (JAMB/WAEC prep + AI skills, 50K+ students), PlanAI (AI business tools, 650+ businesses). Built in Lagos.',
+    'BoldmindNG is Nigeria\'s AI-first tech ecosystem — four pillars, one account. AmeboGist (Pidgin media, 12K+ readers), VillageCircle (conviction & venture studio), EduCenter (JAMB/WAEC prep + AI skills, 50K+ students), PlanAI (AI business tools, 650+ businesses). Built in Lagos.',
   keywords: [
-    'BoldMind',
+    'BoldmindNG',
     'Nigerian entrepreneurs',
     'AI tools Nigeria',
     'AmeboGist',
@@ -78,8 +78,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_NG',
     url: BASE_URL,
-    title: 'BoldMind — Building Systems That Shift Nations',
-    siteName: 'BoldMind',
+    title: 'BoldmindNG — Building Systems That Shift Nations',
+    siteName: 'BoldmindNG',
     description:
       'One account. Four pillars. AmeboGist · VillageCircle · EduCenter · PlanAI. 650+ businesses, 50K+ students, 12K+ readers. Built in Lagos.',
     images: [
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
         url: `${BASE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'BoldMind — Nigerian Tech Ecosystem: AmeboGist, VillageCircle, EduCenter, PlanAI',
+        alt: 'BoldmindNG — Nigerian Tech Ecosystem: AmeboGist, VillageCircle, EduCenter, PlanAI',
         type: 'image/png',
       },
     ],
@@ -96,9 +96,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@boldmindng',
     creator: '@boldmindng',
-    title: 'BoldMind — Building Systems That Shift Nations',
+    title: 'BoldmindNG — Building Systems That Shift Nations',
     description:
-      'One account. Four pillars. AmeboGist · VillageCircle · EduCenter · PlanAI. 650+ businesses running. Built in Lagos. 🇳🇬',
+      'One account. Four pillars. AmeboGist NG· VillageCircle NG· Boldmind EduCenter · PlanAI by BoldmindNG. 650+ businesses running. Built in Lagos. 🇳🇬',
     images: [`${BASE_URL}/og-image.png`],
   },
   verification: { google: process.env['NEXT_PUBLIC_GOOGLE_SITE_VERIFY'] },
@@ -112,11 +112,11 @@ export const metadata: Metadata = {
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
     shortcut: '/favicon.ico',
   },
-  manifest: '/manifest.webmanifest',
-  appleWebApp: { title: 'BoldMind', statusBarStyle: 'black-translucent' },
+  manifest: '/site.webmanifest',
+  appleWebApp: { title: 'BoldmindNG', statusBarStyle: 'black-translucent' },
   other: {
-    'application-name': 'BoldMind',
-    'apple-mobile-web-app-title': 'BoldMind',
+    'application-name': 'BoldmindNG',
+    'apple-mobile-web-app-title': 'BoldmindNG',
     'msapplication-TileColor': '#2B4D87',
   },
 };
@@ -136,7 +136,7 @@ export const viewport: Viewport = {
 const orgSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'BoldMind Technology Solution Enterprise',
+  name: 'Boldmind Technology Solution Enterprise',
   url: BASE_URL,
   logo: `${BASE_URL}/logo.webp`,
   description:
@@ -159,10 +159,10 @@ const orgSchema = {
     availableLanguage: ['English', 'Pidgin English'],
   },
   subOrganization: [
-    { '@type': 'Organization', name: 'AmeboGist', url: 'https://amebogist.ng' },
-    { '@type': 'Organization', name: 'VillageCircle', url: 'https://villagecircle.ng' },
-    { '@type': 'Organization', name: 'EduCenter', url: 'https://educenter.com.ng' },
-    { '@type': 'Organization', name: 'PlanAI', url: 'https://planai.boldmind.ng' },
+    { '@type': 'Organization', name: 'AmeboGist NG', url: 'https://amebogist.ng' },
+    { '@type': 'Organization', name: 'VillageCircle NG', url: 'https://villagecircle.ng' },
+    { '@type': 'Organization', name: 'Boldmind EduCenter', url: 'https://educenter.com.ng' },
+    { '@type': 'Organization', name: 'PlanAI by BoldmindNG', url: 'https://planai.boldmind.ng' },
   ],
   sameAs: [
     'https://x.com/boldmindng',
@@ -178,7 +178,7 @@ const orgSchema = {
 const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'BoldMind',
+  name: 'BoldmindNG',
   url: BASE_URL,
   inLanguage: 'en-NG',
   potentialAction: {
@@ -210,7 +210,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 
-        <meta name="application-name" content="BoldMind" />
+        <meta name="application-name" content="BoldmindNG" />
         <meta name="description" content="Building systems that shift nations" />
         <meta name="theme-color" content="#2B4D87" />
         <meta name="msapplication-TileColor" content="#2B4D87" />
@@ -236,36 +236,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <link rel="manifest" href="/site.webmanifest" />
 
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://boldmind.ng" />
-        <meta property="og:site_name" content="BoldMind" />
-        <meta property="og:title" content="BoldMind" />
-        <meta property="og:description" content="Building systems that shift nations" />
-        <meta property="og:image" content="https://boldmind.ng/social/og-image.jpg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="BoldMind — Building systems that shift nations" />
-        <meta property="og:locale" content="en_NG" />
-
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@boldmindNG" />
-        <meta name="twitter:creator" content="@BoldMindNG" />
-        <meta name="twitter:title" content="BoldMind" />
-        <meta name="twitter:description" content="Building systems that shift nations" />
-        <meta name="twitter:image" content="https://boldmind.ng/social/twitter-card.jpg" />
-
-
-        <meta name="msapplication-square70x70logo" content="/icons/windows/mstile-70x70.png" />
-        <meta name="msapplication-square150x150logo" content="/icons/windows/mstile-150x150.png" />
-        <meta name="msapplication-wide310x150logo" content="/icons/windows/mstile-310x150.png" />
-        <meta name="msapplication-square310x310logo" content="/icons/windows/mstile-310x310.png" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="geo.region" content="NG-LA" />
-        <meta name="geo.placename" content="Lagos, Nigeria" />
-        <meta name="geo.position" content="6.5244;3.3792" />
-        <meta name="ICBM" content="6.5244, 3.3792" />
+  
         <meta name="facebook-domain-verification" content="s3gyrqwl3bo41hl1hp21ez9rd324w1" />
         <script
           type="application/ld+json"
@@ -278,9 +249,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <ClientErrorBoundary>
-          <AuthProvider>
-            <BoldMindLayout>{children}</BoldMindLayout>
-          </AuthProvider>
+          <ClientAuthProvider>
+            
+              {children}
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  style: {
+                    fontFamily: 'var(--font-active, sans-serif)',
+                    borderRadius: 'var(--radius-md)',
+                  },
+                }}
+              />
+          </ClientAuthProvider>
           <CookieConsent />
         </ClientErrorBoundary>
       </body>

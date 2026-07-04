@@ -1,18 +1,20 @@
 import type { Metadata, Viewport } from 'next';
 import HomeContent from './HomeContent';
+import PublicLayout from './PublicLayout';
+
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://boldmind.ng'),
   title: {
-    default: 'BoldMind',
-    template: `%s | BoldMind`,
+    default: 'BoldmindNG — Building Systems That Shift Nations',
+    template: `%s | BoldmindNG`,
   },
-  description: 'Building systems that shift nations',
-  applicationName: 'BoldMind',
-  keywords: ['Nigeria', 'boldmind', 'BoldMind', 'Nigerian entrepreneur'],
+  description: 'One ecosystem. Four pillars. AmeboGist, VillageCircle, EduCenter, PlanAI. Nigerian-built, AI-first. 650+ businesses. 50K+ students.',
+  applicationName: 'BoldmindNG',
+  keywords: ['Nigeria', 'boldmind', 'BoldmindNG', 'Nigerian entrepreneur'],
   authors: [{ name: 'Boldmind Technology Solution Enterprise', url: 'https://boldmind.ng' }],
-  creator: 'BoldMind Technology',
-  publisher: 'BoldMind Technology Solution Enterprise',
+  creator: 'BoldmindNG',
+  publisher: 'Boldmind Technology Solution Enterprise',
 
   icons: {
     icon: [
@@ -37,16 +39,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     url: 'https://boldmind.ng',
-    siteName: 'BoldMind',
-    title: 'BoldMind',
-    description: 'Building systems that shift nations',
+    siteName: 'BoldmindNG',
+    title: 'BoldmindNG — Building Systems That Shift Nations',
+    description: 'One ecosystem. Four pillars. AmeboGist, VillageCircle, EduCenter, PlanAI. Nigerian-built, AI-first. 650+ businesses. 50K+ students.',
     locale: 'en_NG',
     images: [
       {
         url: '/social/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'BoldMind',
+        alt: 'BoldmindNG',
       },
     ],
   },
@@ -55,8 +57,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@boldmindNG',
     creator: '@boldmindindng',
-    title: 'BoldMind',
-    description: 'Building systems that shift nations',
+    title: 'BoldmindNG',
+    description: 'One ecosystem. Four pillars. AmeboGist, VillageCircle, EduCenter, PlanAI. Nigerian-built, AI-first. 650+ businesses. 50K+ students.',
     images: ['/social/twitter-card.jpg'],
   },
 };
@@ -71,6 +73,10 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function BoldMindHomePage() {
-  return <HomeContent />;
+export default function HomePage() {
+  return (
+    <PublicLayout>
+      <HomeContent />
+    </PublicLayout>
+  );
 }

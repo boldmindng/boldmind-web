@@ -1,12 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SuperNavbar, Card, CardHeader, CardTitle, CardContent, Button, Input } from '@boldmind-tech/ui';
-import { hubAPIAdapter, type Announcement } from '../../../../lib/hub-api-adapter';
-import { useAuth } from '@boldmind-tech/auth';
+import { SuperNavbar, Card, CardHeader, CardTitle, CardContent, Button, Input } from '@boldmindng/ui';
+import { authAPI } from '@boldmindng/auth';
 import { useRouter } from 'next/navigation';
-import { DashboardSidebar } from '../../Sidebar';
 import { toast } from 'sonner';
 import { Plus, Megaphone, X, Loader2, RefreshCw } from 'lucide-react';
 
@@ -42,7 +41,7 @@ function CreateForm({
   onCreated,
 }: {
   onClose: () => void;
-  onCreated: (a: Announcement) => void;
+  onCreated: (a: any) => void;
 }) {
   const [formData, setFormData] = useState({ title: '', content: '', priority: 'normal' });
   const [submitting, setSubmitting] = useState(false);
@@ -52,7 +51,7 @@ function CreateForm({
     if (!formData.title.trim() || !formData.content.trim()) return;
     setSubmitting(true);
     try {
-      const created = await hubAPIAdapter.createAnnouncement(formData);
+      const created = await authAPI.createAnnouncement(formData);
       toast.success('Announcement created!');
       onCreated(created);
       onClose();
@@ -139,10 +138,10 @@ function CreateForm({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AnnouncementsPage() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = authAPI();
   const router = useRouter();
 
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
   const [loading,       setLoading]       = useState(true);
   const [showForm,      setShowForm]      = useState(false);
 

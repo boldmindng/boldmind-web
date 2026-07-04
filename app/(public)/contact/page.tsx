@@ -9,7 +9,7 @@ import {
   Input,
   ParticleBackground,
   StatusBadge
-} from '@boldmind-tech/ui';
+} from '@boldmindng/ui';
 import { Mail, Phone, MapPin, Send, MessageCircle, Calendar, ExternalLink, CheckCircle2 } from 'lucide-react';
 
 export default function ContactPage() {
@@ -77,7 +77,7 @@ export default function ContactPage() {
 
   const faqs = [
     {
-      q: 'How can I get started with BoldMind products?',
+      q: 'How can I get started with BoldmindNG products?',
       a: 'Simply reach out via WhatsApp or email, and our team will guide you through the onboarding process for any of our products.',
     },
     {
@@ -85,8 +85,8 @@ export default function ContactPage() {
       a: 'Yes! While we have 31+ existing products, we also offer custom software development and digital transformation consultancy for businesses.',
     },
     {
-      q: 'What is the PlanAI Suite?',
-      a: 'PlanAI is our comprehensive suite of 10 AI-powered business tools designed to help Nigerian entrepreneurs automate and scale their operations.',
+      q: 'What is the PlanAI by BoldmindNG?',
+      a: 'PlanAI is our comprehensive suite of 13 AI-powered business tools designed to help Nigerian entrepreneurs automate and scale their operations.',
     },
     {
       q: 'How do I become a strategic partner?',

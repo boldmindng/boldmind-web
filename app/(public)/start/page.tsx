@@ -17,11 +17,11 @@ const brand = {
 const PILLARS = [
   {
     icon: Globe,
-    name: 'AmeboGist',
-    tagline: 'Nigerian Media & Culture',
+    name: 'AmeboGist NG',
+    tagline: 'Nigerian No 1 Pidgin News ',
     href: 'https://amebogist.ng',
-    color: '#00A859',
-    stat: '50K+',
+    color: '#065F46',
+    stat: '12K+',
     statLabel: 'Monthly Readers',
     description: 'Authentic Pidgin news, lifestyle, and entertainment for the everyday Nigerian. Your culture, your voice, your gist.',
     perks: [
@@ -33,10 +33,10 @@ const PILLARS = [
   },
   {
     icon: GraduationCap,
-    name: 'EduCenter',
-    tagline: 'Academic Excellence Platform',
+    name: 'Boldmind EduCenter',
+    tagline: 'Pass Exam, Build Business Master AI',
     href: 'https://educenter.com.ng',
-    color: '#2A4A6E',
+    color: '#1E40AF',
     stat: '10K+',
     statLabel: 'Students Prepared',
     description: 'JAMB, WAEC, and beyond. Structured exam prep, career guides, and skill courses built for Nigerian students.',
@@ -49,11 +49,11 @@ const PILLARS = [
   },
   {
     icon: Brain,
-    name: 'PlanAI Suite',
+    name: 'PlanAI by BoldmindNG',
     tagline: 'AI Business Planning Tools',
     href: 'https://planai.boldmind.ng',
-    color: '#FFC800',
-    stat: '500+',
+    color: '#5B21B6',
+    stat: '600+',
     statLabel: 'Plans Generated',
     description: 'From idea to investor-ready business plan in minutes. AI-powered strategy, market analysis, and credibility hubs.',
     perks: [
@@ -66,9 +66,9 @@ const PILLARS = [
   {
     icon: Users,
     name: 'VillageCircle',
-    tagline: 'Community & Social Network',
+    tagline: 'Where Conviction becomes Code',
     href: 'https://villagecircle.ng',
-    color: '#E63946',
+    color: '#3B1F0A',
     stat: '2K+',
     statLabel: 'Active Members',
     description: 'Hyper-local community network connecting Nigerians by neighbourhood, interest, and profession.',

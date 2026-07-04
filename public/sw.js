@@ -1,15 +1,13 @@
-// BoldMind Hub — Service Worker
-// Provides offline fallback and caches static assets.
-
 const CACHE_NAME = 'boldmind-hub-v1';
 const OFFLINE_URL = '/';
 
 // Assets to pre-cache on install
 const PRECACHE_ASSETS = [
   '/',
-  '/manifest.webmanifest',
+  '/site.webmanifest',
   '/icon-192x192.png',
   '/icon-512x512.png',
+  '/logo.png',
 ];
 
 // ── Install ───────────────────────────────────────────────────────────────────

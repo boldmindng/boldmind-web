@@ -1,10 +1,10 @@
 {
-  "name": "BoldMind",
-  "short_name": "BOLDMIND",
+  "name": "Boldmind Technology Solution Enterprise",
+  "short_name": "BoldmindNG",
   "description": "Building systems that shift nations",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#2B4D87",
+  "background_color": "#FAFAF9",
   "theme_color": "#2B4D87",
   "orientation": "portrait-primary",
   "icons": [
@@ -107,7 +107,7 @@
   ],
   "shortcuts": [
     {
-      "name": "Open BoldMind",
+      "name": "Open BoldmindNG",
       "url": "/",
       "icons": [
         {

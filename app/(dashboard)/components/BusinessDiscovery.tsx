@@ -5,25 +5,32 @@ import { Plus, Users, ArrowRight, ExternalLink } from 'lucide-react';
 
 const SUGGESTED_BUSINESSES = [
     {
-        name: 'AmeboGist',
+        name: 'AmeboGist NG',
         category: 'Media',
         description: 'Authentic Pigin news and media platform.',
         icon: '📰',
-        color: '#00A859'
+        color: '#065F46'
     },
     {
-        name: 'PlanAI',
+        name: 'PlanAI by BoldmindNG',
         category: 'AI / Business',
         description: 'AI-powered business planning and automation.',
-        icon: '🤖',
-        color: '#FFC800'
+        icon: '⚡',
+        color: '#5B21B6'
     },
     {
-        name: 'EduCenter',
+        name: 'Boldmind EduCenter',
         category: 'Education',
         description: 'Practical learning engine for digital skills.',
         icon: '🎓',
-        color: '#2A4A6E'
+        color: '#1E40AF'
+    },
+     {
+        name: 'VillageCirle NG',
+        category: 'Community',
+        description: 'Where conviction becomes Code',
+        icon: '🌱',
+        color: '#3B1F0A'
     }
 ];
 

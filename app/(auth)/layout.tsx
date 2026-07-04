@@ -4,7 +4,7 @@ import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAuth } from '@boldmind-tech/auth';
+import { useAuth } from '@boldmindng/auth';
 import { motion } from 'framer-motion';
 
 const brand = {
@@ -92,7 +92,7 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
               className="font-black text-xl tracking-tight transition-colors"
               style={{ color: brand.fg }}
             >
-              BoldMind
+              Boldmind NG
             </span>
           </Link>
 
@@ -117,8 +117,8 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
               className="text-base leading-relaxed mb-10"
               style={{ color: `color-mix(in srgb, ${brand.fg} 60%, transparent)` }}
             >
-              Sign in once, access every BoldMind product — AmeboGist, EduCenter,
-              PlanAI Suite, BoldMind OS and more.
+              Sign in once, access every BoldMind product — AmeboGist NG, BoldmindNG EduCenter,
+              PlanAI by BoldmindNG, VillageCirle NG and more.
             </motion.p>
 
             {/* Ecosystem product pills */}
