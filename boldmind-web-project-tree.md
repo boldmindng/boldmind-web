@@ -1,6 +1,6 @@
-
 ```
 boldmind-web
+├─ README.md
 ├─ app
 │  ├─ (admin)
 │  │  └─ admin
@@ -26,15 +26,16 @@ boldmind-web
 │  │  └─ verify-email
 │  │     └─ page.tsx
 │  ├─ (dashboard)
+│  │  ├─ StatCard.tsx
 │  │  ├─ account
 │  │  │  └─ page.tsx
 │  │  ├─ components
 │  │  │  ├─ BusinessDiscovery.tsx
 │  │  │  ├─ CommunityFeed.tsx
-│  │  │  ├─ dashboard
-│  │  │  │  └─ HubDashboardPage.tsx
 │  │  │  ├─ FlywheelMetrics.tsx
 │  │  │  ├─ IdentitySection.tsx
+│  │  │  ├─ dashboard
+│  │  │  │  └─ HubDashboardPage.tsx
 │  │  │  └─ layout
 │  │  │     └─ ProtectedLayout.tsx
 │  │  ├─ dashboard
@@ -60,21 +61,20 @@ boldmind-web
 │  │  │  │  └─ page.tsx
 │  │  │  └─ wallet
 │  │  │     └─ page.tsx
-│  │  ├─ referral
-│  │  │  └─ page.tsx
-│  │  └─ StatCard.tsx
+│  │  └─ referral
+│  │     └─ page.tsx
 │  ├─ (public)
+│  │  ├─ HomeContent.tsx
+│  │  ├─ PublicLayout.tsx
 │  │  ├─ about
 │  │  │  └─ page.tsx
 │  │  ├─ contact
 │  │  │  └─ page.tsx
-│  │  ├─ HomeContent.tsx
 │  │  ├─ page.tsx
 │  │  ├─ pricing
 │  │  │  └─ page.tsx
 │  │  ├─ privacy
 │  │  │  └─ page.tsx
-│  │  ├─ PublicLayout.tsx
 │  │  ├─ start
 │  │  │  └─ page.tsx
 │  │  └─ terms
@@ -102,7 +102,6 @@ boldmind-web
 │  ├─ sitemap.ts
 │  └─ sso
 │     └─ route.ts
-├─ boldmind-system-design-v2-alignment-addendum.md
 ├─ boldmind-web-architecture-plan.md
 ├─ boldmind-web-project-tree.md
 ├─ eslint.config.mjs
@@ -117,7 +116,6 @@ boldmind-web
 ├─ package.json
 ├─ pnpm-lock.yaml
 ├─ postcss.config.js
-├─ project-tree.md
 ├─ proxy.ts
 ├─ public
 │  ├─ about-story-bg.jpg
@@ -187,7 +185,6 @@ boldmind-web
 │  │  └─ youtube-art.jpg
 │  ├─ social-media-banner.png
 │  └─ sw.js
-├─ README.md
 ├─ system.md
 ├─ tailwind.config.ts
 └─ tsconfig.json
