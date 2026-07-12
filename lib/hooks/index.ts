@@ -2,10 +2,10 @@
  * lib/hooks/index.ts — custom hooks for boldmind-web
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuthStore } from '@boldmindng/auth';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useAuthStore, authAPI } from "@boldmindng/auth";
 import {
   dashboardApi,
   referralApi,
@@ -15,15 +15,18 @@ import {
   type DashboardStats,
   type ReferralStats,
   type WalletData,
-} from '../api';
+} from "../api";
 
-// ─── Generic fetch hook ───────────────────────────────────────────────────────
+// ─── Generic fetch hook (GET-style, runs on mount) ─────────────────────────────
 
-function useFetch<T>(fetcher: () => Promise<{ data: T }>, deps: unknown[] = []) {
-  const [data, setData]     = useState<T | null>(null);
+function useFetch<T>(
+  fetcher: () => Promise<{ data: T }>,
+  deps: unknown[] = [],
+) {
+  const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError]   = useState<Error | null>(null);
-  const mountedRef           = useRef(true);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
 
   const run = useCallback(async () => {
     setLoading(true);
@@ -36,16 +39,68 @@ function useFetch<T>(fetcher: () => Promise<{ data: T }>, deps: unknown[] = []) 
     } finally {
       if (mountedRef.current) setLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   useEffect(() => {
     mountedRef.current = true;
     run();
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, [run]);
 
   return { data, loading, error, refresh: run };
+}
+
+// ─── Generic mutation hook (POST/PATCH-style, caller-triggered) ────────────────
+//
+// NEW — this was missing, which is why `useForgotPassword`/`useResetPassword`
+// didn't exist. Unlike useFetch, `execute()` re-throws the error after storing
+// it in state, so a caller can safely do:
+//
+//   try {
+//     await mutation.execute(...);
+//     // success
+//   } catch (err) {
+//     // failure — err and mutation.error carry the same Error
+//   }
+//
+// without racing React's state batching (the bug in the original
+// forgot-password/change-password pages, which read `mutation.error`
+// immediately after `await execute()` in the same closure).
+
+function useMutation<TArgs extends unknown[], TResult>(
+  fn: (...args: TArgs) => Promise<{ data: TResult }>,
+) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [data, setData] = useState<TResult | null>(null);
+
+  const execute = useCallback(async (...args: TArgs): Promise<TResult> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fn(...args);
+      setData(res.data);
+      return res.data;
+    } catch (err) {
+      const e = err instanceof Error ? err : new Error("Request failed");
+      setError(e);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const reset = useCallback(() => {
+    setLoading(false);
+    setError(null);
+    setData(null);
+  }, []);
+
+  return { execute, loading, error, data, reset };
 }
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
@@ -78,9 +133,16 @@ export function useMySubscriptions() {
 
 // ─── Admin users ─────────────────────────────────────────────────────────────
 
-export function useAdminUsers(params: { page?: number; pageSize?: number; role?: string; search?: string } = {}) {
-  const [page, setPage]     = useState(params.page ?? 1);
-  const [search, setSearch] = useState(params.search ?? '');
+export function useAdminUsers(
+  params: {
+    page?: number;
+    pageSize?: number;
+    role?: string;
+    search?: string;
+  } = {},
+) {
+  const [page, setPage] = useState(params.page ?? 1);
+  const [search, setSearch] = useState(params.search ?? "");
 
   const { data, loading, error, refresh } = useFetch(
     () => adminApi.getUsers({ ...params, page, search }),
@@ -88,6 +150,31 @@ export function useAdminUsers(params: { page?: number; pageSize?: number; role?:
   );
 
   return { data, loading, error, refresh, page, setPage, search, setSearch };
+}
+
+// ─── Password reset flow ────────────────────────────────────────────────────
+//
+// NEW. Routed through `authAPI` from `@boldmindng/auth` — the same package
+// login/page.tsx and register/page.tsx already use for `authAPI.login`,
+// `authAPI.register`, `authAPI.me` — rather than lib/api's `apiFetch`, since
+// password reset is an auth-package concern, not a hub-domain one.
+//
+// ⚠️ CONFIRM against `@boldmindng/auth`'s actual export: this assumes
+//    `authAPI.forgotPassword({ email })` and
+//    `authAPI.resetPassword({ email, token, password })`
+//    each resolve `{ data: ... }` and reject/throw on failure (mirroring the
+//    already-working `authAPI.login`/`authAPI.register` shape used elsewhere
+//    in this app). If the real method names or payload shape differ, this is
+//    a one-line change here — nothing else needs to move.
+
+export function useForgotPassword() {
+  return useMutation((email: string) => authAPI.forgotPassword({ email }));
+}
+
+export function useResetPassword() {
+  return useMutation((email: string, token: string, password: string) =>
+    authAPI.resetPassword({ email, token, password }),
+  );
 }
 
 // ─── Auth selectors ───────────────────────────────────────────────────────────
@@ -98,15 +185,15 @@ export function useAuth() {
     user,
     status,
     session,
-    isAuthenticated: status === 'authenticated',
-    isLoading: status === 'loading',
+    isAuthenticated: status === "authenticated",
+    isLoading: status === "loading",
     accessToken: session?.accessToken ?? null,
   };
 }
 
 export function useIsAdmin() {
   const { user } = useAuth();
-  return user?.role === 'super_admin' || user?.role === 'admin';
+  return user?.role === "super_admin" || user?.role === "admin";
 }
 
 // ─── Clipboard ───────────────────────────────────────────────────────────────
@@ -114,23 +201,25 @@ export function useIsAdmin() {
 export function useClipboard(timeout = 2000) {
   const [copied, setCopied] = useState(false);
 
-  const copy = useCallback(async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), timeout);
-    } catch {
-      // fallback
-      const el = document.createElement('textarea');
-      el.value = text;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      setCopied(true);
-      setTimeout(() => setCopied(false), timeout);
-    }
-  }, [timeout]);
+  const copy = useCallback(
+    async (text: string) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), timeout);
+      } catch {
+        const el = document.createElement("textarea");
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        setCopied(true);
+        setTimeout(() => setCopied(false), timeout);
+      }
+    },
+    [timeout],
+  );
 
   return { copied, copy };
 }
@@ -139,7 +228,7 @@ export function useClipboard(timeout = 2000) {
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') return initialValue;
+    if (typeof window === "undefined") return initialValue;
     try {
       const item = window.localStorage.getItem(key);
       return item ? (JSON.parse(item) as T) : initialValue;
@@ -148,15 +237,21 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   });
 
-  const setValue = useCallback((value: T | ((val: T) => T)) => {
-    try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+  const setValue = useCallback(
+    (value: T | ((val: T) => T)) => {
+      try {
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        }
+      } catch {
+        /* ignore */
       }
-    } catch {/* ignore */}
-  }, [key, storedValue]);
+    },
+    [key, storedValue],
+  );
 
   return [storedValue, setValue] as const;
 }

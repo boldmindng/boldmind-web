@@ -1,34 +1,39 @@
-'use client';
+"use client";
 
-import { useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useAuth } from '@boldmindng/auth';
-import { motion } from 'framer-motion';
+import { useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  useAuth,
+  isSafeBoldMindUrl,
+  getAppNameFromReturnUrl,
+} from "@boldmindng/auth";
+import { motion } from "framer-motion";
 
 const brand = {
-  primary:   'var(--product-primary)',
-  secondary: 'var(--product-secondary)',
-  bg:        'var(--product-background)',
-  fg:        'var(--product-foreground)',
-  muted:     'var(--product-muted)',
+  primary: "var(--product-primary)",
+  secondary: "var(--product-secondary)",
+  bg: "var(--product-background)",
+  fg: "var(--product-foreground)",
+  muted: "var(--product-muted)",
 } as const;
 
 function AuthLayoutInner({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const returnUrl = searchParams.get('return_url');
+  const returnUrl = searchParams?.get("return_url");
 
+  // FIX: single source of truth for "is this URL safe to redirect to" —
+  // was previously a hand-rolled BOLDMIND_DOMAINS list missing villagecircle.ng,
+  // which meant an already-logged-in user hitting /login?return_url=https://villagecircle.ng/...
+  // got silently bounced to /dashboard instead of continuing to VillageCircle.
   useEffect(() => {
     if (!isLoading && user) {
-      const destination = returnUrl ?? '/dashboard';
-      if (returnUrl && !isSafeBoldMindUrl(returnUrl)) {
-        router.replace('/dashboard');
-      } else {
-        router.replace(destination);
-      }
+      const destination =
+        returnUrl && isSafeBoldMindUrl(returnUrl) ? returnUrl : "/dashboard";
+      router.replace(destination);
     }
   }, [user, isLoading, router, returnUrl]);
 
@@ -51,6 +56,13 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
 
   if (user) return null;
 
+  // FIX: same app-name resolver the login page uses, so the layout banner
+  // and the login page heading never disagree about which product you're signing into.
+  const appName =
+    returnUrl && isSafeBoldMindUrl(returnUrl)
+      ? getAppNameFromReturnUrl(returnUrl)
+      : "BoldMind";
+
   return (
     <div
       className="min-h-screen flex"
@@ -63,30 +75,37 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
           background: `linear-gradient(135deg, ${brand.primary} 0%, color-mix(in srgb, ${brand.primary} 80%, #1a2a5e) 60%, color-mix(in srgb, ${brand.primary} 90%, black) 100%)`,
         }}
       >
-        {/* Ambient glows */}
         <div className="absolute inset-0 pointer-events-none">
           <div
             className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full blur-[100px]"
-            style={{ background: `color-mix(in srgb, ${brand.secondary} 8%, transparent)` }}
+            style={{
+              background: `color-mix(in srgb, ${brand.secondary} 8%, transparent)`,
+            }}
           />
           <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full blur-[80px] bg-blue-500/8" />
         </div>
 
-        {/* Subtle grid texture */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
                               linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
-            backgroundSize: '40px 40px',
+            backgroundSize: "40px 40px",
           }}
         />
 
         <div className="relative z-10 flex flex-col h-full p-12">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 mb-16 no-underline group">
+          <Link
+            href="/"
+            className="flex items-center gap-3 mb-16 no-underline group"
+          >
             <div className="relative w-10 h-10">
-              <Image src="/logo.webp" alt="BoldMind" fill className="object-contain" />
+              <Image
+                src="/logo.webp"
+                alt="BoldMind"
+                fill
+                className="object-contain"
+              />
             </div>
             <span
               className="font-black text-xl tracking-tight transition-colors"
@@ -96,7 +115,6 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
 
-          {/* Hero copy */}
           <div className="flex-1 flex flex-col justify-center">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -107,7 +125,7 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
             >
               One account.
               <br />
-              <span style={{ color: brand.secondary }}>32+ products.</span>
+              <span style={{ color: brand.secondary }}>Four pillars.</span>
             </motion.h1>
 
             <motion.p
@@ -115,13 +133,17 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
               className="text-base leading-relaxed mb-10"
-              style={{ color: `color-mix(in srgb, ${brand.fg} 60%, transparent)` }}
+              style={{
+                color: `color-mix(in srgb, ${brand.fg} 60%, transparent)`,
+              }}
             >
-              Sign in once, access every BoldMind product — AmeboGist NG, BoldmindNG EduCenter,
-              PlanAI by BoldmindNG, VillageCirle NG and more.
+              Sign in once, access every BoldMind product — AmeboGist NG,
+              VillageCircle NG, Boldmind EduCenter and PlanAI by BoldmindNG.
             </motion.p>
 
-            {/* Ecosystem product pills */}
+            {/* FIX: was a stale product list (SkillGig, Amebo Studio, BoldMind OS as
+                top-level products) that no longer matches products.ts. Now mirrors the
+                four real ecosystem pillars. */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -144,7 +166,6 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
               ))}
             </motion.div>
 
-            {/* Trust stats */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -152,15 +173,22 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
               className="mt-10 flex items-center gap-8"
             >
               {[
-                { value: '10,000+', label: 'Entrepreneurs' },
-                { value: '32+',     label: 'Products'      },
-                { value: '100%',    label: 'Nigerian-built' },
-              ].map(stat => (
+                { value: "650+", label: "Businesses on PlanAI" },
+                { value: "4", label: "Ecosystem pillars" },
+                { value: "100%", label: "Nigerian-built" },
+              ].map((stat) => (
                 <div key={stat.label}>
-                  <p className="text-xl font-black" style={{ color: brand.secondary }}>{stat.value}</p>
+                  <p
+                    className="text-xl font-black"
+                    style={{ color: brand.secondary }}
+                  >
+                    {stat.value}
+                  </p>
                   <p
                     className="text-xs mt-0.5"
-                    style={{ color: `color-mix(in srgb, ${brand.fg} 40%, transparent)` }}
+                    style={{
+                      color: `color-mix(in srgb, ${brand.fg} 40%, transparent)`,
+                    }}
                   >
                     {stat.label}
                   </p>
@@ -169,45 +197,52 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
             </motion.div>
           </div>
 
-          {/* Footer */}
           <p
             className="text-xs"
-            style={{ color: `color-mix(in srgb, ${brand.fg} 25%, transparent)` }}
+            style={{
+              color: `color-mix(in srgb, ${brand.fg} 25%, transparent)`,
+            }}
           >
-            © {new Date().getFullYear()} BoldMind Technology Solution Enterprise
+            © {new Date().getFullYear()} Boldmind Technology Solution Enterprise
           </p>
         </div>
       </div>
 
       {/* ── RIGHT PANEL — auth form ── */}
       <div className="flex-1 flex flex-col min-h-screen">
-
-        {/* Mobile logo bar */}
         <div
           className="lg:hidden flex items-center justify-between px-6 py-5"
-          style={{ borderBottom: `1px solid color-mix(in srgb, ${brand.fg} 5%, transparent)` }}
+          style={{
+            borderBottom: `1px solid color-mix(in srgb, ${brand.fg} 5%, transparent)`,
+          }}
         >
           <Link href="/" className="flex items-center gap-2 no-underline">
             <div className="relative w-8 h-8">
-              <Image src="/logo.webp" alt="BoldMind" fill className="object-contain" />
+              <Image
+                src="/logo.webp"
+                alt="BoldMind"
+                fill
+                className="object-contain"
+              />
             </div>
-            <span className="font-black text-base" style={{ color: brand.fg }}>BoldMind</span>
+            <span className="font-black text-base" style={{ color: brand.fg }}>
+              BoldMind
+            </span>
           </Link>
           {returnUrl && (
             <span
               className="text-xs"
-              style={{ color: `color-mix(in srgb, ${brand.fg} 30%, transparent)` }}
+              style={{
+                color: `color-mix(in srgb, ${brand.fg} 30%, transparent)`,
+              }}
             >
-              ↳ {getAppNameFromUrl(returnUrl)}
+              ↳ {appName}
             </span>
           )}
         </div>
 
-        {/* Centred form area */}
         <div className="flex-1 flex items-center justify-center px-6 py-10">
-          <div className="w-full max-w-[420px]">
-
-            {/* Return-URL context banner */}
+          <div className="w-full max-w-105">
             {returnUrl && (
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
@@ -221,17 +256,21 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
                 <span className="text-lg">🔐</span>
                 <p
                   className="text-sm"
-                  style={{ color: `color-mix(in srgb, ${brand.fg} 60%, transparent)` }}
+                  style={{
+                    color: `color-mix(in srgb, ${brand.fg} 60%, transparent)`,
+                  }}
                 >
-                  Sign in to continue to{' '}
-                  <span className="font-semibold" style={{ color: brand.secondary }}>
-                    {getAppNameFromUrl(returnUrl)}
+                  Sign in to continue to{" "}
+                  <span
+                    className="font-semibold"
+                    style={{ color: brand.secondary }}
+                  >
+                    {appName}
                   </span>
                 </p>
               </motion.div>
             )}
 
-            {/* Auth form card */}
             <div
               className="rounded-2xl p-8 backdrop-blur-sm"
               style={{
@@ -242,24 +281,29 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
               {children}
             </div>
 
-            {/* Terms footer */}
             <p
               className="text-center text-xs mt-5"
-              style={{ color: `color-mix(in srgb, ${brand.fg} 20%, transparent)` }}
+              style={{
+                color: `color-mix(in srgb, ${brand.fg} 20%, transparent)`,
+              }}
             >
-              By continuing, you agree to our{' '}
+              By continuing, you agree to our{" "}
               <Link
                 href="/terms"
                 className="transition-colors hover:underline"
-                style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}
+                style={{
+                  color: `color-mix(in srgb, ${brand.fg} 35%, transparent)`,
+                }}
               >
                 Terms
               </Link>
-              {' & '}
+              {" & "}
               <Link
                 href="/privacy"
                 className="transition-colors hover:underline"
-                style={{ color: `color-mix(in srgb, ${brand.fg} 35%, transparent)` }}
+                style={{
+                  color: `color-mix(in srgb, ${brand.fg} 35%, transparent)`,
+                }}
               >
                 Privacy Policy
               </Link>
@@ -271,58 +315,29 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--product-background)' }} />}>
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen"
+          style={{ background: "var(--product-background)" }}
+        />
+      }
+    >
       <AuthLayoutInner>{children}</AuthLayoutInner>
     </Suspense>
   );
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-const BOLDMIND_DOMAINS = [
-  'boldmind.ng',
-  'amebogist.ng',
-  'educenter.com.ng',
-  'localhost',
-  '127.0.0.1',
-];
-
-function isSafeBoldMindUrl(url: string): boolean {
-  try {
-    const { hostname } = new URL(url);
-    return BOLDMIND_DOMAINS.some(
-      (d) => hostname === d || hostname.endsWith(`.${d}`),
-    );
-  } catch {
-    return false;
-  }
-}
-
-function getAppNameFromUrl(url: string): string {
-  try {
-    const { hostname } = new URL(url);
-    if (hostname.includes('amebogist'))  return 'AmeboGist';
-    if (hostname.includes('educenter'))  return 'EduCenter';
-    if (hostname.includes('planai'))     return 'PlanAI Suite';
-    if (hostname.includes('fit.'))       return 'NaijaFit';
-    if (hostname.includes('os.'))        return 'BoldMind OS';
-    if (hostname.includes('studio'))     return 'Amebo Studio';
-    if (hostname.includes('tools'))      return 'BoldMind Tools';
-    if (hostname.includes('skills'))     return 'SkillGig';
-    return 'BoldMind';
-  } catch {
-    return 'BoldMind';
-  }
-}
-
+// ─── Ecosystem pill data — matches products.ts pillar hubs, not invented products ──
 const ECOSYSTEM_PRODUCTS = [
-  { slug: 'amebogist',  name: 'AmeboGist',    icon: '📰' },
-  { slug: 'educenter',  name: 'EduCenter',    icon: '🎓' },
-  { slug: 'planai',     name: 'PlanAI',       icon: '🧠' },
-  { slug: 'fit',        name: 'NaijaFit',     icon: '💪' },
-  { slug: 'os',         name: 'BoldMind OS',  icon: '🖥️' },
-  { slug: 'studio',     name: 'Studio',       icon: '✍️' },
-  { slug: 'skillgig',   name: 'SkillGig',     icon: '🎭' },
+  { slug: "amebogist", name: "AmeboGist", icon: "📰" },
+  { slug: "villagecircle", name: "VillageCircle", icon: "🌱" },
+  { slug: "educenter", name: "EduCenter", icon: "🎓" },
+  { slug: "planai", name: "PlanAI", icon: "⚡" },
 ];
