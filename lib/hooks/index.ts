@@ -159,21 +159,19 @@ export function useAdminUsers(
 // `authAPI.register`, `authAPI.me` — rather than lib/api's `apiFetch`, since
 // password reset is an auth-package concern, not a hub-domain one.
 //
-// ⚠️ CONFIRM against `@boldmindng/auth`'s actual export: this assumes
-//    `authAPI.forgotPassword({ email })` and
-//    `authAPI.resetPassword({ email, token, password })`
-//    each resolve `{ data: ... }` and reject/throw on failure (mirroring the
-//    already-working `authAPI.login`/`authAPI.register` shape used elsewhere
-//    in this app). If the real method names or payload shape differ, this is
-//    a one-line change here — nothing else needs to move.
+// Confirmed against packages/auth/src/api.ts:
+//   authAPI.forgotPassword({ email })
+//   authAPI.resetPassword({ token, password })   — NOTE: no `email` field.
+// resetPassword identifies the user from the token alone; passing an email
+// here would be an excess-property TS error against ResetPasswordPayload.
 
 export function useForgotPassword() {
   return useMutation((email: string) => authAPI.forgotPassword({ email }));
 }
 
 export function useResetPassword() {
-  return useMutation((email: string, token: string, password: string) =>
-    authAPI.resetPassword({ email, token, password }),
+  return useMutation((token: string, password: string) =>
+    authAPI.resetPassword({ token, password }),
   );
 }
 

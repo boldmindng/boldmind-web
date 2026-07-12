@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  useAuth,
+  useAuthStore,
   isSafeBoldMindUrl,
   getAppNameFromReturnUrl,
 } from "@boldmindng/auth";
@@ -20,15 +20,20 @@ const brand = {
 } as const;
 
 function AuthLayoutInner({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuth();
+  // FIX: `useAuth` doesn't exist on @boldmindng/auth — that name only exists
+  // as boldmind-web's own lib/hooks/index.ts wrapper (a different, local hook
+  // with the same name). @boldmindng/auth's confirmed export is `useAuthStore`
+  // (see packages/auth/src/index.ts → `export { useAuthStore } from './store'`).
+  // Deriving `user`/`isLoading` here the same way lib/hooks' useAuth() does,
+  // straight off the store, so this component only depends on exports that
+  // are actually confirmed to exist.
+  const { user, status } = useAuthStore();
+  const isLoading = status === "loading";
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnUrl = searchParams?.get("return_url");
 
-  // FIX: single source of truth for "is this URL safe to redirect to" —
-  // was previously a hand-rolled BOLDMIND_DOMAINS list missing villagecircle.ng,
-  // which meant an already-logged-in user hitting /login?return_url=https://villagecircle.ng/...
-  // got silently bounced to /dashboard instead of continuing to VillageCircle.
   useEffect(() => {
     if (!isLoading && user) {
       const destination =
@@ -56,8 +61,6 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
 
   if (user) return null;
 
-  // FIX: same app-name resolver the login page uses, so the layout banner
-  // and the login page heading never disagree about which product you're signing into.
   const appName =
     returnUrl && isSafeBoldMindUrl(returnUrl)
       ? getAppNameFromReturnUrl(returnUrl)
@@ -70,7 +73,7 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
     >
       {/* ── LEFT PANEL — branding (desktop only) ── */}
       <div
-        className="hidden lg:flex lg:flex-col lg:w-[480px] lg:flex-shrink-0 relative overflow-hidden"
+        className="hidden lg:flex lg:flex-col lg:w-120 lg:shrink-0 relative overflow-hidden"
         style={{
           background: `linear-gradient(135deg, ${brand.primary} 0%, color-mix(in srgb, ${brand.primary} 80%, #1a2a5e) 60%, color-mix(in srgb, ${brand.primary} 90%, black) 100%)`,
         }}
@@ -141,9 +144,6 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
               VillageCircle NG, Boldmind EduCenter and PlanAI by BoldmindNG.
             </motion.p>
 
-            {/* FIX: was a stale product list (SkillGig, Amebo Studio, BoldMind OS as
-                top-level products) that no longer matches products.ts. Now mirrors the
-                four real ecosystem pillars. */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -34,7 +35,6 @@ function ChangePasswordContent() {
 
   useEffect(() => {
     if (!token || !email)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFieldError("Invalid or missing reset link. Please request a new one.");
   }, [token, email]);
 
@@ -67,11 +67,13 @@ function ChangePasswordContent() {
     // right after `await execute(...)` reflects the PREVIOUS render, not the
     // outcome of this call. That meant a failed reset could still flip to the
     // "Password Changed!" success screen. try/catch on the awaited call is the
-    // reliable signal.
-    // NOTE: assumes `execute` rethrows on failure — confirm against the actual
-    // `useResetPassword` implementation in lib/hooks/index.ts.
+    // reliable signal (useMutation's execute() rethrows on failure).
+    //
+    // NOTE: only `token` + `password` are sent — authAPI.resetPassword's
+    // confirmed payload shape is { token, password }, no email field. `email`
+    // is still read from the URL purely for display/validation on this page.
     try {
-      await resetMutation.execute(email, token, password);
+      await resetMutation.execute(token, password);
       setSuccess(true);
       toast.success("Password changed successfully!");
       setTimeout(() => router.push("/login"), 2000);
