@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -169,7 +169,7 @@ function SidebarContent({
     >
       {/* Brand bar */}
       <div
-        className="flex items-center justify-between h-14 px-5 flex-shrink-0"
+        className="flex items-center justify-between h-14 px-5 shrink-0"
         style={{
           background:
             "linear-gradient(135deg, var(--product-primary), color-mix(in srgb, var(--product-primary) 75%, black))",
@@ -179,7 +179,7 @@ function SidebarContent({
           href={variant === "admin" ? "/admin" : "/dashboard"}
           className="flex items-center gap-2.5"
         >
-          <div className="relative w-7 h-7 flex-shrink-0">
+          <div className="relative w-7 h-7 shrink-0">
             <Image
               src="/logo.webp"
               alt="BoldmindNG"
@@ -220,7 +220,7 @@ function SidebarContent({
           style={{ backgroundColor: "var(--product-muted)" }}
         >
           <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white flex-shrink-0"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white shrink-0"
             style={{ backgroundColor: "var(--product-primary)" }}
           >
             {initials}
@@ -374,15 +374,14 @@ export default function BoldmindLayout({
   variant = "protected",
 }: BoldmindLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const router = useRouter();
   const { user } = useAuth();
   const isAdmin = useIsAdmin();
   const clearSession = useAuthStore((s) => s.clearSession);
 
   // Close mobile drawer on route change
-  useEffect(() => {
-  }, [pathname]);
+  useEffect(() => {}, [pathname]);
 
   const displayName =
     (user as any)?.firstName ??

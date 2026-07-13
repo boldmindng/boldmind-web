@@ -1,46 +1,78 @@
-import { SuperNavbar, SuperFooter } from '@boldmindng/ui';
-import type { ReactNode } from 'react';
+import { SuperNavbar, SuperFooter } from "@boldmindng/ui";
+import type { ReactNode } from "react";
 
 const NAV_LINKS = [
-  { href: '/',                               label: 'Home'           },
-  { href: 'https://amebogist.ng',            label: 'AmeboGist',     isExternal: true },
-  { href: 'https://villagecircle.ng',        label: 'VillageCircle', isExternal: true },
-  { href: 'https://educenter.com.ng',        label: 'EduCenter',     isExternal: true },
-  { href: 'https://planai.boldmind.ng',      label: 'PlanAI',        isExternal: true },
-  { href: '/pricing',                        label: 'Pricing'        },
-  { href: '/about',                          label: 'About'          },
+  { href: "/", label: "Home" },
+  { href: "https://amebogist.ng", label: "AmeboGist", isExternal: true },
+  {
+    href: "https://villagecircle.ng",
+    label: "VillageCircle",
+    isExternal: true,
+  },
+  { href: "https://educenter.com.ng", label: "EduCenter", isExternal: true },
+  { href: "https://planai.boldmind.ng", label: "PlanAI", isExternal: true },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/about", label: "About" },
 ];
 
 const FOOTER_SECTIONS = [
   {
-    title: '🚀 Ecosystem',
+    title: "🚀 Ecosystem",
     links: [
-      { href: 'https://amebogist.ng',                label: 'AmeboGist',       isExternal: true },
-      { href: 'https://villagecircle.ng',             label: 'VillageCircle',   isExternal: true },
-      { href: 'https://villagecircle.ng/vibe-coders', label: 'Vibe Coders',     isExternal: true },
-      { href: 'https://educenter.com.ng',             label: 'EduCenter',       isExternal: true },
-      { href: 'https://planai.boldmind.ng',           label: 'PlanAI Suite',    isExternal: true },
-      { href: 'https://marketplace.boldmind.ng',      label: 'Marketplace',     isExternal: true },
+      { href: "https://amebogist.ng", label: "AmeboGist", isExternal: true },
+      {
+        href: "https://villagecircle.ng",
+        label: "VillageCircle",
+        isExternal: true,
+      },
+      {
+        href: "https://villagecircle.ng/vibe-coders",
+        label: "Vibe Coders",
+        isExternal: true,
+      },
+      {
+        href: "https://educenter.com.ng",
+        label: "EduCenter",
+        isExternal: true,
+      },
+      {
+        href: "https://planai.boldmind.ng",
+        label: "PlanAI Suite",
+        isExternal: true,
+      },
+      {
+        href: "https://marketplace.boldmind.ng",
+        label: "Marketplace",
+        isExternal: true,
+      },
     ],
   },
   {
-    title: '🏢 Company',
+    title: "🏢 Company",
     links: [
-      { href: '/about',    label: 'About BoldmindNG' },
-      { href: '/ecosystem',label: 'Ecosystem'        },
-      { href: '/pricing',  label: 'Pricing'          },
-      { href: '/blog',     label: 'Blog'             },
-      { href: '/contact',  label: 'Contact'          },
-      { href: '/privacy',  label: 'Privacy Policy'   },
-      { href: '/terms',    label: 'Terms of Service' },
+      { href: "/about", label: "About BoldmindNG" },
+      { href: "/ecosystem", label: "Ecosystem" },
+      { href: "/pricing", label: "Pricing" },
+      { href: "/blog", label: "Blog" },
+      { href: "/contact", label: "Contact" },
+      { href: "/privacy", label: "Privacy Policy" },
+      { href: "/terms", label: "Terms of Service" },
     ],
   },
   {
-    title: '🛟 Support',
+    title: "🛟 Support",
     links: [
-      { href: 'mailto:hello@boldmind.ng',      label: 'Email Us'          },
-      { href: 'https://wa.me/2349138349271',    label: 'WhatsApp Support',  isExternal: true },
-      { href: 'https://wa.me/2349138349271',    label: 'Report a Bug',      isExternal: true },
+      { href: "mailto:hello@boldmind.ng", label: "Email Us" },
+      {
+        href: "https://wa.me/2349138349271",
+        label: "WhatsApp Support",
+        isExternal: true,
+      },
+      {
+        href: "https://wa.me/2349138349271",
+        label: "Report a Bug",
+        isExternal: true,
+      },
     ],
   },
 ];
@@ -48,16 +80,22 @@ const FOOTER_SECTIONS = [
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen">
-      <SuperNavbar links={NAV_LINKS} logoSrc="/logo.png" sticky showThemeControls />
+      <SuperNavbar
+        brandName="BoldmindNG"
+        links={NAV_LINKS}
+        logoSrc="/logo.png"
+        sticky
+        showThemeControls
+      />
       <main className="flex-1">{children}</main>
       <SuperFooter
         logoSrc="/logo.png"
         sections={FOOTER_SECTIONS}
         contactInfo={{
-          email:    'hello@boldmind.ng',
-          phone:    '+2349138349271',
-          whatsapp: '+2349138349271',
-          address:  'No 5 Olusoji Imole Street, Ikosi Ketu, Lagos, Nigeria',
+          email: "hello@boldmind.ng",
+          phone: "+2349138349271",
+          whatsapp: "+2349138349271",
+          address: "No 5 Olusoji Imole Street, Ikosi Ketu, Lagos, Nigeria",
         }}
         copyright={`© ${new Date().getFullYear()} Boldmind Technology Solution Enterprise. All rights reserved.`}
       />
