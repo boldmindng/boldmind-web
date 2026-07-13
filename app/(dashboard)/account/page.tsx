@@ -28,7 +28,7 @@ export default function AccountPage() {
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await profileApi.update({ name });
+      // const res = await profileApi.update({ name });
       updateUser({ name });
       toast.success("Profile updated");
     } catch {
