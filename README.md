@@ -95,7 +95,6 @@ boldmind-web
 │  │  ├─ AnalyticsInit.tsx
 │  │  ├─ ClientAuthProvider.tsx
 │  │  └─ ClientErrorBoundary.tsx
-│  ├─ example.tsx
 │  ├─ globals.css
 │  ├─ layout.tsx
 │  ├─ manifest.ts
@@ -115,7 +114,6 @@ boldmind-web
 │  └─ user-api-adapter.ts
 ├─ next.config.mjs
 ├─ package.json
-├─ pnpm-lock.yaml
 ├─ postcss.config.js
 ├─ proxy.ts
 ├─ public
