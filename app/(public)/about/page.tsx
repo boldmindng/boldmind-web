@@ -9,13 +9,11 @@ import {
   Heart,
   Zap,
   Globe,
-  Rocket,
   Award,
   TrendingUp,
   Linkedin,
   Twitter,
   ExternalLink,
-  BookOpen,
   GraduationCap,
   Facebook,
 } from "lucide-react";
@@ -151,7 +149,7 @@ export default function AboutPage() {
           />
         </div>
         <div
-          className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-3xl opacity-20 pointer-events-none z-0"
+          className="absolute top-0 right-0 w-125 h-125 rounded-full blur-3xl opacity-20 pointer-events-none z-0"
           style={{
             backgroundColor: brand.secondary,
             transform: "translate(30%,-30%)",
@@ -272,7 +270,7 @@ export default function AboutPage() {
                 </p>
                 <div className="flex items-center gap-4 pt-4">
                   <div
-                    className="h-0.5 w-12 flex-shrink-0"
+                    className="h-0.5 w-12 shrink-0"
                     style={{ backgroundColor: brand.secondary }}
                   />
                   <p
@@ -291,7 +289,7 @@ export default function AboutPage() {
               viewport={{ once: true }}
             >
               <div
-                className="rounded-3xl p-10 relative overflow-hidden min-h-[500px] flex items-center"
+                className="rounded-3xl p-10 relative overflow-hidden min-h-125 flex items-center"
                 style={{
                   background: `linear-gradient(135deg, var(--product-primary), color-mix(in srgb, var(--product-primary) 70%, black))`,
                 }}
@@ -573,21 +571,22 @@ export default function AboutPage() {
                     className="text-lg mb-6 leading-relaxed italic"
                     style={{ color: brand.fg, opacity: 0.75 }}
                   >
-                    &quot;I didn&apos;t set out to build a tech company. I set out to fix
-                    education in Nigeria. EduCenter was the seed. AmeboGist was
-                    the megaphone. PlanAI was the enabler. VillageCircle was the
-                    realisation — that what we were really building was an
-                    ecosystem that could shift a nation.&quot;
+                    &quot;I didn&apos;t set out to build a tech company. I set
+                    out to fix education in Nigeria. EduCenter was the seed.
+                    AmeboGist was the megaphone. PlanAI was the enabler.
+                    VillageCircle was the realisation — that what we were really
+                    building was an ecosystem that could shift a nation.&quot;
                   </p>
                   <div className="flex gap-3">
-                    <a href="https://facebook.com/charleschiukau"
-                     target="_blank"
-                       rel="noopener noreferrer"
+                    <a
+                      href="https://facebook.com/charleschiukau"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 text-sm font-bold transition-all hover:opacity-80 hover:scale-105"
                       style={{ borderColor: brand.muted, color: brand.fg }}
-                      >
-                        <Facebook size={16}/> Facebook
-                      </a>
+                    >
+                      <Facebook size={16} /> Facebook
+                    </a>
 
                     <a
                       href="https://linkedin.com/in/charlesuchijuka"

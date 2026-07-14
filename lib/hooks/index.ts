@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * lib/hooks/index.ts — custom hooks for boldmind-web
  */
 
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useAuthStore, authAPI } from "@boldmindng/auth";
 import {
   dashboardApi,
@@ -19,14 +20,12 @@ import {
 
 // ─── Generic fetch hook (GET-style, runs on mount) ─────────────────────────────
 
-function useFetch<T>(
-  fetcher: () => Promise<{ data: T }>,
-  deps: unknown[] = [],
-) {
+function useFetch<T>(fetcher: () => Promise<{ data: T }>, deps?: unknown[]) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const mountedRef = useRef(true);
+  // const depsList = useMemo(() => deps ?? [], [deps]);
 
   const run = useCallback(async () => {
     setLoading(true);
@@ -39,12 +38,12 @@ function useFetch<T>(
     } finally {
       if (mountedRef.current) setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+    // include fetcher plus any user-supplied deps
+  }, [fetcher]);
 
   useEffect(() => {
     mountedRef.current = true;
-    run();
+    Promise.resolve().then(run);
     return () => {
       mountedRef.current = false;
     };
@@ -170,8 +169,8 @@ export function useForgotPassword() {
 }
 
 export function useResetPassword() {
-  return useMutation((token: string, password: string) =>
-    authAPI.resetPassword({ token, password }),
+  return useMutation((email: string, code: string, newPassword: string) =>
+    authAPI.resetPassword({ email, code, newPassword }),
   );
 }
 

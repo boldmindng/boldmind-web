@@ -11,12 +11,12 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@boldmindng/analytics": "10.0.0",
-    "@boldmindng/api-client": "10.0.0",
-    "@boldmindng/auth": "13.0.0",
-    "@boldmindng/ui": "15.0.0",
-    "@boldmindng/utils": "8.1.0",
-    "@boldmindng/pwa": "0.1.4",
+    "@boldmindng/analytics": "12.0.0",
+    "@boldmindng/api-client": "12.0.0",
+    "@boldmindng/auth": "15.0.0",
+    "@boldmindng/ui": "17.0.0",
+    "@boldmindng/utils": "10.0.0",
+    "@boldmindng/pwa": "2.0.0",
     "@types/node": "24.10.0",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
