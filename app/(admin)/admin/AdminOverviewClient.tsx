@@ -2,7 +2,9 @@
 "use client";
 
 import Link from "next/link";
+// WAS:
 import { useDashboardStats } from "../../../lib/hooks";
+// ...
 
 export default function AdminOverviewClient() {
   const { data: stats, loading, error, refresh } = useDashboardStats();
@@ -219,7 +221,7 @@ export default function AdminOverviewClient() {
                       (green/red/yellow are not CSS var driven here intentionally,
                        since status colours are universal, not product-themed). */}
                   <span
-                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                    className={`w-2 h-2 rounded-full shrink-0 ${
                       svc.status === "healthy"
                         ? "bg-green-400"
                         : svc.status === "unhealthy"
