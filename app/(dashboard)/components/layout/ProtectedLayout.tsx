@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "../../../../lib/hooks";
-import { authAPI, broadcastLogout, useAuthStore } from "@boldmindng/auth";
+import { authAPI, useAuthStore } from "@boldmindng/auth";
 import { getUserRoleDisplay, hasAdminPermission } from "@boldmindng/utils";
 import { toast } from "sonner";
 import type { ReactNode } from "react";
@@ -41,7 +41,6 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
     } catch {
       /* ignore — cookies get cleared client-side regardless */
     }
-    broadcastLogout();
     clearSession();
     toast.success("Signed out successfully");
     router.push("/");

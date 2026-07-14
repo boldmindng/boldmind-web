@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { motion } from "framer-motion";
 import { Trophy, Flame, Target, Award } from "lucide-react";
-import type { AuthUser } from "../../../lib/api";
+import { getUserRoleDisplay } from "@boldmindng/utils";
+import type { AuthUser } from "@boldmindng/auth";
 
 interface IdentitySectionProps {
   user: AuthUser | null;
@@ -12,10 +12,33 @@ interface IdentitySectionProps {
 export function IdentitySection({ user }: IdentitySectionProps) {
   if (!user) return null;
 
-  const roleName = user.ecosystemRole || user.role || "Member";
-  const maturity = (user as any).digitalMaturity || "Exploring";
+  // `digitalMaturity` is expected from the auth payload, but the local
+  // AuthUser type may not include it yet. Narrow it here to keep the
+  // component compile-safe without changing the shared type.
+  const { digitalMaturity } = user as AuthUser & {
+    digitalMaturity?: "low" | "medium" | "high";
+  };
 
-  // Mock data for streak and progress until backend supports it
+  const maturity = digitalMaturity
+    ? digitalMaturity.charAt(0).toUpperCase() + digitalMaturity.slice(1)
+    : "Exploring";
+
+  // FIXED: centralized role display — was local `.replace("_", " ")`
+  // duplicating logic that now lives in @boldmindng/utils (ProtectedLayout,
+  // AdminLayout, and AdminUsersPage all resolve role labels the same way).
+  // Prefers ecosystemRole (the persona layer — founder/creator/student/etc.)
+  // over the system role, falling back to system role for staff accounts
+  // that have no ecosystemRole set (e.g. an internal 'admin' with no persona).
+  const roleName = getUserRoleDisplay(
+    user.ecosystemRole ?? user.role ?? "guest",
+  );
+
+  const displayName = user.name || user.email?.split("@")[0] || "Builder";
+
+  // TODO: streak/progress/rank/badges are mocked — no backend source yet.
+  // The only streak model that exists today (StudyStreak) is EduCenter-only
+  // and scoped to students, not a general cross-ecosystem builder streak.
+  // Wire this up once/if a Hub-wide activity streak exists server-side.
   const streak = 7;
   const progress = 65;
   const rank = "Top 18%";
@@ -36,7 +59,7 @@ export function IdentitySection({ user }: IdentitySectionProps) {
               <h2 className="text-3xl font-black mb-2">
                 Welcome back,{" "}
                 <span className="text-[#FFC800]">
-                  {user.name.split(" ")[0]}
+                  {displayName.split(" ")[0]}
                 </span>{" "}
                 🔥
               </h2>
@@ -52,15 +75,13 @@ export function IdentitySection({ user }: IdentitySectionProps) {
                 <p className="text-blue-200 text-xs uppercase tracking-wider mb-1">
                   Role
                 </p>
-                <p className="font-bold text-lg capitalize">
-                  {roleName.replace("_", " ")}
-                </p>
+                <p className="font-bold text-lg">{roleName}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10 text-center min-w-25">
                 <p className="text-blue-200 text-xs uppercase tracking-wider mb-1">
                   Maturity
                 </p>
-                <p className="font-bold text-lg capitalize">{maturity}</p>
+                <p className="font-bold text-lg">{maturity}</p>
               </div>
             </div>
           </div>

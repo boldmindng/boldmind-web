@@ -11,7 +11,7 @@ import {
   CardContent,
   Input,
 } from "@boldmindng/ui";
-import { authAPI, useAuthStore, useUser } from "@boldmindng/auth";
+import { authAPI } from "@boldmindng/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Plus, Megaphone, X, Loader2, RefreshCw } from "lucide-react";
@@ -184,7 +184,7 @@ function CreateForm({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AnnouncementsPage() {
-  const { user, isLoading: authLoading } = authAPI;
+  const { user } = authAPI as any;
   const router = useRouter();
 
   const [announcements, setAnnouncements] = useState<any[]>([]);
@@ -193,10 +193,11 @@ export default function AnnouncementsPage() {
 
   // Auth guard
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (user === undefined) return;
+    if (!user) {
       router.push("/login?redirect=/dashboard/announcements");
     }
-  }, [user, authLoading, router]);
+  }, [user, router]);
 
   const loadAnnouncements = useCallback(async () => {
     setLoading(true);
@@ -211,10 +212,11 @@ export default function AnnouncementsPage() {
   }, []);
 
   useEffect(() => {
-    if (user) loadAnnouncements();
+    if (!user) return;
+    void Promise.resolve().then(loadAnnouncements);
   }, [user, loadAnnouncements]);
 
-  const handleCreated = (a: Announcement) => {
+  const handleCreated = (a: any) => {
     setAnnouncements((prev) => [a, ...prev]);
   };
 
@@ -301,13 +303,13 @@ export default function AnnouncementsPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.04 }}
                     >
-                      <Card className={style.border || undefined}>
+                      <Card className={style?.border || undefined}>
                         <CardHeader>
                           <div className="flex items-start justify-between gap-3">
                             <CardTitle className="flex items-center gap-2 text-base">
                               {a.title}
                               <span
-                                className={`text-xs px-2 py-0.5 rounded-full font-medium ${style.badge}`}
+                                className={`text-xs px-2 py-0.5 rounded-full font-medium ${style?.badge || ""}`}
                               >
                                 {a.priority}
                               </span>
