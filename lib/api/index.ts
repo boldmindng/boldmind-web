@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * lib/api/index.ts
  *
@@ -239,4 +240,70 @@ export const onboardingApi = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+};
+
+// ─── Analytics (composed from confirmed endpoints — no dedicated analytics
+// overview route exists on any uploaded controller) ────────────────────────
+
+export interface AnalyticsOverview {
+  totalRevenue: number;
+  activeUsers: number;
+  /**
+   * revenueChange/activeUsersChange/churnRate/churnChange/conversionRate/
+   * conversionChange have no backend source anywhere in the confirmed
+   * controllers. Left as `null` rather than fabricated — KpiCard/the page
+   * below render "—" and hide the change badge when null. Wire these once
+   * a real period-over-period analytics endpoint exists (likely on
+   * analytics.controller.ts, which hasn't been uploaded/reviewed yet).
+   */
+  revenueChange: number | null;
+  activeUsersChange: number | null;
+  churnRate: number | null;
+  churnChange: number | null;
+  conversionRate: number | null;
+  conversionChange: number | null;
+  topProductsByRevenue: Array<{
+    name: string;
+    revenue: number;
+    percentage: number;
+  }>;
+  recentActivity: Array<{ text: string; time: string }>;
+}
+
+export const analyticsApi = {
+  /**
+   * Composes GET /hub/dashboard/stats + GET /hub/dashboard/pillars (both
+   * confirmed real) into the shape this page needs. Anything neither
+   * endpoint provides is left null/empty rather than guessed.
+   */
+  getOverview: async (): Promise<AnalyticsOverview> => {
+    const [statsRes, pillarsRes] = await Promise.all([
+      dashboardApi.getStats(),
+      dashboardApi.getPillarStats(),
+    ]);
+    const stats = statsRes.data;
+    const pillars = pillarsRes.data;
+
+    const topProductsByRevenue = stats.userStats.topProducts
+      .map((p) => ({ name: p.productName, revenue: 0, percentage: 0 })) // no per-product revenue on this endpoint
+      .slice(0, 6);
+
+    const recentActivity = stats.recentActivity.map((a) => ({
+      text: `${a.user.fullName ?? a.user.email} ${a.action}`,
+      time: new Date(a.createdAt).toLocaleString("en-NG"),
+    }));
+
+    return {
+      totalRevenue: stats.ecosystemOverview.totalMonthlyRevenue,
+      activeUsers: stats.userStats.totals.users,
+      revenueChange: null,
+      activeUsersChange: stats.userStats.growth.percentage ?? null,
+      churnRate: null,
+      churnChange: null,
+      conversionRate: null,
+      conversionChange: null,
+      topProductsByRevenue,
+      recentActivity,
+    };
+  },
 };

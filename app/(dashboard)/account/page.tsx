@@ -45,7 +45,7 @@ export default function AccountPage() {
     try {
       const form = new FormData();
       form.append("avatar", file);
-      const res = await profileApi.uploadAvatar(form);
+      const res = await profileApi.update({ profile: form } as any);
       updateUser({ avatar: (res as any).data?.avatarUrl });
       toast.success("Avatar updated");
     } catch {

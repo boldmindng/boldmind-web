@@ -252,3 +252,11 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
   return [storedValue, setValue] as const;
 }
+
+import { analyticsApi, type AnalyticsOverview } from "../api";
+
+export function useAnalyticsOverview() {
+  return useFetch<AnalyticsOverview>(() =>
+    analyticsApi.getOverview().then((data) => ({ data })),
+  );
+}
