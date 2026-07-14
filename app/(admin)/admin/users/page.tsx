@@ -4,17 +4,9 @@
 import { useState } from "react";
 import { useAdminUsers } from "../../../../lib/hooks";
 import { adminApi } from "../../../../lib/api";
+import { usersAPI } from "@boldmindng/api-client";
+import { ADMIN_ROLES } from "@boldmindng/utils";
 import { toast } from "sonner";
-
-const ROLES = [
-  "guest",
-  "student",
-  "creator",
-  "founder",
-  "moderator",
-  "admin",
-  "super_admin",
-] as const;
 
 export default function AdminUsersPage() {
   const { data, loading, page, setPage, search, setSearch, refresh } =
@@ -38,14 +30,23 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleToggleStatus = async (userId: string, isActive: boolean) => {
+  // FIXED: adminApi.toggleUserStatus doesn't exist server-side — there is no
+  // PATCH /admin/users/:id/status route on admin.controller.ts. The only
+  // real status-affecting endpoint is DELETE /users/:id/ban, which is
+  // ban-only (no unban counterpart). Until that's decided/built, this only
+  // supports deactivating an active user — the button is disabled for
+  // already-inactive users rather than silently no-oping on a fake toggle.
+  const handleBan = async (userId: string) => {
+    const reason = window.prompt("Reason for deactivating this user:");
+    if (!reason) return; // cancelled — ban.controller.ts requires a reason
+
     setTogglingStatus(userId);
     try {
-      await adminApi.toggleUserStatus(userId, !isActive);
-      toast.success(`User ${isActive ? "deactivated" : "activated"}`);
+      await usersAPI.ban(userId);
+      toast.success("User deactivated");
       refresh();
     } catch {
-      toast.error("Failed to update status");
+      toast.error("Failed to deactivate user");
     } finally {
       setTogglingStatus(null);
     }
@@ -111,7 +112,7 @@ export default function AdminUsersPage() {
               style={{ borderColor: "var(--product-muted)" }}
             >
               <div
-                className="w-8 h-8 rounded-full flex-shrink-0"
+                className="w-8 h-8 rounded-full shrink-0"
                 style={{ backgroundColor: "var(--product-muted)" }}
               />
               <div className="flex-1 space-y-2">
@@ -155,7 +156,7 @@ export default function AdminUsersPage() {
               {/* User col */}
               <div className="col-span-4 flex items-center gap-3 min-w-0">
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white flex-shrink-0"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white shrink-0"
                   style={{ backgroundColor: "var(--product-primary)" }}
                 >
                   {user.name?.[0]?.toUpperCase() ??
@@ -188,6 +189,13 @@ export default function AdminUsersPage() {
                     Saving…
                   </span>
                 ) : (
+                  /* FIXED: was a hand-listed ROLES array containing a fake
+                     "moderator" role and missing manager/editor/support/
+                     analyst plus every ecosystem role. Now derived from the
+                     single source of truth (ADMIN_ROLES, itself derived from
+                     constants/auth.ts — see admin/index.ts). Options show
+                     the real display name, value stays the raw role id the
+                     backend expects. */
                   <select
                     value={user.role}
                     onChange={(e) => handleRoleChange(user.id, e.target.value)}
@@ -198,9 +206,9 @@ export default function AdminUsersPage() {
                       color: "var(--product-foreground)",
                     }}
                   >
-                    {ROLES.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
+                    {ADMIN_ROLES.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.name}
                       </option>
                     ))}
                   </select>
@@ -227,11 +235,16 @@ export default function AdminUsersPage() {
               {/* Status col */}
               <div className="col-span-2">
                 <button
-                  onClick={() =>
-                    handleToggleStatus(user.id, user.isActive !== false)
+                  onClick={() => handleBan(user.id)}
+                  disabled={
+                    togglingStatus === user.id || user.isActive === false
                   }
-                  disabled={togglingStatus === user.id}
-                  className="text-xs font-semibold px-2 py-1 rounded-full"
+                  title={
+                    user.isActive === false
+                      ? "Reactivation isn't supported yet — no unban endpoint exists"
+                      : "Deactivate this user"
+                  }
+                  className="text-xs font-semibold px-2 py-1 rounded-full disabled:cursor-not-allowed"
                   style={{
                     backgroundColor:
                       user.isActive !== false
@@ -241,6 +254,7 @@ export default function AdminUsersPage() {
                       user.isActive !== false
                         ? "var(--color-success)"
                         : "var(--color-error)",
+                    opacity: user.isActive === false ? 0.6 : 1,
                   }}
                 >
                   {togglingStatus === user.id
