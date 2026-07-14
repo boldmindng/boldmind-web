@@ -73,7 +73,7 @@ function ChangePasswordContent() {
     // confirmed payload shape is { token, password }, no email field. `email`
     // is still read from the URL purely for display/validation on this page.
     try {
-      await resetMutation.execute(token, password);
+      await resetMutation.execute(token, password, confirmPassword);
       setSuccess(true);
       toast.success("Password changed successfully!");
       setTimeout(() => router.push("/login"), 2000);
