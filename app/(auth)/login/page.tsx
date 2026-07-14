@@ -54,12 +54,23 @@ function LoginForm() {
 
     try {
       const res = await authAPI.login({ email, password });
-      const tokens = res.data;
+      const data = res.data;
+
+      // Check if 2FA is required
+      if ("requires2fa" in data && data.requires2fa) {
+        // Store the pending token and redirect to 2FA
+        sessionStorage.setItem("pendingToken", data.pendingToken);
+        router.push(`/2fa?return_url=${encodeURIComponent(returnUrl)}`);
+        return;
+      }
+
+      // Normal login flow
+      const tokens = data as Exclude<typeof data, { requires2fa: true }>;
       setAccessToken(tokens.accessToken);
 
       const userRes = await authAPI.me();
       setSession({
-        user: userRes.data,
+        user: userRes.data as any,
         accessToken: tokens.accessToken,
         // FIX: tokens.expiresIn is a DURATION in seconds (e.g. 900), not a
         // timestamp. Everywhere else (auth-provider.tsx's cookieRefresh,

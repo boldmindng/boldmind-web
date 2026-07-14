@@ -126,8 +126,19 @@ function RegisterForm() {
       const tokens = res.data;
       setAccessToken(tokens.accessToken);
       const userRes = await authAPI.me();
+      // Normalize user shape: api-client's AuthUser may be missing fields
+      // expected by @boldmindng/auth's session type. Fill with safe
+      // defaults to satisfy the type checker at runtime.
+      const me = userRes.data as any;
+      const normalizedUser = {
+        ...me,
+        name: me.name ?? me.email ?? "",
+        permissions: me.permissions ?? [],
+        isVerified: me.isVerified ?? false,
+      };
+
       setSession({
-        user: userRes.data,
+        user: normalizedUser as any,
         accessToken: tokens.accessToken,
         // FIX: same duration-vs-timestamp bug as login/page.tsx.
         expiresAt: Date.now() + tokens.expiresIn * 1000,
