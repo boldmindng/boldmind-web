@@ -1,12 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
-import { useAuth, useDashboardStats } from "../../../../lib/hooks";
+import {
+  useAuth,
+  useDashboardStats,
+  isPersonalStats,
+  isEcosystemStats,
+} from "../../../../lib/hooks";
 import { ArrowRight, TrendingUp, TrendingDown, Minus } from "lucide-react";
-// import type { DashboardStats } from '../../../../lib/api';
-
-// ─── StatCard ─────────────────────────────────────────────────────────────────
 
 function StatCard({
   icon: Icon,
@@ -152,17 +153,12 @@ function GrowthBadge({
   );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
-
 export default function HubDashboardPage() {
   const { user } = useAuth();
   const { data: stats, loading, error, refresh } = useDashboardStats();
 
   const displayName =
-    (user as any)?.firstName ||
-    user?.name?.split(" ")[0] ||
-    user?.email?.split("@")[0] ||
-    "Founder";
+    user?.name?.split(" ")[0] || user?.email?.split("@")[0] || "Founder";
 
   if (error) {
     return (
@@ -184,15 +180,168 @@ export default function HubDashboardPage() {
     );
   }
 
-  const totalUsers = stats?.userStats?.totals?.users ?? 0;
-  const activeProducts = stats?.userStats?.totals?.activeProducts ?? 0;
-  const totalAdmins = stats?.userStats?.totals?.admins ?? 0;
-  const monthlyRevenue = stats?.ecosystemOverview?.totalMonthlyRevenue ?? 0;
-  const growth = stats?.userStats?.growth;
+  // ── Personal (non-admin) view — the everyday case for most Hub users ──────
+  if (stats && isPersonalStats(stats)) {
+    const walletNaira = `₦${(stats.wallet.balanceKobo / 100).toLocaleString("en-NG")}`;
+    return (
+      <div className="space-y-8">
+        <div
+          className="rounded-2xl p-7 relative overflow-hidden"
+          style={{
+            background:
+              "linear-gradient(135deg, var(--product-primary), color-mix(in srgb, var(--product-primary) 75%, black))",
+          }}
+        >
+          <h1 className="text-2xl font-black text-white mb-1">
+            Welcome back, {displayName} 🚀
+          </h1>
+          <p className="text-white/70 text-sm">
+            {stats.products.activeCount} active product
+            {stats.products.activeCount === 1 ? "" : "s"} · Member since{" "}
+            {stats.member.memberSince
+              ? new Date(stats.member.memberSince).getFullYear()
+              : "—"}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <StatCard
+            icon={PackageIcon}
+            label="Active Products"
+            value={stats.products.activeCount}
+          />
+          <StatCard
+            icon={DollarIcon}
+            label="Total Spend"
+            value={`₦${stats.spend.totalPaidNGN.toLocaleString()}`}
+            sub={`${stats.spend.totalTransactions} transactions`}
+          />
+          <StatCard
+            icon={WalletIcon}
+            label="Wallet Balance"
+            value={walletNaira}
+            sub={stats.wallet.tier ?? undefined}
+            accent
+          />
+          <StatCard
+            icon={UsersIcon}
+            label="Referral Earnings"
+            value={`₦${stats.referrals.totalEarnings.toLocaleString()}`}
+            sub={`${stats.referrals.totalReferrals} referrals`}
+          />
+        </div>
+
+        <div>
+          <h2
+            className="text-lg font-black mb-4"
+            style={{ color: "var(--product-foreground)" }}
+          >
+            My Products
+          </h2>
+          <div
+            className="rounded-2xl border-2 overflow-hidden"
+            style={{
+              borderColor: "var(--product-muted)",
+              backgroundColor: "var(--product-background)",
+            }}
+          >
+            {stats.products.active.length === 0 ? (
+              <div
+                className="px-5 py-8 text-center text-sm"
+                style={{ color: "var(--product-foreground)", opacity: 0.4 }}
+              >
+                No active products yet
+              </div>
+            ) : (
+              stats.products.active.map((p, i) => (
+                <div
+                  key={p.productSlug}
+                  className="flex items-center gap-4 px-5 py-3.5"
+                  style={{
+                    borderBottom:
+                      i < stats.products.active.length - 1
+                        ? "1px solid var(--product-muted)"
+                        : undefined,
+                  }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-sm font-semibold truncate"
+                      style={{ color: "var(--product-foreground)" }}
+                    >
+                      {p.productName}
+                    </p>
+                    <p
+                      className="text-xs"
+                      style={{
+                        color: "var(--product-foreground)",
+                        opacity: 0.4,
+                      }}
+                    >
+                      {p.tier} · {p.status}
+                    </p>
+                  </div>
+                  <span
+                    className="text-xs"
+                    style={{ color: "var(--product-foreground)", opacity: 0.5 }}
+                  >
+                    renews{" "}
+                    {new Date(p.currentPeriodEnd).toLocaleDateString("en-NG")}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {QUICK_LINKS.map((q) => (
+            <Link
+              key={q.href}
+              href={q.href}
+              className="flex items-center gap-3 p-4 rounded-xl border-2 transition-all hover:shadow-md group"
+              style={{
+                borderColor: "var(--product-muted)",
+                backgroundColor: "var(--product-background)",
+              }}
+            >
+              <span className="text-2xl">{q.emoji}</span>
+              <div>
+                <p
+                  className="font-bold text-sm"
+                  style={{ color: "var(--product-foreground)" }}
+                >
+                  {q.label}
+                </p>
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--product-foreground)", opacity: 0.5 }}
+                >
+                  {q.sub}
+                </p>
+              </div>
+              <ArrowRight
+                size={14}
+                className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ color: "var(--product-primary)" }}
+              />
+            </Link>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Ecosystem (admin/super_admin) view ─────────────────────────────────────
+  const ecosystem = stats && isEcosystemStats(stats) ? stats : null;
+  const totalUsers = ecosystem?.userStats.totals.users ?? 0;
+  const activeProducts = ecosystem?.userStats.totals.activeProducts ?? 0;
+  const totalAdmins = ecosystem?.userStats.totals.admins ?? 0;
+  const monthlyRevenue = ecosystem?.ecosystemOverview.totalMonthlyRevenue ?? 0;
+  const growth = ecosystem?.userStats.growth;
 
   return (
     <div className="space-y-8">
-      {/* ── Greeting banner ─────────────────────────────────────────── */}
       <div
         className="rounded-2xl p-7 relative overflow-hidden"
         style={{
@@ -220,7 +369,6 @@ export default function HubDashboardPage() {
         )}
       </div>
 
-      {/* ── Stats grid ──────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
@@ -230,7 +378,7 @@ export default function HubDashboardPage() {
               icon={UsersIcon}
               label="Total Users"
               value={totalUsers.toLocaleString()}
-              sub={`${stats?.userStats?.growth?.currentMonth ?? 0} this month`}
+              sub={`${ecosystem?.userStats.growth.currentMonth ?? 0} this month`}
             />
             <StatCard
               icon={PackageIcon}
@@ -242,14 +390,13 @@ export default function HubDashboardPage() {
               icon={DollarIcon}
               label="Monthly Revenue"
               value={`₦${monthlyRevenue.toLocaleString()}`}
-              sub={`Team: ${stats?.ecosystemOverview?.totalTeamSize ?? 0}`}
+              sub={`Team: ${ecosystem?.ecosystemOverview.totalTeamSize ?? 0}`}
               accent
             />
           </>
         )}
       </div>
 
-      {/* ── Quick actions ────────────────────────────────────────────── */}
       <div>
         <h2
           className="text-lg font-black mb-4"
@@ -267,14 +414,6 @@ export default function HubDashboardPage() {
                 borderColor: "var(--product-muted)",
                 backgroundColor: "var(--product-background)",
               }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLElement).style.borderColor =
-                  "var(--product-primary)")
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLElement).style.borderColor =
-                  "var(--product-muted)")
-              }
             >
               <span className="text-2xl">{q.emoji}</span>
               <div>
@@ -301,8 +440,7 @@ export default function HubDashboardPage() {
         </div>
       </div>
 
-      {/* ── Top products ─────────────────────────────────────────────── */}
-      {!loading && (stats?.userStats?.topProducts?.length ?? 0) > 0 && (
+      {!loading && (ecosystem?.userStats.topProducts.length ?? 0) > 0 && (
         <div>
           <h2
             className="text-lg font-black mb-4"
@@ -317,13 +455,13 @@ export default function HubDashboardPage() {
               backgroundColor: "var(--product-background)",
             }}
           >
-            {stats!.userStats.topProducts.map((product, i) => (
+            {ecosystem!.userStats.topProducts.map((product, i) => (
               <div
                 key={product.productSlug}
                 className="flex items-center gap-4 px-5 py-3.5"
                 style={{
                   borderBottom:
-                    i < stats!.userStats.topProducts.length - 1
+                    i < ecosystem!.userStats.topProducts.length - 1
                       ? "1px solid var(--product-muted)"
                       : undefined,
                 }}
@@ -360,7 +498,6 @@ export default function HubDashboardPage() {
         </div>
       )}
 
-      {/* ── Recent activity ───────────────────────────────────────────── */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2
@@ -386,7 +523,7 @@ export default function HubDashboardPage() {
         >
           {loading ? (
             Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
-          ) : (stats?.recentActivity?.length ?? 0) === 0 ? (
+          ) : (ecosystem?.recentActivity.length ?? 0) === 0 ? (
             <div
               className="px-5 py-8 text-center text-sm"
               style={{ color: "var(--product-foreground)", opacity: 0.4 }}
@@ -394,7 +531,7 @@ export default function HubDashboardPage() {
               No recent activity
             </div>
           ) : (
-            stats!.recentActivity.slice(0, 5).map((act, i) => (
+            ecosystem!.recentActivity.slice(0, 5).map((act, i) => (
               <div
                 key={act.id ?? i}
                 className="flex items-center gap-4 px-5 py-3.5 transition-colors"
@@ -402,20 +539,13 @@ export default function HubDashboardPage() {
                   borderBottom:
                     i < 4 ? "1px solid var(--product-muted)" : undefined,
                 }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLElement).style.backgroundColor =
-                    "var(--product-muted)")
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLElement).style.backgroundColor = "")
-                }
               >
                 <div
                   className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white shrink-0"
                   style={{ backgroundColor: "var(--product-primary)" }}
                 >
-                  {act.user?.fullName?.[0] ||
-                    act.user?.email?.[0]?.toUpperCase() ||
+                  {act.user.fullName?.[0] ||
+                    act.user.email?.[0]?.toUpperCase() ||
                     "S"}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -423,7 +553,7 @@ export default function HubDashboardPage() {
                     className="text-sm font-medium truncate"
                     style={{ color: "var(--product-foreground)" }}
                   >
-                    <strong>{act.user?.fullName || "System"}</strong>{" "}
+                    <strong>{act.user.fullName || "System"}</strong>{" "}
                     {act.action}
                   </p>
                   <p
@@ -440,8 +570,7 @@ export default function HubDashboardPage() {
         </div>
       </div>
 
-      {/* ── System health ─────────────────────────────────────────────── */}
-      {!loading && (stats?.systemHealth?.length ?? 0) > 0 && (
+      {!loading && (ecosystem?.systemHealth.length ?? 0) > 0 && (
         <div>
           <h2
             className="text-lg font-black mb-4"
@@ -450,7 +579,7 @@ export default function HubDashboardPage() {
             System Health
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {stats!.systemHealth.map((service) => (
+            {ecosystem!.systemHealth.map((service) => (
               <div
                 key={service.name}
                 className="rounded-xl p-4 border-2"
@@ -582,6 +711,24 @@ function DollarIcon({ size = 18 }: { size?: number }) {
     >
       <line x1="12" y1="1" x2="12" y2="23" />
       <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    </svg>
+  );
+}
+function WalletIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
     </svg>
   );
 }

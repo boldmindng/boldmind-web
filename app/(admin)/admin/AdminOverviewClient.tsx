@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
-// WAS:
-import { useDashboardStats } from "../../../lib/hooks";
-// ...
+import { useDashboardStats, isEcosystemStats } from "../../../lib/hooks";
 
 export default function AdminOverviewClient() {
   const { data: stats, loading, error, refresh } = useDashboardStats();
@@ -29,7 +26,31 @@ export default function AdminOverviewClient() {
     );
   }
 
-  const totals = stats?.userStats?.totals;
+  // Defensive: getStats() on the backend returns HubPersonalStats for any
+  // non admin/super_admin caller. If this page is reached without ecosystem
+  // scope, the user's role doesn't actually grant admin stats — don't render
+  // wrong/empty ecosystem cards, surface it plainly instead.
+  if (!loading && stats && !isEcosystemStats(stats)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-2">
+        <p
+          className="text-sm font-semibold"
+          style={{ color: "var(--color-error)" }}
+        >
+          Admin stats unavailable for this account.
+        </p>
+        <p
+          className="text-xs"
+          style={{ color: "var(--product-foreground)", opacity: 0.5 }}
+        >
+          Your role doesn&apos;t have ecosystem-wide access.
+        </p>
+      </div>
+    );
+  }
+
+  const ecosystem = stats && isEcosystemStats(stats) ? stats : null;
+  const totals = ecosystem?.userStats.totals;
 
   const STAT_CARDS = [
     {
@@ -52,7 +73,7 @@ export default function AdminOverviewClient() {
     },
     {
       label: "Monthly Revenue",
-      value: `₦${(stats?.ecosystemOverview?.totalMonthlyRevenue ?? 0).toLocaleString()}`,
+      value: `₦${(ecosystem?.ecosystemOverview.totalMonthlyRevenue ?? 0).toLocaleString()}`,
       icon: "💰",
       accent: true,
     },
@@ -60,7 +81,6 @@ export default function AdminOverviewClient() {
 
   return (
     <div className="space-y-8">
-      {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
           <h1
@@ -87,7 +107,6 @@ export default function AdminOverviewClient() {
         </div>
       </div>
 
-      {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {STAT_CARDS.map((card) => (
           <div
@@ -97,8 +116,6 @@ export default function AdminOverviewClient() {
               backgroundColor: card.accent
                 ? "var(--product-primary)"
                 : "var(--product-background)",
-              // Use border shorthand with CSS var so colour is driven by the token system,
-              // not Tailwind's default border palette.
               border: `2px solid ${card.accent ? "var(--product-primary)" : "var(--product-muted)"}`,
             }}
           >
@@ -139,7 +156,6 @@ export default function AdminOverviewClient() {
         ))}
       </div>
 
-      {/* Quick links */}
       <div className="grid sm:grid-cols-3 gap-4">
         {[
           {
@@ -169,14 +185,6 @@ export default function AdminOverviewClient() {
               border: "2px solid var(--product-muted)",
               backgroundColor: "var(--product-background)",
             }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.borderColor =
-                "var(--product-primary)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.borderColor =
-                "var(--product-muted)";
-            }}
           >
             <span className="text-2xl">{item.icon}</span>
             <div>
@@ -197,8 +205,7 @@ export default function AdminOverviewClient() {
         ))}
       </div>
 
-      {/* System health */}
-      {!loading && (stats?.systemHealth?.length ?? 0) > 0 && (
+      {!loading && (ecosystem?.systemHealth.length ?? 0) > 0 && (
         <div>
           <h2
             className="text-base font-black mb-4"
@@ -207,7 +214,7 @@ export default function AdminOverviewClient() {
             System Health
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {stats!.systemHealth.map((svc: any) => (
+            {ecosystem!.systemHealth.map((svc) => (
               <div
                 key={svc.name}
                 className="rounded-xl p-4"
@@ -217,17 +224,8 @@ export default function AdminOverviewClient() {
                 }}
               >
                 <div className="flex items-center gap-2 mb-1">
-                  {/* Status dot — uses Tailwind bg-* only for semantic colours
-                      (green/red/yellow are not CSS var driven here intentionally,
-                       since status colours are universal, not product-themed). */}
                   <span
-                    className={`w-2 h-2 rounded-full shrink-0 ${
-                      svc.status === "healthy"
-                        ? "bg-green-400"
-                        : svc.status === "unhealthy"
-                          ? "bg-red-400"
-                          : "bg-yellow-400"
-                    }`}
+                    className={`w-2 h-2 rounded-full shrink-0 ${svc.status === "healthy" ? "bg-green-400" : svc.status === "unhealthy" ? "bg-red-400" : "bg-yellow-400"}`}
                   />
                   <p
                     className="text-sm font-semibold truncate"
@@ -250,8 +248,7 @@ export default function AdminOverviewClient() {
         </div>
       )}
 
-      {/* Recent activity */}
-      {!loading && (stats?.recentActivity?.length ?? 0) > 0 && (
+      {!loading && (ecosystem?.recentActivity.length ?? 0) > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2
@@ -275,7 +272,7 @@ export default function AdminOverviewClient() {
               backgroundColor: "var(--product-background)",
             }}
           >
-            {stats!.recentActivity.slice(0, 8).map((act: any, i: number) => (
+            {ecosystem!.recentActivity.slice(0, 8).map((act, i) => (
               <div
                 key={act.id ?? i}
                 className="flex items-center gap-4 px-5 py-3.5"
@@ -285,10 +282,10 @@ export default function AdminOverviewClient() {
                 }}
               >
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white flex-shrink-0"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white shrink-0"
                   style={{ backgroundColor: "var(--product-primary)" }}
                 >
-                  {act.user?.email?.[0]?.toUpperCase() ?? "S"}
+                  {act.user.email?.[0]?.toUpperCase() ?? "S"}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
@@ -296,7 +293,7 @@ export default function AdminOverviewClient() {
                     style={{ color: "var(--product-foreground)" }}
                   >
                     <strong>
-                      {act.user?.fullName || act.user?.email || "System"}
+                      {act.user.fullName || act.user.email || "System"}
                     </strong>{" "}
                     {act.action}
                   </p>

@@ -1,31 +1,32 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/**
- * lib/hooks/index.ts — custom hooks for boldmind-web
- */
-
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuthStore, authAPI } from "@boldmindng/auth";
 import {
   dashboardApi,
+  statsApi,
+  adminOverviewApi,
   referralApi,
   walletApi,
   subscriptionApi,
   adminApi,
-  type DashboardStats,
+  analyticsApi,
+  isPersonalStats,
+  isEcosystemStats,
+  type HubStatsResponse,
   type ReferralStats,
-  type WalletData,
+  type WalletBalanceResponse,
+  type AnalyticsOverview,
 } from "../api";
 
-// ─── Generic fetch hook (GET-style, runs on mount) ─────────────────────────────
+// ─── Generic fetch hook ─────────────────────────────────────────────────────
 
 function useFetch<T>(fetcher: () => Promise<{ data: T }>, deps?: unknown[]) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const mountedRef = useRef(true);
-  // const depsList = useMemo(() => deps ?? [], [deps]);
 
   const run = useCallback(async () => {
     setLoading(true);
@@ -38,7 +39,6 @@ function useFetch<T>(fetcher: () => Promise<{ data: T }>, deps?: unknown[]) {
     } finally {
       if (mountedRef.current) setLoading(false);
     }
-    // include fetcher plus any user-supplied deps
   }, [fetcher]);
 
   useEffect(() => {
@@ -51,23 +51,6 @@ function useFetch<T>(fetcher: () => Promise<{ data: T }>, deps?: unknown[]) {
 
   return { data, loading, error, refresh: run };
 }
-
-// ─── Generic mutation hook (POST/PATCH-style, caller-triggered) ────────────────
-//
-// NEW — this was missing, which is why `useForgotPassword`/`useResetPassword`
-// didn't exist. Unlike useFetch, `execute()` re-throws the error after storing
-// it in state, so a caller can safely do:
-//
-//   try {
-//     await mutation.execute(...);
-//     // success
-//   } catch (err) {
-//     // failure — err and mutation.error carry the same Error
-//   }
-//
-// without racing React's state batching (the bug in the original
-// forgot-password/change-password pages, which read `mutation.error`
-// immediately after `await execute()` in the same closure).
 
 function useMutation<TArgs extends unknown[], TResult>(
   fn: (...args: TArgs) => Promise<{ data: TResult }>,
@@ -102,35 +85,74 @@ function useMutation<TArgs extends unknown[], TResult>(
   return { execute, loading, error, data, reset };
 }
 
-// ─── Dashboard ────────────────────────────────────────────────────────────────
+// ─── Hub stats (role-aware — the real backer for both dashboard pages) ──────
+// FIXED: HubDashboardPage.tsx and AdminOverviewClient.tsx both read
+// userStats/ecosystemOverview/systemHealth — that's HubEcosystemStats, which
+// only comes back from GET /hub/stats for admin/super_admin. The old
+// useDashboardStats() pointed at GET /hub/dashboard, a different shape
+// entirely ({ subscriptions, productAccess, recentActivity, wallet }), so
+// every field those pages read was silently undefined.
+//
+// useDashboardStats is kept as the exported name (both pages already import
+// it) but now correctly resolves to /hub/stats. Components narrow the union
+// with isPersonalStats/isEcosystemStats.
 
 export function useDashboardStats() {
-  return useFetch<DashboardStats>(dashboardApi.getStats);
+  return useFetch<HubStatsResponse>(statsApi.getOverview);
+}
+
+// Explicit alias, same endpoint — use this name in new code.
+export function useHubStats() {
+  return useFetch<HubStatsResponse>(statsApi.getOverview);
+}
+
+// GET /hub/dashboard — subscriptions/productAccess/wallet widget, separate
+// from the stats cards above.
+export function useHubDashboardWidget() {
+  return useFetch(dashboardApi.getDashboard);
 }
 
 export function usePillarStats() {
   return useFetch(dashboardApi.getPillarStats);
 }
 
-// ─── Referrals ────────────────────────────────────────────────────────────────
+// Admin-controller shape — GET /admin/dashboard. Only for pages that
+// specifically want the admin.controller.ts response, not /hub/stats.
+export function useAdminOverview() {
+  return useFetch(adminOverviewApi.getStats);
+}
+
+export function useAnalyticsOverview() {
+  return useFetch<AnalyticsOverview>(
+    () => analyticsApi.getOverview().then((data) => ({ data })),
+  );
+}
+
+// ─── Referrals ────────────────────────────────────────────────────────────
 
 export function useReferralStats() {
   return useFetch<ReferralStats>(referralApi.getStats);
 }
 
-// ─── Wallet ───────────────────────────────────────────────────────────────────
+// ─── Wallet ───────────────────────────────────────────────────────────────
+// FIXED: was `useFetch<WalletData>`, a type that was never exported anywhere
+// — WalletBalanceResponse is the real shape from wallet.api.ts.
 
 export function useWallet() {
-  return useFetch<WalletData>(walletApi.getBalance);
+  return useFetch<WalletBalanceResponse>(walletApi.getBalance);
 }
 
-// ─── Subscriptions ────────────────────────────────────────────────────────────
+export function useWalletLedger(page = 1, pageSize = 20) {
+  return useFetch(() => walletApi.getLedger(page, pageSize), [page, pageSize]);
+}
+
+// ─── Subscriptions ────────────────────────────────────────────────────────
 
 export function useMySubscriptions() {
   return useFetch(subscriptionApi.getMySubscriptions);
 }
 
-// ─── Admin users ─────────────────────────────────────────────────────────────
+// ─── Admin users ─────────────────────────────────────────────────────────
 
 export function useAdminUsers(
   params: {
@@ -152,17 +174,6 @@ export function useAdminUsers(
 }
 
 // ─── Password reset flow ────────────────────────────────────────────────────
-//
-// NEW. Routed through `authAPI` from `@boldmindng/auth` — the same package
-// login/page.tsx and register/page.tsx already use for `authAPI.login`,
-// `authAPI.register`, `authAPI.me` — rather than lib/api's `apiFetch`, since
-// password reset is an auth-package concern, not a hub-domain one.
-//
-// Confirmed against packages/auth/src/api.ts:
-//   authAPI.forgotPassword({ email })
-//   authAPI.resetPassword({ token, password })   — NOTE: no `email` field.
-// resetPassword identifies the user from the token alone; passing an email
-// here would be an excess-property TS error against ResetPasswordPayload.
 
 export function useForgotPassword() {
   return useMutation((email: string) => authAPI.forgotPassword({ email }));
@@ -174,7 +185,7 @@ export function useResetPassword() {
   );
 }
 
-// ─── Auth selectors ───────────────────────────────────────────────────────────
+// ─── Auth selectors ───────────────────────────────────────────────────────
 
 export function useAuth() {
   const { user, status, session } = useAuthStore();
@@ -193,7 +204,7 @@ export function useIsAdmin() {
   return user?.role === "super_admin" || user?.role === "admin";
 }
 
-// ─── Clipboard ───────────────────────────────────────────────────────────────
+// ─── Clipboard ───────────────────────────────────────────────────────────
 
 export function useClipboard(timeout = 2000) {
   const [copied, setCopied] = useState(false);
@@ -221,7 +232,7 @@ export function useClipboard(timeout = 2000) {
   return { copied, copy };
 }
 
-// ─── Local storage ───────────────────────────────────────────────────────────
+// ─── Local storage ─────────────────────────────────────────────────────────
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   const [storedValue, setStoredValue] = useState<T>(() => {
@@ -253,10 +264,4 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   return [storedValue, setValue] as const;
 }
 
-import { analyticsApi, type AnalyticsOverview } from "../api";
-
-export function useAnalyticsOverview() {
-  return useFetch<AnalyticsOverview>(() =>
-    analyticsApi.getOverview().then((data) => ({ data })),
-  );
-}
+export { isPersonalStats, isEcosystemStats };
