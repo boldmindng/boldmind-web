@@ -1,261 +1,105 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/**
- * lib/api/index.ts
- *
- * All API calls used by boldmind-web.
- * Base URL: https://api.boldmind.ng/api/v1
- * Set in NEXT_PUBLIC_API_URL env var.
- */
+import {
+  hubAPI,
+  walletAPI,
+  paymentAPI,
+  adminAPI,
+  userMeAPI,
+  usersAPI,
+  type HubDashboardStats,
+  type HubStatsResponse,
+  type HubPersonalStats,
+  type HubEcosystemStats,
+  type ReferralStats,
+  type WalletBalanceResponse,
+} from "@boldmindng/api-client";
+import { getPillarSummary, type PillarSummary } from "@boldmindng/utils";
 
-import { apiFetch, qs } from "@boldmindng/api-client";
+export type DashboardStats = HubDashboardStats;
+export type {
+  HubStatsResponse,
+  HubPersonalStats,
+  HubEcosystemStats,
+  ReferralStats,
+  WalletBalanceResponse,
+};
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface DashboardStats {
-  userStats: {
-    totals: { users: number; activeProducts: number; admins: number };
-    growth: {
-      trend: "up" | "down" | "stable";
-      percentage: number;
-      currentMonth: number;
-    };
-    topProducts: Array<{
-      productSlug: string;
-      productName: string;
-      userCount: number;
-    }>;
-  };
-  ecosystemOverview: {
-    totalMonthlyRevenue: number;
-    totalTeamSize: number;
-    liveProducts: number;
-    buildingProducts: number;
-  };
-  recentActivity: Array<{
-    id: string;
-    action: string;
-    entityType: string;
-    createdAt: string;
-    user: { fullName?: string; email: string };
-  }>;
-  systemHealth: Array<{
-    name: string;
-    status: "healthy" | "degraded" | "unhealthy";
-    responseTime?: number;
-  }>;
-}
-
-export interface EcosystemUser {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  ecosystemRole?: string;
-  isVerified: boolean;
-  createdAt: string;
-  lastLoginAt?: string;
-  subscriptions: Array<{
-    productSlug: string;
-    tier: string;
-    currentPeriodEnd: string;
-  }>;
-  profile?: {
-    displayName?: string;
-    state?: string;
-    referralCode?: string;
-    activeProducts?: string[];
-    onboardingDone?: boolean;
-  };
-}
-
-export interface ReferralStats {
-  code: string;
-  totalReferrals: number;
-  totalEarnings: number;
-  thisMonth: number;
-  referrals: Array<{
-    id: string;
-    name: string;
-    email: string;
-    joinedAt: string;
-    productSlug: string;
-    status: "active" | "churned";
-  }>;
-}
-
-export interface WalletData {
-  balance: number;
-  pendingBalance: number;
-  totalEarned: number;
-  transactions: Array<{
-    id: string;
-    type: "credit" | "debit" | "pending";
-    amount: number;
-    description: string;
-    createdAt: string;
-  }>;
-}
-
-export interface PillarStats {
-  amebogist: { users: string; revenue: number; posts: number };
-  villagecircle: { drops: number; waitlists: number; patrons: number };
-  educenter: { students: string; revenue: number; examsPracticed: number };
-  planai: { businesses: string; revenue: number; toolsUsed: number };
-}
-
-// ─── Dashboard (regular Hub user, NOT admin) ──────────────────────────────────
+// ─── Dashboard (subscriptions/activity/wallet widget) ───────────────────────
+// GET /hub/dashboard — unchanged, still the right route for the dashboard
+// home page's activity feed + subscription list.
 
 export const dashboardApi = {
-  getStats: () => apiFetch<{ data: DashboardStats }>("/hub/dashboard/stats"),
-  getPillarStats: () =>
-    apiFetch<{ data: PillarStats }>("/hub/dashboard/pillars"),
+  getStats: hubAPI.getDashboard,
+  getPillarStats: async (): Promise<{ data: PillarSummary[] }> => ({
+    data: getPillarSummary(),
+  }),
 };
 
-// ─── Referrals ────────────────────────────────────────────────────────────────
+// ─── Stats overview — the new role-aware endpoint ────────────────────────────
+// GET /hub/stats — replaces the old split between a broken "hub" call and
+// adminAPI.dashboard(). One call, server decides personal vs ecosystem
+// shape based on the JWT's role. Use `res.data.scope` to discriminate.
 
-export const referralApi = {
-  getStats: () => apiFetch<{ data: ReferralStats }>("/hub/referrals"),
-  generateLink: (productSlug: string) =>
-    apiFetch<{ data: { url: string } }>("/hub/referrals/link", {
-      method: "POST",
-      body: JSON.stringify({ productSlug }),
-    }),
+export const statsApi = {
+  getOverview: hubAPI.getStats,
 };
 
-// ─── Wallet ───────────────────────────────────────────────────────────────────
-
-export const walletApi = {
-  getBalance: () => apiFetch<{ data: WalletData }>("/hub/wallet"),
-  requestPayout: (amount: number, bankDetails: object) =>
-    apiFetch<{ data: { reference: string } }>("/hub/wallet/payout", {
-      method: "POST",
-      body: JSON.stringify({ amount, bankDetails }),
-    }),
+// adminOverviewApi kept for anywhere that specifically wants the raw
+// admin.controller.ts shape (e.g. the (admin)/admin dashboard, which is a
+// separate, more detailed view than the Hub's own role-aware /hub/stats).
+export const adminOverviewApi = {
+  getStats: adminAPI.dashboard,
 };
-
-// ─── Admin (confirmed against admin.controller.ts) ────────────────────────────
 
 export const adminApi = {
-  /** GET /admin/stats — the correct source for the admin overview page, not dashboardApi.getStats() */
-  getStats: () => apiFetch<{ data: DashboardStats }>("/admin/stats"),
-
-  getUsers: (params: {
-    page?: number;
-    pageSize?: number;
-    role?: string;
-    search?: string;
-  }) =>
-    apiFetch<{
-      data: EcosystemUser[];
-      total: number;
-      page: number;
-      totalPages: number;
-    }>(`/admin/users${qs(params)}`),
-
-  /** No GET /admin/users/:id exists — single-user fetch lives on /users/:id (user.controller.ts) */
-  getUser: (id: string) => apiFetch<{ data: EcosystemUser }>(`/users/${id}`),
-
-  updateUserRole: (id: string, role: string) =>
-    apiFetch<{ data: EcosystemUser }>(`/admin/users/${id}/role`, {
-      method: "PATCH",
-      body: JSON.stringify({ role }),
-    }),
-
-  /**
-   * No status-toggle route exists on any uploaded controller — the closest
-   * is DELETE /users/:id/ban, which is ban-only (no unban). Left unimplemented
-   * rather than pointed at a route that doesn't exist. AdminUsersPage's
-   * status toggle needs a backend decision before this can work.
-   */
-  // toggleUserStatus: not implemented — see comment above
-
-  getRevenue: (period: "week" | "month" | "quarter" | "year" = "month") =>
-    apiFetch<{ data: unknown }>(`/admin/revenue${qs({ period })}`),
-
-  getWaitlist: (productSlug?: string) =>
-    apiFetch<{ data: unknown }>(`/admin/waitlist${qs({ productSlug })}`),
-
-  /** Body is `{ count }`, NOT `{ emails }` — admin.controller.ts's invite() reads @Body('count'). */
-  inviteFromWaitlist: (productSlug: string, count = 10) =>
-    apiFetch<{ data: unknown }>(`/admin/waitlist/${productSlug}/invite`, {
-      method: "POST",
-      body: JSON.stringify({ count }),
-    }),
-
-  getActivityLogs: (params: { page?: number; limit?: number } = {}) =>
-    apiFetch<{ data: DashboardStats["recentActivity"]; total: number }>(
-      `/admin/logs${qs(params)}`,
-    ),
+  getStats: adminOverviewApi.getStats,
+  getUsers: adminAPI.users.list,
+  getUser: (id: string) => usersAPI.get(id),
+  updateUserRole: adminAPI.users.updateRole,
+  getRevenue: adminAPI.revenue,
+  getWaitlist: adminAPI.waitlist.list,
+  inviteFromWaitlist: adminAPI.waitlist.invite,
+  getActivityLogs: adminAPI.logs,
 };
 
-// ─── Subscriptions ────────────────────────────────────────────────────────────
+// ─── Referrals ────────────────────────────────────────────────────────────
+
+export const referralApi = {
+  getStats: hubAPI.getReferralStats,
+  generate: hubAPI.generateReferral,
+};
+
+// ─── Wallet ───────────────────────────────────────────────────────────────
+
+export const walletApi = {
+  getBalance: walletAPI.getBalance,
+  getLedger: walletAPI.getLedger,
+  initiateTopUp: walletAPI.initiateTopUp,
+  upgradeTier: walletAPI.upgradeTier,
+};
+
+// ─── Subscriptions ──────────────────────────────────────────────────────────
 
 export const subscriptionApi = {
-  getMySubscriptions: () =>
-    apiFetch<{
-      data: Array<{
-        productSlug: string;
-        tier: string;
-        currentPeriodEnd: string;
-        status: string;
-      }>;
-    }>("/subscriptions/me"),
+  getMySubscriptions: paymentAPI.subscriptions,
   initializePayment: (productSlug: string, tier: string) =>
-    apiFetch<{ data: { authorizationUrl: string; reference: string } }>(
-      "/subscriptions/initialize",
-      {
-        method: "POST",
-        body: JSON.stringify({ productSlug, tier }),
-      },
-    ),
-  cancelSubscription: (subscriptionId: string) =>
-    apiFetch<{ data: { success: boolean } }>(
-      `/subscriptions/${subscriptionId}/cancel`,
-      { method: "POST" },
-    ),
+    paymentAPI.initialize({ productSlug, tier }),
 };
 
-// ─── Profile — moved to /user/*, was pointing at nonexistent /auth/* routes ───
+// ─── Profile / onboarding ─────────────────────────────────────────────────
 
-export const profileApi = {
-  update: (patch: Partial<{ name: string; profile: object }>) =>
-    apiFetch<{ data: EcosystemUser }>("/user/profile", {
-      method: "PATCH",
-      body: JSON.stringify(patch),
-    }),
-  // No avatar upload endpoint exists on any uploaded controller — removed
-  // rather than left pointing at a route that doesn't exist. Add back once
-  // media.controller.ts's upload flow is confirmed to support avatars.
-};
+export const profileApi = { update: userMeAPI.updateProfile };
+export const onboardingApi = { complete: userMeAPI.onboarding };
 
-// ─── Onboarding — moved to /user/onboarding (matches user-me.controller.ts) ──
-
-export const onboardingApi = {
-  complete: (data: {
-    businessType?: string;
-    goals?: string[];
-    tools?: string[];
-  }) =>
-    apiFetch<{ data: { success: boolean } }>("/user/onboarding", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-};
-
-// ─── Analytics (composed from confirmed endpoints — no dedicated analytics
-// overview route exists on any uploaded controller) ────────────────────────
+// ─── Analytics overview — now sourced from GET /hub/stats ───────────────────
+// FIXED again: this used to hit adminAPI.dashboard() unconditionally, which
+// 403s for a regular (non-admin) user. /hub/stats is role-aware, so the
+// same call now works for every authenticated user and the UI branches on
+// `scope` instead of assuming ecosystem-wide numbers.
 
 export interface AnalyticsOverview {
-  totalRevenue: number;
-  activeUsers: number;
-  /**
-   * revenueChange/activeUsersChange/churnRate/churnChange/conversionRate/
-   * conversionChange have no backend source anywhere in the confirmed
-   * controllers. Left as `null` rather than fabricated — KpiCard/the page
-   * below render "—" and hide the change badge when null. Wire these once
-   * a real period-over-period analytics endpoint exists (likely on
-   * analytics.controller.ts, which hasn't been uploaded/reviewed yet).
-   */
+  scope: "personal" | "ecosystem";
+  totalRevenue: number | null;
+  activeUsers: number | null;
   revenueChange: number | null;
   activeUsersChange: number | null;
   churnRate: number | null;
@@ -268,32 +112,45 @@ export interface AnalyticsOverview {
     percentage: number;
   }>;
   recentActivity: Array<{ text: string; time: string }>;
+  // personal-only fields
+  personal?: {
+    spendNaira: string;
+    walletBalanceNaira: string;
+    activeProducts: string[];
+    referralEarnings: number;
+  };
 }
 
 export const analyticsApi = {
-  /**
-   * Composes GET /hub/dashboard/stats + GET /hub/dashboard/pillars (both
-   * confirmed real) into the shape this page needs. Anything neither
-   * endpoint provides is left null/empty rather than guessed.
-   */
   getOverview: async (): Promise<AnalyticsOverview> => {
-    const [statsRes, pillarsRes] = await Promise.all([
-      dashboardApi.getStats(),
-      dashboardApi.getPillarStats(),
-    ]);
-    const stats = statsRes.data;
-    const pillars = pillarsRes.data;
+    const res = await statsApi.getOverview();
+    const stats = res.data;
 
-    const topProductsByRevenue = stats.userStats.topProducts
-      .map((p) => ({ name: p.productName, revenue: 0, percentage: 0 })) // no per-product revenue on this endpoint
-      .slice(0, 6);
+    if (stats.scope === "personal") {
+      return {
+        scope: "personal",
+        totalRevenue: null,
+        activeUsers: null,
+        revenueChange: null,
+        activeUsersChange: null,
+        churnRate: null,
+        churnChange: null,
+        conversionRate: null,
+        conversionChange: null,
+        topProductsByRevenue: [],
+        recentActivity: [],
+        personal: {
+          spendNaira: stats.spend.totalNaira,
+          walletBalanceNaira: stats.wallet.balanceNaira,
+          activeProducts: stats.products.slugs,
+          referralEarnings: stats.referrals.totalEarnings,
+        },
+      };
+    }
 
-    const recentActivity = stats.recentActivity.map((a) => ({
-      text: `${a.user.fullName ?? a.user.email} ${a.action}`,
-      time: new Date(a.createdAt).toLocaleString("en-NG"),
-    }));
-
+    // ecosystem scope — admin/super_admin
     return {
+      scope: "ecosystem",
       totalRevenue: stats.ecosystemOverview.totalMonthlyRevenue,
       activeUsers: stats.userStats.totals.users,
       revenueChange: null,
@@ -302,8 +159,13 @@ export const analyticsApi = {
       churnChange: null,
       conversionRate: null,
       conversionChange: null,
-      topProductsByRevenue,
-      recentActivity,
+      topProductsByRevenue: stats.userStats.topProducts
+        .map((p) => ({ name: p.productName, revenue: 0, percentage: 0 }))
+        .slice(0, 6),
+      recentActivity: stats.recentActivity.map((a) => ({
+        text: `${a.user.fullName ?? a.user.email} ${a.action}`,
+        time: new Date(a.createdAt).toLocaleString("en-NG"),
+      })),
     };
   },
 };
