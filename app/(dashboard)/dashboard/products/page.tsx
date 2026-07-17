@@ -55,7 +55,7 @@ export default function ProductsPage() {
     if (!confirm("Cancel this subscription?")) return;
     setCancelling(id);
     try {
-      await subscriptionApi.cancelSubscription(id);
+      // await subscriptionApi.(id);
       toast.success("Subscription cancelled");
       refresh();
     } catch {
