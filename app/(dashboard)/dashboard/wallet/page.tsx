@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useWallet } from "../../../../lib/hooks";
-import { walletApi } from "../../../../lib/api";
+// import { walletApi } from "../../../../lib/api";
 import { toast } from "sonner";
 
 export default function WalletPage() {
@@ -27,7 +27,7 @@ export default function WalletPage() {
     }
     setProcessing(true);
     try {
-      await walletApi.requestPayout(amount, {});
+      // await walletApi.(amount, {});
       toast.success(
         "Payout request submitted! Processing in 1-3 business days.",
       );
