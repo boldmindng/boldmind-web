@@ -7,12 +7,15 @@ import {
   adminAPI,
   userMeAPI,
   usersAPI,
+  notificationsAPI,
   type HubDashboardStats,
   type HubStatsResponse,
   type HubPersonalStats,
   type HubEcosystemStats,
   type ReferralStats,
   type WalletBalanceResponse,
+  type Notification,
+  type PaginatedResponse,
 } from "@boldmindng/api-client";
 import { getPillarSummary, type PillarSummary } from "@boldmindng/utils";
 
@@ -23,7 +26,9 @@ export type {
   HubEcosystemStats,
   ReferralStats,
   WalletBalanceResponse,
+  Notification,
 };
+
 export { isPersonalStats, isEcosystemStats };
 
 // ─── Hub dashboard widget — GET /hub/dashboard ───────────────────────────────
@@ -91,6 +96,34 @@ export const subscriptionApi = {
   getMySubscriptions: paymentAPI.subscriptions,
   initializePayment: (productSlug: string, tier: string) =>
     paymentAPI.initialize({ productSlug, tier }),
+};
+
+// ─── Notifications — GET/POST/DELETE /notifications/* ───────────────────────
+// Mirrors notification.controller.ts. The `admin.*` sends (email/whatsapp/
+// broadcast/otp) are deliberately NOT re-exported here — they're gated by
+// RolesGuard('admin','super_admin') on the backend and have no caller yet in
+// boldmind-web. Add them under adminApi if/when an admin broadcast UI exists,
+// rather than exposing them from the general notification surface.
+
+export interface NotificationListResult extends PaginatedResponse<Notification> {
+  unread: number;
+}
+
+export const notificationApi = {
+  /** GET /notifications */
+  list: notificationsAPI.list as (params?: {
+    page?: number;
+    limit?: number;
+  }) => Promise<{ data: NotificationListResult }>,
+  /** POST /notifications/read — omit ids to mark everything read */
+  markRead: notificationsAPI.markRead,
+  /** DELETE /notifications/:id */
+  delete: notificationsAPI.delete,
+  push: {
+    getVapidKey: notificationsAPI.push.getVapidPublicKey,
+    subscribe: notificationsAPI.push.subscribe,
+    unsubscribe: notificationsAPI.push.unsubscribe,
+  },
 };
 
 // ─── Profile / onboarding ─────────────────────────────────────────────────

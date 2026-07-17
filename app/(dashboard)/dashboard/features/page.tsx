@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -14,7 +14,11 @@ import {
   Target,
   Loader2,
 } from "lucide-react";
-import { useDashboardStats } from "../../../../lib/hooks";
+import {
+  useDashboardStats,
+  isEcosystemStats,
+  isPersonalStats,
+} from "../../../../lib/hooks";
 
 // ─── Feature definitions (static meta, data filled from API) ─────────────────
 
@@ -24,7 +28,7 @@ const FEATURES = [
     title: "Product Ecosystem Dashboard",
     description: "Real-time overview of all products",
     icon: LayoutDashboard,
-    color: "#3B82F6", // blue-500
+    color: "#3B82F6",
     bgLight: "rgba(59,130,246,0.08)",
     components: [
       "Product status grid",
@@ -206,27 +210,37 @@ export default function FeaturesPage() {
 
   const active = FEATURES.find((f) => f.id === activeFeature)!;
 
-  // Derive stats from real API data
+  // ── Narrow the role-aware union before reading anything off it ──────────
+  // GET /hub/stats returns HubEcosystemStats for admin/super_admin and
+  // HubPersonalStats otherwise. Reading `.ecosystemOverview` unnarrowed
+  // silently produced dashes for every non-admin user.
+  const ecosystem = stats && isEcosystemStats(stats) ? stats : null;
+  const personal = stats && isPersonalStats(stats) ? stats : null;
+
   const productCount = Array.isArray(products)
     ? products.length
     : ((products as any)?.length ?? "—");
-  const monthlyRevenue = stats?.ecosystemOverview?.totalMonthlyRevenue
-    ? `₦${stats.ecosystemOverview.totalMonthlyRevenue.toLocaleString()}`
-    : "—";
-  const teamSize = stats?.ecosystemOverview?.totalTeamSize ?? "—";
-  const liveProducts = stats?.ecosystemOverview?.liveProducts ?? 0;
-  const totalProducts =
-    (stats?.ecosystemOverview?.liveProducts ?? 0) +
-    (stats?.ecosystemOverview?.buildingProducts ?? 0);
-  const targetAchievement =
-    totalProducts > 0
-      ? `${Math.round((liveProducts / totalProducts) * 100)}%`
+
+  const monthlyRevenue = ecosystem
+    ? `₦${ecosystem.ecosystemOverview.totalMonthlyRevenue.toLocaleString()}`
+    : personal
+      ? `₦${personal.spend.totalPaidNGN.toLocaleString()}` // personal scope: show own spend instead
       : "—";
 
-  // Top priority products (from stats) — fallback to empty array
-  const topPriority = Array.isArray((stats as any)?.topPriority)
-    ? (stats as any).topPriority
-    : (Array.isArray((stats as any)?.top_priority) ? (stats as any).top_priority : []);
+  const teamSize = ecosystem?.ecosystemOverview.totalTeamSize ?? "—";
+
+  // FLAG: ecosystemOverview only carries totalMonthlyRevenue/totalTeamSize on
+  // the real HubEcosystemStats type — there's no liveProducts/buildingProducts
+  // field, so "target achievement" can't be computed from /hub/stats as-is.
+  // Left as a placeholder rather than fabricating a number; ask backend to add
+  // product-status counts to ecosystemOverview if this card should be real.
+  const targetAchievement = "—";
+
+  // GET /hub/stats has no per-product revenue field — userStats.topProducts
+  // is ranked by userCount only. Renamed the section below to match what
+  // the data actually is, rather than labeling a user-count ranking as
+  // "revenue."
+  const topByUsers = ecosystem?.userStats.topProducts ?? [];
 
   return (
     <div className="flex-1 p-6 lg:p-10 overflow-auto">
@@ -335,8 +349,12 @@ export default function FeaturesPage() {
           {activeFeature === "revenue" && (
             <div className="border-t pt-8">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Top Priority Products by Revenue
+                Top Products by Active Users
               </h3>
+              {/* Renamed from "by Revenue": GET /hub/stats has no
+                  per-product revenue figure, only userStats.topProducts
+                  (userCount-ranked). Only populated for admin/super_admin —
+                  personal-scope users see the empty state below. */}
               {statsLoading ? (
                 <div className="space-y-2">
                   {Array.from({ length: 4 }).map((_, i) => (
@@ -346,37 +364,38 @@ export default function FeaturesPage() {
                     />
                   ))}
                 </div>
-              ) : topPriority?.length ? (
+              ) : topByUsers.length > 0 ? (
                 <div className="space-y-2">
-                  {topPriority.slice(0, 6).map((p: { name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; status: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; monthlyRevenue: { toLocaleString: () => string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; }; }, i: Key | null | undefined) => (
+                  {topByUsers.slice(0, 6).map((p, i) => (
                     <div
-                      key={i}
+                      key={p.productSlug}
                       className="flex items-center gap-4 px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-800"
                     >
                       <span
                         className="w-6 h-6 rounded-full text-xs font-black text-white flex items-center justify-center shrink-0"
                         style={{ backgroundColor: active.color }}
                       >
-                        {Number(i ?? 0) + 1}
+                        {i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold truncate text-gray-800 dark:text-white">
-                          {p.name}
+                          {p.productName}
                         </p>
-                        <p className="text-xs text-gray-400">{p.status}</p>
                       </div>
                       <p
                         className="text-sm font-bold"
                         style={{ color: active.color }}
                       >
-                        ₦{p.monthlyRevenue.toLocaleString()}
+                        {p.userCount.toLocaleString()} users
                       </p>
                     </div>
                   ))}
                 </div>
               ) : (
                 <p className="text-sm text-gray-400 italic">
-                  No revenue data available.
+                  {personal
+                    ? "This view is only available to ecosystem admins."
+                    : "No product data available."}
                 </p>
               )}
             </div>
@@ -394,7 +413,7 @@ export default function FeaturesPage() {
           />
           <QuickStat
             icon={DollarSign}
-            label="Monthly Revenue"
+            label={ecosystem ? "Monthly Revenue" : "Your Spend"}
             value={monthlyRevenue}
             color="#22C55E"
             loading={statsLoading}
@@ -419,6 +438,14 @@ export default function FeaturesPage() {
   );
 }
 
+// FLAG: this hits a local Next.js route (/api/products), not
+// @boldmindng/api-client — every other data source on this page goes
+// through the shared hub API layer. If GET /hub/products exists on the
+// backend (per boldmind-web-architecture-plan.md §4.2), this should call
+// hubAPI.getProducts through lib/api/index.ts instead, so it shares auth,
+// error handling, and typing with the rest of the app. Left as-is since I
+// can't confirm from here whether /api/products is an intentional local
+// route or a scaffold leftover — worth a quick check.
 function useHubProducts(): { data: any; loading: boolean } {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -444,4 +471,3 @@ function useHubProducts(): { data: any; loading: boolean } {
 
   return { data, loading };
 }
-

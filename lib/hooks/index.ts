@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
@@ -18,6 +19,8 @@ import {
   type ReferralStats,
   type WalletBalanceResponse,
   type AnalyticsOverview,
+  notificationApi,
+  type NotificationListResult,
 } from "../api";
 
 // ─── Generic fetch hook ─────────────────────────────────────────────────────
@@ -123,8 +126,8 @@ export function useAdminOverview() {
 }
 
 export function useAnalyticsOverview() {
-  return useFetch<AnalyticsOverview>(
-    () => analyticsApi.getOverview().then((data) => ({ data })),
+  return useFetch<AnalyticsOverview>(() =>
+    analyticsApi.getOverview().then((data) => ({ data })),
   );
 }
 
@@ -230,6 +233,63 @@ export function useClipboard(timeout = 2000) {
   );
 
   return { copied, copy };
+}
+
+export function useNotifications(
+  params: { page?: number; limit?: number } = {},
+) {
+  const [page, setPage] = useState(params.page ?? 1);
+  const limit = params.limit ?? 20;
+
+  const { data, loading, error, refresh } = useFetch<NotificationListResult>(
+    () => notificationApi.list({ page, limit }),
+    [page, limit],
+  );
+
+  const markReadMutation = useMutation(
+    (ids?: string[]) =>
+      notificationApi.markRead(ids) as Promise<{
+        data: unknown;
+      }>,
+  );
+
+  const deleteMutation = useMutation(
+    (id: string) => notificationApi.delete(id) as Promise<{ data: unknown }>,
+  );
+
+  const markRead = useCallback(
+    async (ids?: string[]) => {
+      await markReadMutation.execute(ids);
+      await refresh();
+    },
+    [markReadMutation, refresh],
+  );
+
+  const markAllRead = useCallback(() => markRead(undefined), [markRead]);
+
+  const deleteNotification = useCallback(
+    async (id: string) => {
+      await deleteMutation.execute(id);
+      await refresh();
+    },
+    [deleteMutation, refresh],
+  );
+
+  return {
+    notifications: data?.data ?? [],
+    unread: data?.unread ?? 0,
+    total: (data as any)?.total ?? data?.data?.length ?? 0,
+    loading,
+    error,
+    page,
+    setPage,
+    refresh,
+    markRead,
+    markAllRead,
+    deleteNotification,
+    markingRead: markReadMutation.loading,
+    deleting: deleteMutation.loading,
+  };
 }
 
 // ─── Local storage ─────────────────────────────────────────────────────────
