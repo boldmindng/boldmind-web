@@ -30,25 +30,49 @@ export default function AdminUsersPage() {
     }
   };
 
-  // FIXED: adminApi.toggleUserStatus doesn't exist server-side — there is no
-  // PATCH /admin/users/:id/status route on admin.controller.ts. The only
-  // real status-affecting endpoint is DELETE /users/:id/ban, which is
-  // ban-only (no unban counterpart). Until that's decided/built, this only
-  // supports deactivating an active user — the button is disabled for
-  // already-inactive users rather than silently no-oping on a fake toggle.
+  // FIXED: `reason` was captured from the prompt and validated, then never
+  // passed to usersAPI.ban() — it called usersAPI.ban(userId) with no
+  // second argument. usersAPI.ban(id, banReason) in users.api.ts requires
+  // banReason (it wraps update(id, { isBanned: true, banReason })), so the
+  // reason the admin typed was silently thrown away every time.
   const handleBan = async (userId: string) => {
     const reason = window.prompt("Reason for deactivating this user:");
-    if (!reason) return; // cancelled — ban.controller.ts requires a reason
+    if (!reason?.trim()) return;
 
     setTogglingStatus(userId);
     try {
-      await usersAPI.ban(userId);
+      await usersAPI.ban(userId, reason.trim());
       toast.success("User deactivated");
       refresh();
     } catch {
       toast.error("Failed to deactivate user");
     } finally {
       setTogglingStatus(null);
+    }
+  };
+
+  // ADDED: usersAPI.unban(id) is a real, confirmed route in users.api.ts
+  // (a convenience wrapper around PATCH /users/:id with { isBanned: false }).
+  // The previous version disabled reactivation entirely with a comment
+  // claiming no unban endpoint exists — that's stale; it does exist.
+  const handleUnban = async (userId: string) => {
+    setTogglingStatus(userId);
+    try {
+      await usersAPI.unban(userId);
+      toast.success("User reactivated");
+      refresh();
+    } catch {
+      toast.error("Failed to reactivate user");
+    } finally {
+      setTogglingStatus(null);
+    }
+  };
+
+  const handleToggleStatus = (user: any) => {
+    if (user.isActive === false) {
+      handleUnban(user.id);
+    } else {
+      handleBan(user.id);
     }
   };
 
@@ -189,13 +213,6 @@ export default function AdminUsersPage() {
                     Saving…
                   </span>
                 ) : (
-                  /* FIXED: was a hand-listed ROLES array containing a fake
-                     "moderator" role and missing manager/editor/support/
-                     analyst plus every ecosystem role. Now derived from the
-                     single source of truth (ADMIN_ROLES, itself derived from
-                     constants/auth.ts — see admin/index.ts). Options show
-                     the real display name, value stays the raw role id the
-                     backend expects. */
                   <select
                     value={user.role}
                     onChange={(e) => handleRoleChange(user.id, e.target.value)}
@@ -232,19 +249,17 @@ export default function AdminUsersPage() {
                 </span>
               </div>
 
-              {/* Status col */}
+              {/* Status col — now supports both ban and unban */}
               <div className="col-span-2">
                 <button
-                  onClick={() => handleBan(user.id)}
-                  disabled={
-                    togglingStatus === user.id || user.isActive === false
-                  }
+                  onClick={() => handleToggleStatus(user)}
+                  disabled={togglingStatus === user.id}
                   title={
                     user.isActive === false
-                      ? "Reactivation isn't supported yet — no unban endpoint exists"
+                      ? "Reactivate this user"
                       : "Deactivate this user"
                   }
-                  className="text-xs font-semibold px-2 py-1 rounded-full disabled:cursor-not-allowed"
+                  className="text-xs font-semibold px-2 py-1 rounded-full disabled:cursor-not-allowed disabled:opacity-60"
                   style={{
                     backgroundColor:
                       user.isActive !== false
@@ -254,7 +269,6 @@ export default function AdminUsersPage() {
                       user.isActive !== false
                         ? "var(--color-success)"
                         : "var(--color-error)",
-                    opacity: user.isActive === false ? 0.6 : 1,
                   }}
                 >
                   {togglingStatus === user.id
