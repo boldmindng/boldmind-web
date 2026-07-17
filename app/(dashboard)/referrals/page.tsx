@@ -26,7 +26,7 @@ export default function ReferralsPage() {
   const handleGenerateLink = async () => {
     setGeneratingLink(true);
     try {
-      const res = await referralApi.generateLink(selectedProduct);
+      const res = await referralApi.generate();
       const url = (res as any).data?.url ?? "";
       setGeneratedUrl(url);
       await copy(url);
