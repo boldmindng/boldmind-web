@@ -2,9 +2,9 @@
 "use client";
 
 import { useState } from "react";
-import { useReferralStats } from "../../../lib/hooks";
-import { referralApi } from "../../../lib/api";
-import { useClipboard } from "../../../lib/hooks";
+import { useReferralStats } from "../../../../lib/hooks";
+import { referralApi } from "../../../../lib/api";
+import { useClipboard } from "../../../../lib/hooks";
 import { toast } from "sonner";
 
 const LINKABLE_PRODUCTS = [
