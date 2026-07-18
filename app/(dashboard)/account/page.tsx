@@ -131,8 +131,11 @@ export default function AccountPage() {
                 />
               ) : (
                 <div
-                  className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-black text-white"
-                  style={{ backgroundColor: "var(--product-primary)" }}
+                  className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-black"
+                  style={{
+                    backgroundColor: "var(--product-primary)",
+                    color: "var(--product-on-primary, #FFFFFF)",
+                  }}
                 >
                   {displayInitial}
                 </div>
@@ -153,6 +156,7 @@ export default function AccountPage() {
                 style={{
                   borderColor: "var(--product-primary)",
                   color: "var(--product-primary)",
+                  minHeight: "44px",
                 }}
               >
                 {uploadingAvatar ? "Uploading…" : "Change photo"}
@@ -355,6 +359,7 @@ export default function AccountPage() {
             style={{
               borderColor: "var(--color-error)",
               color: "var(--color-error)",
+              minHeight: "44px",
             }}
           >
             Delete Account

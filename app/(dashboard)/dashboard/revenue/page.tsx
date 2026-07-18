@@ -11,7 +11,6 @@ import {
   RefreshCw,
   BarChart3,
 } from "lucide-react";
-import { SuperNavbar } from "@boldmindng/ui";
 import { toast } from "sonner";
 
 // ─── API Adapter ──────────────────────────────────────────────────────────────
@@ -185,16 +184,6 @@ export default function RevenueDashboard() {
   return (
     <div className="flex min-h-screen bg-linear-to-br from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
       <div className="flex-1 flex flex-col">
-        <SuperNavbar
-          logoSrc="/logo.png"
-          user={{ name: "Bobby", role: "Founder" }}
-          links={[
-            { href: "/dashboard", label: "Dashboard" },
-            { href: "/dashboard/revenue", label: "Revenue" },
-            { href: "/dashboard/roadmap", label: "Roadmap" },
-          ]}
-        />
-
         <main className="flex-1 p-6 lg:p-10 overflow-auto">
           <div className="max-w-5xl mx-auto space-y-10">
             {/* Header */}

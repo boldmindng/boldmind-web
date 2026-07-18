@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { CookieConsent } from "@boldmindng/ui";
+import { BM_KEYS } from "@boldmindng/utils";
 import { ClientErrorBoundary } from "./components/ClientErrorBoundary";
 import { ClientAuthProvider } from "./components/ClientAuthProvider";
 // import { AnalyticsInit }  from './components/AnalyticsInit';
@@ -186,8 +187,8 @@ const orgSchema = {
   ],
   sameAs: [
     "https://x.com/boldmindng",
-    "https://facebook.com/boldmindng",
-    "https://instagram.com/boldmindng",
+    "https://facebook.com/boldmindng1",
+    "https://instagram.com/charlesuchijuka",
     "https://linkedin.com/company/boldmindng",
     "https://github.com/boldmindng",
     "https://youtube.com/@boldmindng",
@@ -223,7 +224,29 @@ export default function RootLayout({
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){function applyFontClass(font){var b=document.body;if(!b)return;b.classList.remove('font-standard','font-dyslexic');b.classList.add('font-'+font);}try{var f=localStorage.getItem('boldmind-font-mode')||'dyslexic';document.documentElement.setAttribute('data-font',f);document.documentElement.setAttribute('data-product','boldmind-hub');applyFontClass(f);if(!document.body){document.addEventListener('DOMContentLoaded',function(){applyFontClass(f);});}}catch(e){var fallback='dyslexic';document.documentElement.setAttribute('data-font',fallback);document.documentElement.setAttribute('data-product','boldmind-hub');applyFontClass(fallback);if(!document.body){document.addEventListener('DOMContentLoaded',function(){applyFontClass(fallback);});}}})();`,
+            __html: `(function(){
+function applyFontClass(font){var b=document.body;if(!b)return;b.classList.remove('font-standard','font-dyslexic');b.classList.add('font-'+font);}
+function resolveThemeClass(t){if(t!=='system')return t;try{return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}catch(e){return 'light';}}
+try{
+  var f=localStorage.getItem('${BM_KEYS.FONT_MODE}')||'dyslexic';
+  var storedTheme=localStorage.getItem('${BM_KEYS.THEME}');
+  var t=resolveThemeClass(storedTheme||'light');
+  document.documentElement.setAttribute('data-font',f);
+  document.documentElement.setAttribute('data-product','boldmind-hub');
+  document.documentElement.setAttribute('data-theme',t);
+  document.documentElement.classList.add(t);
+  applyFontClass(f);
+  if(!document.body){document.addEventListener('DOMContentLoaded',function(){applyFontClass(f);});}
+}catch(e){
+  var fallback='dyslexic';
+  document.documentElement.setAttribute('data-font',fallback);
+  document.documentElement.setAttribute('data-product','boldmind-hub');
+  document.documentElement.setAttribute('data-theme','light');
+  document.documentElement.classList.add('light');
+  applyFontClass(fallback);
+  if(!document.body){document.addEventListener('DOMContentLoaded',function(){applyFontClass(fallback);});}
+}
+})();`,
           }}
         />
         <link
