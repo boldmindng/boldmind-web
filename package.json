@@ -14,7 +14,7 @@
     "@boldmindng/analytics": "13.0.0",
     "@boldmindng/api-client": "16.0.0",
     "@boldmindng/auth": "22.0.0",
-    "@boldmindng/ui": "24.0.0",
+    "@boldmindng/ui": "25.0.0",
     "@boldmindng/utils": "10.1.0",
     "@boldmindng/pwa": "2.1.6",
     "@types/node": "24.10.0",

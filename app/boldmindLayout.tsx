@@ -194,6 +194,14 @@ function SidebarContent({
             <div
               className="text-[9px] font-black uppercase tracking-widest leading-none mt-0.5"
               style={{
+                // '#FCA5A5' (admin-only) has no matching token in
+                // globals.css's semantic set — --color-error (#DC2626) is
+                // too saturated for text on this dark gradient, and
+                // --color-error-light (#FEE2E2) is close to white with
+                // weak contrast here. Left as a hand-picked value rather
+                // than forcing a token that reads worse; worth adding a
+                // real `--color-error-onDark`-style token if this pattern
+                // recurs elsewhere.
                 color:
                   variant === "admin" ? "#FCA5A5" : "var(--product-secondary)",
               }}
@@ -205,7 +213,8 @@ function SidebarContent({
         {onClose && (
           <button
             onClick={onClose}
-            className="lg:hidden p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/15 transition-colors"
+            className="lg:hidden flex items-center justify-center rounded-lg text-white/70 hover:text-white hover:bg-white/15 transition-colors"
+            style={{ minWidth: "44px", minHeight: "44px" }}
             aria-label="Close sidebar"
           >
             <X size={15} />
@@ -220,8 +229,11 @@ function SidebarContent({
           style={{ backgroundColor: "var(--product-muted)" }}
         >
           <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white shrink-0"
-            style={{ backgroundColor: "var(--product-primary)" }}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0"
+            style={{
+              backgroundColor: "var(--product-primary)",
+              color: "var(--product-on-primary, #FFFFFF)",
+            }}
           >
             {initials}
           </div>
@@ -467,8 +479,12 @@ export default function BoldmindLayout({
           {/* Mobile hamburger */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg mr-3 lg:hidden transition-colors"
-            style={{ color: "var(--product-foreground)" }}
+            className="flex items-center justify-center rounded-lg mr-3 lg:hidden transition-colors"
+            style={{
+              color: "var(--product-foreground)",
+              minWidth: "44px",
+              minHeight: "44px",
+            }}
             onMouseEnter={(e) =>
               ((e.currentTarget as HTMLElement).style.backgroundColor =
                 "var(--product-muted)")
@@ -505,8 +521,13 @@ export default function BoldmindLayout({
           <div className="flex items-center gap-1.5">
             <Link
               href="/dashboard/notifications"
-              className="relative p-2 rounded-lg transition-colors"
-              style={{ color: "var(--product-foreground)", opacity: 0.65 }}
+              className="relative flex items-center justify-center rounded-lg transition-colors"
+              style={{
+                color: "var(--product-foreground)",
+                opacity: 0.65,
+                minWidth: "44px",
+                minHeight: "44px",
+              }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLElement).style.backgroundColor =
                   "var(--product-muted)";
@@ -520,10 +541,17 @@ export default function BoldmindLayout({
             >
               <Bell size={17} />
             </Link>
-            <Link href="/account">
+            <Link
+              href="/account"
+              className="flex items-center justify-center"
+              style={{ minWidth: "44px", minHeight: "44px" }}
+            >
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white"
-                style={{ backgroundColor: "var(--product-primary)" }}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black"
+                style={{
+                  backgroundColor: "var(--product-primary)",
+                  color: "var(--product-on-primary, #FFFFFF)",
+                }}
               >
                 {initials}
               </div>

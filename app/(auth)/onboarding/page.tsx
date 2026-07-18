@@ -2,21 +2,39 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import {
+  ShoppingBag,
+  Wrench,
+  UtensilsCrossed,
+  BarChart3,
+  Laptop2,
+  BookOpen,
+  Shirt,
+  Sparkles,
+  Check,
+  Rocket,
+  Newspaper,
+  Sprout,
+  GraduationCap,
+  Zap,
+} from "lucide-react";
 import { onboardingApi } from "../../../lib/api";
 // import ProtectedLayout from '../../(dashboard)/components/layout/ProtectedLayout';
 import { useAuth } from "../../../lib/hooks";
 import { toast } from "sonner";
 
+// Icons were emoji (🛍️🔧🍽️📊💻📚👗✨); swapped for lucide-react to match
+// the rest of the ecosystem's move away from emoji-as-iconography.
 const BUSINESS_TYPES = [
-  { value: "ecommerce", emoji: "🛍️", label: "E-Commerce / Retail" },
-  { value: "services", emoji: "🔧", label: "Services / Freelance" },
-  { value: "restaurant", emoji: "🍽️", label: "Restaurant / Food" },
-  { value: "agency", emoji: "📊", label: "Marketing / Digital Agency" },
-  { value: "tech", emoji: "💻", label: "Tech / Software" },
-  { value: "education", emoji: "📚", label: "Education / Tutoring" },
-  { value: "fashion", emoji: "👗", label: "Fashion / Beauty" },
-  { value: "other", emoji: "✨", label: "Something else" },
+  { value: "ecommerce", Icon: ShoppingBag, label: "E-Commerce / Retail" },
+  { value: "services", Icon: Wrench, label: "Services / Freelance" },
+  { value: "restaurant", Icon: UtensilsCrossed, label: "Restaurant / Food" },
+  { value: "agency", Icon: BarChart3, label: "Marketing / Digital Agency" },
+  { value: "tech", Icon: Laptop2, label: "Tech / Software" },
+  { value: "education", Icon: BookOpen, label: "Education / Tutoring" },
+  { value: "fashion", Icon: Shirt, label: "Fashion / Beauty" },
+  { value: "other", Icon: Sparkles, label: "Something else" },
 ] as const;
 
 const GOALS = [
@@ -30,9 +48,12 @@ const GOALS = [
   { value: "pass_exams", label: "Pass JAMB / WAEC / NECO" },
 ] as const;
 
+const ECOSYSTEM_ICONS = [Newspaper, Sprout, GraduationCap, Zap];
+
 export default function OnboardingPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const prefersReducedMotion = useReducedMotion();
 
   const [step, setStep] = useState(1);
   const [businessType, setBusinessType] = useState("");
@@ -50,13 +71,18 @@ export default function OnboardingPage() {
     setSaving(true);
     try {
       await onboardingApi.complete({ businessType, goals });
-      toast.success("All set! Welcome to BoldmindNG 🚀");
+      toast.success("All set! Welcome to BoldmindNG");
       router.push("/dashboard");
     } catch {
       // Even if it fails, send to dashboard — onboarding is not blocking
       router.push("/dashboard");
     }
   };
+
+  const slideTransition = (dir: 1 | -1) => ({
+    x: prefersReducedMotion ? 0 : 20 * dir,
+    opacity: 0,
+  });
 
   return (
     <div
@@ -82,9 +108,9 @@ export default function OnboardingPage() {
           {step === 1 && (
             <motion.div
               key="step1"
-              initial={{ opacity: 0, x: 20 }}
+              initial={slideTransition(1)}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              exit={slideTransition(-1)}
             >
               <h1
                 className="text-2xl font-black mb-2"
@@ -115,7 +141,11 @@ export default function OnboardingPage() {
                           : "var(--product-background)",
                     }}
                   >
-                    <div className="text-2xl mb-2">{t.emoji}</div>
+                    <t.Icon
+                      className="w-6 h-6 mb-2"
+                      style={{ color: "var(--product-primary)" }}
+                      aria-hidden="true"
+                    />
                     <div
                       className="text-sm font-bold"
                       style={{ color: "var(--product-foreground)" }}
@@ -138,9 +168,9 @@ export default function OnboardingPage() {
           {step === 2 && (
             <motion.div
               key="step2"
-              initial={{ opacity: 0, x: 20 }}
+              initial={slideTransition(1)}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              exit={slideTransition(-1)}
             >
               <h1
                 className="text-2xl font-black mb-2"
@@ -170,14 +200,19 @@ export default function OnboardingPage() {
                     }}
                   >
                     <span
-                      className="w-5 h-5 rounded flex items-center justify-center text-xs font-black text-white shrink-0"
+                      className="w-5 h-5 rounded flex items-center justify-center shrink-0"
                       style={{
                         backgroundColor: goals.includes(g.value)
                           ? "var(--product-primary)"
                           : "var(--product-muted)",
                       }}
                     >
-                      {goals.includes(g.value) ? "✓" : ""}
+                      {goals.includes(g.value) && (
+                        <Check
+                          className="w-3.5 h-3.5 text-white"
+                          aria-hidden="true"
+                        />
+                      )}
                     </span>
                     <span
                       className="text-sm font-semibold"
@@ -213,12 +248,27 @@ export default function OnboardingPage() {
           {step === 3 && (
             <motion.div
               key="step3"
-              initial={{ opacity: 0, x: 20 }}
+              initial={slideTransition(1)}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              exit={slideTransition(-1)}
               className="text-center"
             >
-              <div className="text-6xl mb-6">🚀</div>
+              {/* Was a bare 6xl 🚀 emoji standing in as the screen's hero
+                  icon — replaced with a real icon in the product's own
+                  color, at the same scale, so it still reads as a
+                  celebratory centerpiece without being emoji-as-iconography. */}
+              <div className="flex justify-center mb-6">
+                <div
+                  className="w-20 h-20 rounded-3xl flex items-center justify-center"
+                  style={{ backgroundColor: "var(--product-highlight)" }}
+                >
+                  <Rocket
+                    className="w-10 h-10"
+                    style={{ color: "var(--product-primary)" }}
+                    aria-hidden="true"
+                  />
+                </div>
+              </div>
               <h1
                 className="text-3xl font-black mb-3"
                 style={{ color: "var(--product-foreground)" }}
@@ -233,13 +283,17 @@ export default function OnboardingPage() {
                 Everything you need to build.
               </p>
               <div className="grid grid-cols-4 gap-3 mb-10">
-                {["📰", "🌱", "🎓", "⚡"].map((icon, i) => (
+                {ECOSYSTEM_ICONS.map((Icon, i) => (
                   <div
                     key={i}
-                    className="rounded-2xl p-4 flex items-center justify-center text-3xl"
+                    className="rounded-2xl p-4 flex items-center justify-center"
                     style={{ backgroundColor: "var(--product-highlight)" }}
                   >
-                    {icon}
+                    <Icon
+                      className="w-7 h-7"
+                      style={{ color: "var(--product-primary)" }}
+                      aria-hidden="true"
+                    />
                   </div>
                 ))}
               </div>

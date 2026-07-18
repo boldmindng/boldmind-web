@@ -9,7 +9,8 @@ import {
   isSafeBoldMindUrl,
   getAppNameFromReturnUrl,
 } from "@boldmindng/auth";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { Lock, Newspaper, Sprout, GraduationCap, Zap } from "lucide-react";
 
 const brand = {
   primary: "var(--product-primary)",
@@ -29,6 +30,7 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
   // are actually confirmed to exist.
   const { user, status } = useAuthStore();
   const isLoading = status === "loading";
+  const prefersReducedMotion = useReducedMotion();
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -85,7 +87,19 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
               background: `color-mix(in srgb, ${brand.secondary} 8%, transparent)`,
             }}
           />
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full blur-[80px] bg-blue-500/8" />
+          {/* FIXED: this was `bg-blue-500/8` — a hardcoded, off-brand blue
+              blob sitting right next to a sibling blob that correctly derives
+              from `brand.secondary`. Every pixel of this panel elsewhere ties
+              back to the active product's own tokens; this one didn't. Now
+              built from `brand.primary` at low alpha instead, so it reads as
+              a second, cooler-toned echo of the same brand color rather than
+              an unrelated hue. */}
+          <div
+            className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full blur-[80px]"
+            style={{
+              background: `color-mix(in srgb, ${brand.primary} 8%, transparent)`,
+            }}
+          />
         </div>
 
         <div
@@ -120,7 +134,7 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
 
           <div className="flex-1 flex flex-col justify-center">
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="text-4xl font-black leading-tight mb-6"
@@ -145,7 +159,7 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="flex flex-wrap gap-2"
@@ -160,7 +174,7 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
                     border: `1px solid color-mix(in srgb, ${brand.fg} 12%, transparent)`,
                   }}
                 >
-                  <span>{p.icon}</span>
+                  <p.Icon className="w-3.5 h-3.5" aria-hidden="true" />
                   {p.name}
                 </span>
               ))}
@@ -179,7 +193,7 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
               ].map((stat) => (
                 <div key={stat.label}>
                   <p
-                    className="text-xl font-black"
+                    className="text-xl font-black tabular-nums"
                     style={{ color: brand.secondary }}
                   >
                     {stat.value}
@@ -245,7 +259,7 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
           <div className="w-full max-w-105">
             {returnUrl && (
               <motion.div
-                initial={{ opacity: 0, y: -8 }}
+                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-6 flex items-center gap-3 px-4 py-3 rounded-xl border"
                 style={{
@@ -253,7 +267,11 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
                   borderColor: `color-mix(in srgb, ${brand.secondary} 20%, transparent)`,
                 }}
               >
-                <span className="text-lg">🔐</span>
+                <Lock
+                  className="w-5 h-5 shrink-0"
+                  style={{ color: brand.secondary }}
+                  aria-hidden="true"
+                />
                 <p
                   className="text-sm"
                   style={{
@@ -334,10 +352,12 @@ export default function AuthLayout({
   );
 }
 
-// ─── Ecosystem pill data — matches products.ts pillar hubs, not invented products ──
+// ─── Ecosystem pill data — matches products.ts pillar hubs, not invented
+// products. Icons were emoji (📰🌱🎓⚡); swapped for lucide-react to match
+// the rest of the ecosystem's move away from emoji-as-iconography.
 const ECOSYSTEM_PRODUCTS = [
-  { slug: "amebogist", name: "AmeboGist", icon: "📰" },
-  { slug: "villagecircle", name: "VillageCircle", icon: "🌱" },
-  { slug: "educenter", name: "EduCenter", icon: "🎓" },
-  { slug: "planai", name: "PlanAI", icon: "⚡" },
+  { slug: "amebogist", name: "AmeboGist", Icon: Newspaper },
+  { slug: "villagecircle", name: "VillageCircle", Icon: Sprout },
+  { slug: "educenter", name: "EduCenter", Icon: GraduationCap },
+  { slug: "planai", name: "PlanAI", Icon: Zap },
 ];

@@ -7,7 +7,19 @@ import {
   isPersonalStats,
   isEcosystemStats,
 } from "../../../../lib/hooks";
-import { ArrowRight, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import {
+  ArrowRight,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Package,
+  DollarSign,
+  Wallet,
+  Users,
+  Shield,
+  Link2,
+  Settings,
+} from "lucide-react";
 
 function StatCard({
   icon: Icon,
@@ -57,7 +69,7 @@ function StatCard({
         </span>
       </div>
       <p
-        className="text-3xl font-black"
+        className="text-3xl font-black tabular-nums"
         style={{ color: accent ? "white" : "var(--product-foreground)" }}
       >
         {value}
@@ -127,6 +139,12 @@ function SkeletonRow() {
   );
 }
 
+// Trend colors were `text-green-400`/`text-red-400` — switched to the
+// `--color-success`/`--color-error` tokens the rest of the dashboard uses
+// for the same up/down semantics (AdminUsersPage's verified/status pills),
+// instead of a separate ad-hoc green/red pair. The neutral "stable" case
+// stays a plain translucent white, since this badge only ever renders on
+// the dark hero gradient card.
 function GrowthBadge({
   trend,
   percentage,
@@ -138,18 +156,94 @@ function GrowthBadge({
     trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
   const color =
     trend === "up"
-      ? "text-green-400"
+      ? "var(--color-success)"
       : trend === "down"
-        ? "text-red-400"
-        : "text-white/40";
+        ? "var(--color-error)"
+        : "rgba(255,255,255,0.4)";
   return (
     <span
-      className={`inline-flex items-center gap-1 text-xs font-semibold ${color}`}
+      className="inline-flex items-center gap-1 text-xs font-semibold"
+      style={{ color }}
     >
       <Icon size={13} />
-      {percentage > 0 ? "+" : ""}
-      {percentage}% this month
+      <span className="tabular-nums">
+        {percentage > 0 ? "+" : ""}
+        {percentage}%
+      </span>{" "}
+      this month
     </span>
+  );
+}
+
+// Icons were emoji (📦💰🔗⚙️); swapped for lucide-react to match the rest
+// of the ecosystem's move away from emoji-as-iconography.
+const QUICK_LINKS = [
+  {
+    href: "/dashboard/products",
+    Icon: Package,
+    label: "Products",
+    sub: "Manage your subscriptions",
+  },
+  {
+    href: "/dashboard/revenue",
+    Icon: DollarSign,
+    label: "Revenue",
+    sub: "View earnings & payouts",
+  },
+  {
+    href: "/dashboard/referrals",
+    Icon: Link2,
+    label: "Referrals",
+    sub: "Track & share your link",
+  },
+  {
+    href: "/settings",
+    Icon: Settings,
+    label: "Settings",
+    sub: "Profile & preferences",
+  },
+] as const;
+
+function QuickLinkCard({ q }: { q: (typeof QUICK_LINKS)[number] }) {
+  return (
+    <Link
+      href={q.href}
+      className="flex items-center gap-3 p-4 rounded-xl border-2 transition-all hover:shadow-md group"
+      style={{
+        borderColor: "var(--product-muted)",
+        backgroundColor: "var(--product-background)",
+      }}
+    >
+      <div
+        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+        style={{ backgroundColor: "var(--product-highlight)" }}
+      >
+        <q.Icon
+          size={16}
+          style={{ color: "var(--product-primary)" }}
+          aria-hidden="true"
+        />
+      </div>
+      <div>
+        <p
+          className="font-bold text-sm"
+          style={{ color: "var(--product-foreground)" }}
+        >
+          {q.label}
+        </p>
+        <p
+          className="text-xs"
+          style={{ color: "var(--product-foreground)", opacity: 0.5 }}
+        >
+          {q.sub}
+        </p>
+      </div>
+      <ArrowRight
+        size={14}
+        className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{ color: "var(--product-primary)" }}
+      />
+    </Link>
   );
 }
 
@@ -206,25 +300,25 @@ export default function HubDashboardPage() {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           <StatCard
-            icon={PackageIcon}
+            icon={Package}
             label="Active Products"
             value={stats.products.activeCount}
           />
           <StatCard
-            icon={DollarIcon}
+            icon={DollarSign}
             label="Total Spend"
             value={`₦${stats.spend.totalPaidNGN.toLocaleString()}`}
             sub={`${stats.spend.totalTransactions} transactions`}
           />
           <StatCard
-            icon={WalletIcon}
+            icon={Wallet}
             label="Wallet Balance"
             value={walletNaira}
             sub={stats.wallet.tier ?? undefined}
             accent
           />
           <StatCard
-            icon={UsersIcon}
+            icon={Users}
             label="Referral Earnings"
             value={`₦${stats.referrals.totalEarnings.toLocaleString()}`}
             sub={`${stats.referrals.totalReferrals} referrals`}
@@ -296,36 +390,7 @@ export default function HubDashboardPage() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {QUICK_LINKS.map((q) => (
-            <Link
-              key={q.href}
-              href={q.href}
-              className="flex items-center gap-3 p-4 rounded-xl border-2 transition-all hover:shadow-md group"
-              style={{
-                borderColor: "var(--product-muted)",
-                backgroundColor: "var(--product-background)",
-              }}
-            >
-              <span className="text-2xl">{q.emoji}</span>
-              <div>
-                <p
-                  className="font-bold text-sm"
-                  style={{ color: "var(--product-foreground)" }}
-                >
-                  {q.label}
-                </p>
-                <p
-                  className="text-xs"
-                  style={{ color: "var(--product-foreground)", opacity: 0.5 }}
-                >
-                  {q.sub}
-                </p>
-              </div>
-              <ArrowRight
-                size={14}
-                className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ color: "var(--product-primary)" }}
-              />
-            </Link>
+            <QuickLinkCard key={q.href} q={q} />
           ))}
         </div>
       </div>
@@ -375,19 +440,19 @@ export default function HubDashboardPage() {
         ) : (
           <>
             <StatCard
-              icon={UsersIcon}
+              icon={Users}
               label="Total Users"
               value={totalUsers.toLocaleString()}
               sub={`${ecosystem?.userStats.growth.currentMonth ?? 0} this month`}
             />
             <StatCard
-              icon={PackageIcon}
+              icon={Package}
               label="Active Products"
               value={activeProducts}
             />
-            <StatCard icon={ShieldIcon} label="Admins" value={totalAdmins} />
+            <StatCard icon={Shield} label="Admins" value={totalAdmins} />
             <StatCard
-              icon={DollarIcon}
+              icon={DollarSign}
               label="Monthly Revenue"
               value={`₦${monthlyRevenue.toLocaleString()}`}
               sub={`Team: ${ecosystem?.ecosystemOverview.totalTeamSize ?? 0}`}
@@ -406,36 +471,7 @@ export default function HubDashboardPage() {
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {QUICK_LINKS.map((q) => (
-            <Link
-              key={q.href}
-              href={q.href}
-              className="flex items-center gap-3 p-4 rounded-xl border-2 transition-all hover:shadow-md group"
-              style={{
-                borderColor: "var(--product-muted)",
-                backgroundColor: "var(--product-background)",
-              }}
-            >
-              <span className="text-2xl">{q.emoji}</span>
-              <div>
-                <p
-                  className="font-bold text-sm"
-                  style={{ color: "var(--product-foreground)" }}
-                >
-                  {q.label}
-                </p>
-                <p
-                  className="text-xs"
-                  style={{ color: "var(--product-foreground)", opacity: 0.5 }}
-                >
-                  {q.sub}
-                </p>
-              </div>
-              <ArrowRight
-                size={14}
-                className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ color: "var(--product-primary)" }}
-              />
-            </Link>
+            <QuickLinkCard key={q.href} q={q} />
           ))}
         </div>
       </div>
@@ -487,7 +523,7 @@ export default function HubDashboardPage() {
                   </p>
                 </div>
                 <span
-                  className="text-sm font-black"
+                  className="text-sm font-black tabular-nums"
                   style={{ color: "var(--product-primary)" }}
                 >
                   {product.userCount.toLocaleString()} users
@@ -578,6 +614,9 @@ export default function HubDashboardPage() {
           >
             System Health
           </h2>
+          {/* Health dots stay fixed green/red/yellow regardless of product —
+              a universal semantic (healthy/unhealthy/degraded), same
+              reasoning as StatusBadge's live/building/hiring variants. */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {ecosystem!.systemHealth.map((service) => (
               <div
@@ -601,7 +640,7 @@ export default function HubDashboardPage() {
                 </div>
                 {service.responseTime != null && (
                   <p
-                    className="text-xs"
+                    className="text-xs tabular-nums"
                     style={{ color: "var(--product-foreground)", opacity: 0.4 }}
                   >
                     {service.responseTime}ms
@@ -613,122 +652,5 @@ export default function HubDashboardPage() {
         </div>
       )}
     </div>
-  );
-}
-
-const QUICK_LINKS = [
-  {
-    href: "/dashboard/products",
-    emoji: "📦",
-    label: "Products",
-    sub: "Manage your subscriptions",
-  },
-  {
-    href: "/dashboard/revenue",
-    emoji: "💰",
-    label: "Revenue",
-    sub: "View earnings & payouts",
-  },
-  {
-    href: "/dashboard/referrals",
-    emoji: "🔗",
-    label: "Referrals",
-    sub: "Track & share your link",
-  },
-  {
-    href: "/settings",
-    emoji: "⚙️",
-    label: "Settings",
-    sub: "Profile & preferences",
-  },
-] as const;
-
-function UsersIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-function PackageIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="16.5" y1="9.4" x2="7.5" y2="4.21" />
-      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-      <line x1="12" y1="22.08" x2="12" y2="12" />
-    </svg>
-  );
-}
-function ShieldIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  );
-}
-function DollarIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="12" y1="1" x2="12" y2="23" />
-      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-    </svg>
-  );
-}
-function WalletIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-    </svg>
   );
 }

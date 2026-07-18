@@ -4,7 +4,8 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { Eye, EyeOff } from "lucide-react";
 import { authAPI } from "@boldmindng/auth";
 import { useAuthStore } from "@boldmindng/auth";
 import { setAccessToken } from "@boldmindng/api-client";
@@ -17,6 +18,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setSession, status } = useAuthStore();
+  const prefersReducedMotion = useReducedMotion();
 
   // FIX (TS18047): useSearchParams() types as ReadonlyURLSearchParams | null —
   // optional-chain every .get() call instead of asserting non-null.
@@ -110,9 +112,9 @@ function LoginForm() {
       style={{ backgroundColor: "var(--product-background)" }}
     >
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
         className="w-full max-w-md"
       >
         {/* Header */}
@@ -256,13 +258,21 @@ function LoginForm() {
                   required
                   autoComplete="current-password"
                 />
+                {/* Was 🙈/👁️ emoji — swapped for lucide Eye/EyeOff, which is
+                    what ChangePasswordPage already uses for the same control.
+                    Same feature, one visual language now instead of two. */}
                 <button
                   type="button"
                   onClick={() => setShowPwd(!showPwd)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                  aria-label={showPwd ? "Hide password" : "Show password"}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
                   style={{ color: "var(--product-foreground)", opacity: 0.5 }}
                 >
-                  {showPwd ? "🙈" : "👁️"}
+                  {showPwd ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>

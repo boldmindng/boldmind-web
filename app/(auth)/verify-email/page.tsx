@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Mail, Loader2, RefreshCw, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -59,11 +59,17 @@ function useResendCooldown(seconds = 60) {
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
+// UPDATED — same rework as its Forgot/Change-password siblings: this page was
+// hardcoded dark (`bg-white/5`, `text-white`, a blue icon badge unrelated to
+// any product token) instead of using `--product-*`. It's nested inside
+// AuthLayout's card, which is NOT guaranteed to be dark, so this was a real
+// contrast risk, not just a style inconsistency.
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   // FIX (TS18047): useSearchParams() types as ReadonlyURLSearchParams | null.
   const email = searchParams?.get("email") ?? "";
+  const prefersReducedMotion = useReducedMotion();
 
   const [code, setCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -131,15 +137,34 @@ function VerifyEmailContent() {
   if (verified) {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="text-center py-4"
       >
-        <div className="w-16 h-16 bg-green-500/15 rounded-full flex items-center justify-center mx-auto mb-5 border border-green-500/25">
-          <CheckCircle className="w-8 h-8 text-green-400" />
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 border"
+          style={{
+            backgroundColor: "var(--color-success-light)",
+            borderColor: "var(--color-success)",
+          }}
+        >
+          <CheckCircle
+            className="w-8 h-8"
+            style={{ color: "var(--color-success)" }}
+          />
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">Email Verified!</h2>
-        <p className="text-white/45 text-sm">Taking you to onboarding…</p>
+        <h2
+          className="text-xl font-bold mb-2"
+          style={{ color: "var(--product-foreground)" }}
+        >
+          Email Verified!
+        </h2>
+        <p
+          className="text-sm"
+          style={{ color: "var(--product-foreground)", opacity: 0.6 }}
+        >
+          Taking you to onboarding…
+        </p>
       </motion.div>
     );
   }
@@ -150,20 +175,39 @@ function VerifyEmailContent() {
       {/* Icon + heading */}
       <div className="text-center mb-7">
         <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
+          initial={{ scale: prefersReducedMotion ? 1 : 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", duration: 0.5 }}
-          className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-500/15 border border-blue-500/25 mb-5"
+          transition={{
+            type: prefersReducedMotion ? "tween" : "spring",
+            duration: 0.5,
+          }}
+          className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-5 border"
+          style={{
+            backgroundColor: "var(--product-highlight)",
+            borderColor: "var(--product-muted)",
+          }}
         >
-          <Mail className="w-7 h-7 text-blue-400" />
+          <Mail
+            className="w-7 h-7"
+            style={{ color: "var(--product-primary)" }}
+          />
         </motion.div>
 
-        <h1 className="text-2xl font-bold text-white mb-1.5">
+        <h1
+          className="text-2xl font-bold mb-1.5"
+          style={{ color: "var(--product-foreground)" }}
+        >
           Check Your Email
         </h1>
-        <p className="text-white/45 text-sm">
+        <p
+          className="text-sm"
+          style={{ color: "var(--product-foreground)", opacity: 0.6 }}
+        >
           We sent a 6-digit code to{" "}
-          <span className="text-white/70 font-medium">
+          <span
+            className="font-medium"
+            style={{ color: "var(--product-foreground)", opacity: 0.85 }}
+          >
             {email || "your email"}
           </span>
         </p>
@@ -171,7 +215,10 @@ function VerifyEmailContent() {
 
       {/* Code input */}
       <form onSubmit={handleVerify}>
-        <label className="text-white/50 text-xs font-medium mb-2 block">
+        <label
+          className="text-xs font-medium mb-2 block"
+          style={{ color: "var(--product-foreground)", opacity: 0.6 }}
+        >
           Verification Code
         </label>
 
@@ -185,17 +232,22 @@ function VerifyEmailContent() {
             setCode(e.target.value.replace(/\D/g, ""));
           }}
           placeholder="123456"
-          className="w-full mb-2 py-4 px-4 bg-white/5 border border-white/10 rounded-xl text-center text-2xl font-black tracking-[0.5em] text-white focus:border-amber-400/50 focus:outline-none transition-all placeholder:tracking-normal placeholder:font-normal placeholder:text-white/20"
+          className="auth-input w-full mb-2 py-4 text-center text-2xl font-black tracking-[0.5em] placeholder:tracking-normal placeholder:font-normal"
         />
 
         {verifyError && (
-          <p className="text-red-400 text-xs text-center mb-3">{verifyError}</p>
+          <p
+            className="text-xs text-center mb-3"
+            style={{ color: "var(--color-error)" }}
+          >
+            {verifyError}
+          </p>
         )}
 
         <button
           type="submit"
           disabled={isVerifying || code.length < 6}
-          className="w-full py-3 rounded-xl font-semibold bg-amber-400 text-black hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-sm mt-1"
+          className="auth-btn-primary w-full flex items-center justify-center gap-2 mt-1"
         >
           {isVerifying ? (
             <>
@@ -208,19 +260,37 @@ function VerifyEmailContent() {
       </form>
 
       {/* Steps */}
-      <div className="mt-6 pt-5 border-t border-white/6 space-y-3">
-        <p className="text-white/25 text-[10px] uppercase tracking-widest font-bold">
+      <div
+        className="mt-6 pt-5 border-t space-y-3"
+        style={{ borderColor: "var(--product-muted)" }}
+      >
+        <p
+          className="text-[10px] uppercase tracking-widest font-bold"
+          style={{ color: "var(--product-foreground)", opacity: 0.3 }}
+        >
           Alternatively
         </p>
         <div className="flex gap-3">
-          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-            <Mail className="w-4 h-4 text-blue-400" />
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+            style={{ backgroundColor: "var(--product-highlight)" }}
+          >
+            <Mail
+              className="w-4 h-4"
+              style={{ color: "var(--product-primary)" }}
+            />
           </div>
           <div>
-            <p className="text-sm font-medium text-white">
+            <p
+              className="text-sm font-medium"
+              style={{ color: "var(--product-foreground)" }}
+            >
               Click the magic link
             </p>
-            <p className="text-xs text-white/40">
+            <p
+              className="text-xs"
+              style={{ color: "var(--product-foreground)", opacity: 0.45 }}
+            >
               You can also click the button in the email to verify instantly.
             </p>
           </div>
@@ -229,13 +299,17 @@ function VerifyEmailContent() {
 
       {/* Resend + back */}
       <div className="mt-6 text-center space-y-3">
-        <p className="text-white/30 text-xs">
+        <p
+          className="text-xs"
+          style={{ color: "var(--product-foreground)", opacity: 0.35 }}
+        >
           Didn&apos;t receive the email? Check your spam or{" "}
         </p>
         <button
           onClick={handleResend}
           disabled={isResending || !cooldown.canResend}
-          className="flex items-center gap-2 mx-auto text-amber-400 hover:text-amber-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-2 mx-auto text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ color: "var(--product-primary)" }}
         >
           {isResending ? (
             <>
@@ -252,7 +326,8 @@ function VerifyEmailContent() {
 
         <Link
           href="/login"
-          className="flex items-center gap-1.5 justify-center text-white/30 hover:text-white/55 text-xs transition-colors"
+          className="flex items-center gap-1.5 justify-center text-xs transition-colors"
+          style={{ color: "var(--product-foreground)", opacity: 0.4 }}
         >
           <ArrowLeft size={12} /> Back to Login
         </Link>
@@ -264,7 +339,14 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense
-      fallback={<div className="text-center text-white/50">Loading...</div>}
+      fallback={
+        <div
+          className="text-center text-sm"
+          style={{ color: "var(--product-foreground)", opacity: 0.5 }}
+        >
+          Loading...
+        </div>
+      }
     >
       <VerifyEmailContent />
     </Suspense>

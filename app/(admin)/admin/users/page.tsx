@@ -2,6 +2,12 @@
 "use client";
 
 import { useState } from "react";
+import {
+  CheckCircle2,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { useAdminUsers } from "../../../../lib/hooks";
 import { adminApi } from "../../../../lib/api";
 import { usersAPI } from "@boldmindng/api-client";
@@ -87,7 +93,7 @@ export default function AdminUsersPage() {
             Users
           </h1>
           <p
-            className="text-sm mt-0.5"
+            className="text-sm mt-0.5 tabular-nums"
             style={{ color: "var(--product-foreground)", opacity: 0.5 }}
           >
             {(data as any)?.total?.toLocaleString() ?? "—"} total accounts
@@ -232,10 +238,13 @@ export default function AdminUsersPage() {
                 )}
               </div>
 
-              {/* Verified col */}
+              {/* Verified col — was raw "✓ Yes" / "⚠ No" text glyphs; the
+                  rest of the dashboard shell (BoldmindLayout) has moved to
+                  lucide-react icons, so these now match instead of being the
+                  one place still using bare Unicode symbols. */}
               <div className="col-span-2">
                 <span
-                  className="text-xs font-semibold px-2 py-1 rounded-full"
+                  className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full"
                   style={{
                     backgroundColor: user.isVerified
                       ? "var(--color-success-light)"
@@ -245,7 +254,12 @@ export default function AdminUsersPage() {
                       : "var(--color-warning)",
                   }}
                 >
-                  {user.isVerified ? "✓ Yes" : "⚠ No"}
+                  {user.isVerified ? (
+                    <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
+                  ) : (
+                    <AlertCircle className="w-3.5 h-3.5" aria-hidden="true" />
+                  )}
+                  {user.isVerified ? "Yes" : "No"}
                 </span>
               </div>
 
@@ -304,16 +318,16 @@ export default function AdminUsersPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 rounded-xl text-sm font-bold border-2 disabled:opacity-30"
+            className="flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-bold border-2 disabled:opacity-30"
             style={{
               borderColor: "var(--product-muted)",
               color: "var(--product-foreground)",
             }}
           >
-            ← Prev
+            <ChevronLeft className="w-4 h-4" aria-hidden="true" /> Prev
           </button>
           <span
-            className="text-sm font-semibold"
+            className="text-sm font-semibold tabular-nums"
             style={{ color: "var(--product-foreground)", opacity: 0.55 }}
           >
             {page} of {totalPages}
@@ -321,13 +335,13 @@ export default function AdminUsersPage() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-4 py-2 rounded-xl text-sm font-bold border-2 disabled:opacity-30"
+            className="flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-bold border-2 disabled:opacity-30"
             style={{
               borderColor: "var(--product-muted)",
               color: "var(--product-foreground)",
             }}
           >
-            Next →
+            Next <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       )}

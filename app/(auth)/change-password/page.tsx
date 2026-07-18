@@ -3,12 +3,13 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useResetPassword } from "../../../lib/hooks";
+import { LoadingSpinner } from "@boldmindng/ui";
 
 function validatePassword(pwd: string): string | null {
   if (pwd.length < 8) return "Password must be at least 8 characters";
@@ -18,11 +19,15 @@ function validatePassword(pwd: string): string | null {
   return null;
 }
 
+// Same rework as ForgotPasswordPage: token-based colors and the shared
+// `.auth-input` / `.auth-btn-primary` / `LoadingSpinner` instead of a
+// hardcoded dark theme that assumed it always renders on a dark surface.
 function ChangePasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams?.get("token") ?? "";
   const email = searchParams?.get("email") ?? "";
+  const prefersReducedMotion = useReducedMotion();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -92,45 +97,85 @@ function ChangePasswordContent() {
   if (success) {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="text-center"
       >
-        <div className="w-14 h-14 bg-green-500/15 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/25">
-          <CheckCircle className="w-7 h-7 text-green-400" />
+        <div
+          className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6 border"
+          style={{
+            backgroundColor: "var(--color-success-light)",
+            borderColor: "var(--color-success)",
+          }}
+        >
+          <CheckCircle
+            className="w-7 h-7"
+            style={{ color: "var(--color-success)" }}
+          />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-3">
+        <h1
+          className="text-2xl font-bold mb-3"
+          style={{ color: "var(--product-foreground)" }}
+        >
           Password Changed!
         </h1>
-        <p className="text-white/50 text-sm mb-4">
+        <p
+          className="text-sm mb-4"
+          style={{ color: "var(--product-foreground)", opacity: 0.6 }}
+        >
           Your password has been successfully updated. You can now log in with
           your new password.
         </p>
-        <p className="text-white/25 text-xs">Redirecting to login…</p>
+        <p
+          className="text-xs"
+          style={{ color: "var(--product-foreground)", opacity: 0.35 }}
+        >
+          Redirecting to login…
+        </p>
       </motion.div>
     );
   }
 
   // ── Form ──────────────────────────────────────────────────────────────────
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+    <motion.div
+      initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
       <div className="text-center mb-7">
-        <h1 className="text-2xl font-bold text-white mb-1.5">
+        <h1
+          className="text-2xl font-bold mb-1.5"
+          style={{ color: "var(--product-foreground)" }}
+        >
           Change Your Password
         </h1>
-        <p className="text-white/45 text-sm">Enter your new password below</p>
+        <p
+          className="text-sm"
+          style={{ color: "var(--product-foreground)", opacity: 0.55 }}
+        >
+          Enter your new password below
+        </p>
       </div>
 
       <AnimatePresence>
         {error && (
           <motion.div
-            initial={{ opacity: 0, y: -6 }}
+            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : -6 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            className="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20"
+            exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -6 }}
+            className="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl"
+            style={{
+              backgroundColor: "var(--color-error-light)",
+              border: "1px solid var(--color-error)",
+            }}
           >
-            <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-red-400">{error}</p>
+            <AlertCircle
+              className="w-4 h-4 shrink-0 mt-0.5"
+              style={{ color: "var(--color-error)" }}
+            />
+            <p className="text-sm" style={{ color: "var(--color-error)" }}>
+              {error}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -139,12 +184,16 @@ function ChangePasswordContent() {
         <div>
           <label
             htmlFor="password"
-            className="text-white/50 text-xs font-medium mb-1.5 block"
+            className="text-xs font-medium mb-1.5 block"
+            style={{ color: "var(--product-foreground)", opacity: 0.6 }}
           >
             New Password
           </label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+            <Lock
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+              style={{ color: "var(--product-foreground)", opacity: 0.35 }}
+            />
             <input
               id="password"
               type={showPassword ? "text" : "password"}
@@ -156,12 +205,14 @@ function ChangePasswordContent() {
               }}
               required
               placeholder="Enter new password"
-              className="w-full pl-9 pr-11 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/25 focus:outline-none focus:border-amber-400/50 text-sm transition-colors"
+              className="auth-input pl-9 pr-11"
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
+              style={{ color: "var(--product-foreground)", opacity: 0.4 }}
             >
               {showPassword ? (
                 <EyeOff className="w-4 h-4" />
@@ -170,7 +221,10 @@ function ChangePasswordContent() {
               )}
             </button>
           </div>
-          <p className="mt-1.5 text-xs text-white/30">
+          <p
+            className="mt-1.5 text-xs"
+            style={{ color: "var(--product-foreground)", opacity: 0.4 }}
+          >
             Min 8 characters · uppercase · lowercase · number
           </p>
         </div>
@@ -178,12 +232,16 @@ function ChangePasswordContent() {
         <div>
           <label
             htmlFor="confirmPassword"
-            className="text-white/50 text-xs font-medium mb-1.5 block"
+            className="text-xs font-medium mb-1.5 block"
+            style={{ color: "var(--product-foreground)", opacity: 0.6 }}
           >
             Confirm New Password
           </label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+            <Lock
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+              style={{ color: "var(--product-foreground)", opacity: 0.35 }}
+            />
             <input
               id="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
@@ -194,12 +252,16 @@ function ChangePasswordContent() {
               }}
               required
               placeholder="Confirm new password"
-              className="w-full pl-9 pr-11 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/25 focus:outline-none focus:border-amber-400/50 text-sm transition-colors"
+              className="auth-input pl-9 pr-11"
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+              aria-label={
+                showConfirmPassword ? "Hide password" : "Show password"
+              }
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
+              style={{ color: "var(--product-foreground)", opacity: 0.4 }}
             >
               {showConfirmPassword ? (
                 <EyeOff className="w-4 h-4" />
@@ -213,10 +275,10 @@ function ChangePasswordContent() {
         <button
           type="submit"
           disabled={resetMutation.loading || !token || !email}
-          className="w-full py-3 rounded-xl font-semibold bg-amber-400 text-black hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-sm"
+          className="auth-btn-primary w-full flex items-center justify-center gap-2"
         >
           {resetMutation.loading && (
-            <span className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+            <LoadingSpinner size="sm" color="currentColor" />
           )}
           {resetMutation.loading ? "Changing Password…" : "Change Password"}
         </button>
@@ -225,7 +287,8 @@ function ChangePasswordContent() {
       <div className="mt-5 text-center">
         <Link
           href="/login"
-          className="text-white/35 hover:text-white/60 text-sm transition-colors"
+          className="text-sm transition-colors"
+          style={{ color: "var(--product-foreground)", opacity: 0.5 }}
         >
           Back to Login
         </Link>
@@ -237,7 +300,14 @@ function ChangePasswordContent() {
 export default function ChangePasswordPage() {
   return (
     <Suspense
-      fallback={<div className="text-center text-white/50">Loading...</div>}
+      fallback={
+        <div
+          className="text-center text-sm"
+          style={{ color: "var(--product-foreground)", opacity: 0.5 }}
+        >
+          Loading...
+        </div>
+      }
     >
       <ChangePasswordContent />
     </Suspense>

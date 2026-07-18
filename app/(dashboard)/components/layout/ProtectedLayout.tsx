@@ -3,29 +3,49 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import {
+  Zap,
+  Package,
+  Wallet,
+  Link2,
+  Users,
+  Bell,
+  User,
+  Settings,
+  ShieldCheck,
+  Newspaper,
+  Sprout,
+  GraduationCap,
+  LogOut,
+  ExternalLink,
+} from "lucide-react";
 import { useAuth } from "../../../../lib/hooks";
 import { authAPI, useAuthStore } from "@boldmindng/auth";
 import { getUserRoleDisplay, hasAdminPermission } from "@boldmindng/utils";
 import { toast } from "sonner";
 import type { ReactNode } from "react";
 
+// Icons were emoji (⚡📦💰🔗👛👥🔔👤⚙️🛡️🚪) — swapped for lucide-react to
+// match BoldmindLayout, the newer sidebar, which already made this move.
+// This file is otherwise a duplicate of that layout; consider retiring it
+// in favor of BoldmindLayout rather than maintaining both long-term.
 const NAV_ITEMS = [
-  { href: "/dashboard", icon: "⚡", label: "Overview" },
-  { href: "/dashboard/products", icon: "📦", label: "Products" },
-  { href: "/dashboard/revenue", icon: "💰", label: "Revenue" },
-  { href: "/dashboard/referrals", icon: "🔗", label: "Referrals" },
-  { href: "/dashboard/wallet", icon: "👛", label: "Wallet" },
-  { href: "/dashboard/team", icon: "👥", label: "Team" },
-  { href: "/dashboard/notifications", icon: "🔔", label: "Notifications" },
-  { href: "/account", icon: "👤", label: "Account" },
-  { href: "/settings", icon: "⚙️", label: "Settings" },
+  { href: "/dashboard", Icon: Zap, label: "Overview" },
+  { href: "/dashboard/products", Icon: Package, label: "Products" },
+  { href: "/dashboard/revenue", Icon: Wallet, label: "Revenue" },
+  { href: "/dashboard/referrals", Icon: Link2, label: "Referrals" },
+  { href: "/dashboard/wallet", Icon: Wallet, label: "Wallet" },
+  { href: "/dashboard/team", Icon: Users, label: "Team" },
+  { href: "/dashboard/notifications", Icon: Bell, label: "Notifications" },
+  { href: "/account", Icon: User, label: "Account" },
+  { href: "/settings", Icon: Settings, label: "Settings" },
 ];
 
 const ECOSYSTEM_LINKS = [
-  { href: "https://amebogist.ng", icon: "📰", label: "AmeboGist" },
-  { href: "https://villagecircle.ng", icon: "🌱", label: "VillageCircle" },
-  { href: "https://educenter.com.ng", icon: "🎓", label: "EduCenter" },
-  { href: "https://planai.boldmind.ng", icon: "⚡", label: "PlanAI" },
+  { href: "https://amebogist.ng", Icon: Newspaper, label: "AmeboGist" },
+  { href: "https://villagecircle.ng", Icon: Sprout, label: "VillageCircle" },
+  { href: "https://educenter.com.ng", Icon: GraduationCap, label: "EduCenter" },
+  { href: "https://planai.boldmind.ng", Icon: Zap, label: "PlanAI" },
 ];
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
@@ -139,7 +159,8 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                aria-current={active ? "page" : undefined}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
                 style={{
                   backgroundColor: active
                     ? "var(--product-primary)"
@@ -148,7 +169,10 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
                   opacity: active ? 1 : 0.7,
                 }}
               >
-                <span className="text-base">{item.icon}</span>
+                <item.Icon
+                  className="w-4.5 h-4.5 shrink-0"
+                  aria-hidden="true"
+                />
                 {item.label}
               </Link>
             );
@@ -164,7 +188,10 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
               </p>
               <Link
                 href="/admin"
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                aria-current={
+                  currentPath.startsWith("/admin") ? "page" : undefined
+                }
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
                 style={{
                   backgroundColor: currentPath.startsWith("/admin")
                     ? "var(--product-primary)"
@@ -175,7 +202,10 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
                   opacity: currentPath.startsWith("/admin") ? 1 : 0.7,
                 }}
               >
-                <span className="text-base">🛡️</span>
+                <ShieldCheck
+                  className="w-4.5 h-4.5 shrink-0"
+                  aria-hidden="true"
+                />
                 Admin Panel
               </Link>
             </>
@@ -193,14 +223,15 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
               style={{ color: "var(--product-foreground)", opacity: 0.6 }}
             >
-              <span className="text-base">{item.icon}</span>
+              <item.Icon className="w-4.5 h-4.5 shrink-0" aria-hidden="true" />
               {item.label}
-              <span className="ml-auto text-[10px]" style={{ opacity: 0.4 }}>
-                ↗
-              </span>
+              <ExternalLink
+                className="w-3 h-3 ml-auto opacity-40"
+                aria-hidden="true"
+              />
             </a>
           ))}
         </nav>
@@ -211,10 +242,10 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
         >
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80 min-h-11"
             style={{ color: "var(--color-error)" }}
           >
-            <span>🚪</span> Sign out
+            <LogOut className="w-4.5 h-4.5" aria-hidden="true" /> Sign out
           </button>
         </div>
       </aside>
@@ -235,12 +266,18 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
             BoldmindNG
           </Link>
           <div className="flex-1" />
+          {/* Was w-9 h-9 (36px) — under the 44px minimum touch target. */}
           <Link
             href="/dashboard/notifications"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-lg"
+            aria-label="Notifications"
+            className="w-11 h-11 rounded-xl flex items-center justify-center"
             style={{ backgroundColor: "var(--product-highlight)" }}
           >
-            🔔
+            <Bell
+              className="w-4.5 h-4.5"
+              style={{ color: "var(--product-primary)" }}
+              aria-hidden="true"
+            />
           </Link>
           <Link href="/account" className="flex items-center gap-2">
             <div

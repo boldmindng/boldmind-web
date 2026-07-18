@@ -2,15 +2,30 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useForgotPassword } from "../../../lib/hooks";
+import { LoadingSpinner } from "@boldmindng/ui";
 
+/**
+ * UPDATED — this page (and its ChangePassword/VerifyEmail siblings) had
+ * drifted onto a completely separate, hardcoded dark theme: `bg-white/5`,
+ * `text-white`, `bg-amber-400 text-black`, raw `border-white/10`, etc. That
+ * assumes it's always rendered on a dark surface — but it's nested inside
+ * AuthLayout's card, which is built from `--product-background`/
+ * `--product-foreground` and is NOT guaranteed to be dark (boldmind-hub's
+ * light mode renders that card close to white). White text on white/5 over a
+ * light background is close to unreadable. Rebuilt on the same token system
+ * every sibling auth page already uses, plus the shared `.auth-input` /
+ * `.auth-btn-primary` classes and `LoadingSpinner` instead of three
+ * independently hand-rolled versions of the same things.
+ */
 function ForgotPasswordContent() {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   const forgotMutation = useForgotPassword();
 
@@ -43,31 +58,54 @@ function ForgotPasswordContent() {
   if (emailSent) {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="text-center"
       >
-        <div className="w-14 h-14 bg-green-500/15 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/25">
-          <CheckCircle className="w-7 h-7 text-green-400" />
+        <div
+          className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6 border"
+          style={{
+            backgroundColor: "var(--color-success-light)",
+            borderColor: "var(--color-success)",
+          }}
+        >
+          <CheckCircle
+            className="w-7 h-7"
+            style={{ color: "var(--color-success)" }}
+          />
         </div>
 
-        <h1 className="text-2xl font-bold text-white mb-3">Check Your Email</h1>
+        <h1
+          className="text-2xl font-bold mb-3"
+          style={{ color: "var(--product-foreground)" }}
+        >
+          Check Your Email
+        </h1>
 
-        <p className="text-white/50 text-sm mb-8 leading-relaxed">
+        <p
+          className="text-sm mb-8 leading-relaxed"
+          style={{ color: "var(--product-foreground)", opacity: 0.6 }}
+        >
           We&apos;ve sent a password reset link to{" "}
-          <strong className="text-white">{email}</strong>. Click the link in the
-          email to reset your password.
+          <strong style={{ color: "var(--product-foreground)" }}>
+            {email}
+          </strong>
+          . Click the link in the email to reset your password.
         </p>
 
         <div className="space-y-4">
-          <p className="text-xs text-white/35">
+          <p
+            className="text-xs"
+            style={{ color: "var(--product-foreground)", opacity: 0.4 }}
+          >
             Didn&apos;t receive the email? Check your spam folder or{" "}
             <button
               onClick={() => {
                 setEmailSent(false);
                 forgotMutation.reset();
               }}
-              className="text-amber-400 hover:text-amber-300 font-medium transition-colors"
+              className="font-medium transition-colors"
+              style={{ color: "var(--product-primary)" }}
             >
               try again
             </button>
@@ -75,7 +113,8 @@ function ForgotPasswordContent() {
 
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 text-white/35 hover:text-white/60 text-sm transition-colors"
+            className="inline-flex items-center gap-2 text-sm transition-colors"
+            style={{ color: "var(--product-foreground)", opacity: 0.5 }}
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Login
@@ -87,12 +126,21 @@ function ForgotPasswordContent() {
 
   // ── Form ──────────────────────────────────────────────────────────────────
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+    <motion.div
+      initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
       <div className="text-center mb-7">
-        <h1 className="text-2xl font-bold text-white mb-1.5">
+        <h1
+          className="text-2xl font-bold mb-1.5"
+          style={{ color: "var(--product-foreground)" }}
+        >
           Reset Your Password
         </h1>
-        <p className="text-white/45 text-sm">
+        <p
+          className="text-sm"
+          style={{ color: "var(--product-foreground)", opacity: 0.55 }}
+        >
           Enter your email and we&apos;ll send you a reset link
         </p>
       </div>
@@ -101,12 +149,16 @@ function ForgotPasswordContent() {
         <div>
           <label
             htmlFor="email"
-            className="text-white/50 text-xs font-medium mb-1.5 block"
+            className="text-xs font-medium mb-1.5 block"
+            style={{ color: "var(--product-foreground)", opacity: 0.6 }}
           >
             Email Address
           </label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+            <Mail
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+              style={{ color: "var(--product-foreground)", opacity: 0.35 }}
+            />
             <input
               id="email"
               type="email"
@@ -117,13 +169,19 @@ function ForgotPasswordContent() {
               }}
               required
               placeholder="you@example.com"
-              className="w-full pl-9 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/25 focus:outline-none focus:border-amber-400/50 text-sm transition-colors"
+              className="auth-input pl-9"
             />
           </div>
         </div>
 
         {forgotMutation.error && (
-          <p className="text-red-400 text-xs bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2">
+          <p
+            className="text-xs rounded-lg px-3 py-2"
+            style={{
+              color: "var(--color-error)",
+              backgroundColor: "var(--color-error-light)",
+            }}
+          >
             {forgotMutation.error.message}
           </p>
         )}
@@ -131,11 +189,11 @@ function ForgotPasswordContent() {
         <button
           type="submit"
           disabled={forgotMutation.loading}
-          className="w-full py-3 rounded-xl font-semibold bg-amber-400 text-black hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-sm"
+          className="auth-btn-primary w-full flex items-center justify-center gap-2"
         >
-          {forgotMutation.loading ? (
-            <span className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-          ) : null}
+          {forgotMutation.loading && (
+            <LoadingSpinner size="sm" color="currentColor" />
+          )}
           {forgotMutation.loading ? "Sending…" : "Send Reset Link"}
         </button>
       </form>
@@ -143,7 +201,8 @@ function ForgotPasswordContent() {
       <div className="mt-5 text-center">
         <Link
           href="/login"
-          className="inline-flex items-center gap-2 text-white/35 hover:text-white/60 text-sm transition-colors"
+          className="inline-flex items-center gap-2 text-sm transition-colors"
+          style={{ color: "var(--product-foreground)", opacity: 0.5 }}
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Login
@@ -156,7 +215,14 @@ function ForgotPasswordContent() {
 export default function ForgotPasswordPage() {
   return (
     <Suspense
-      fallback={<div className="text-center text-white/50">Loading...</div>}
+      fallback={
+        <div
+          className="text-center text-sm"
+          style={{ color: "var(--product-foreground)", opacity: 0.5 }}
+        >
+          Loading...
+        </div>
+      }
     >
       <ForgotPasswordContent />
     </Suspense>

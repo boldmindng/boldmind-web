@@ -21,8 +21,8 @@ importers:
         specifier: 2.1.6
         version: 2.1.6(react@19.2.0)
       '@boldmindng/ui':
-        specifier: 24.0.0
-        version: 24.0.0(@boldmindng/analytics@13.0.0(@boldmindng/utils@10.1.0(react@19.2.0))(react@19.2.0))(@boldmindng/auth@22.0.0(@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0)))(@boldmindng/utils@10.1.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0))(@boldmindng/utils@10.1.0(react@19.2.0))(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.3.2)
+        specifier: 25.0.0
+        version: 25.0.0(@boldmindng/analytics@13.0.0(@boldmindng/utils@10.1.0(react@19.2.0))(react@19.2.0))(@boldmindng/auth@22.0.0(@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0)))(@boldmindng/utils@10.1.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0))(@boldmindng/utils@10.1.0(react@19.2.0))(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.3.2)
       '@boldmindng/utils':
         specifier: 10.1.0
         version: 10.1.0(react@19.2.0)
@@ -192,8 +192,8 @@ packages:
     peerDependencies:
       react: '>=19.2.0'
 
-  '@boldmindng/ui@24.0.0':
-    resolution: {integrity: sha512-kkbO/YWBx0tO0DY7g1nDYFjBRgjZSUYGbBEN+AH5hROw87aFZzGyG9JmYOAmXUxQ15+mwCs6wGvfiKGkyPGXjg==, tarball: https://npm.pkg.github.com/download/@boldmindng/ui/24.0.0/bf23559117c35b17fd03b6f83e4675c546767a34}
+  '@boldmindng/ui@25.0.0':
+    resolution: {integrity: sha512-teRtlw/aFS8qYr4N30Qqg7pITqxVRAJ8Rhf1vQQ943KMz26AP2mF5eh1pP12lrThhGG1wUWcMx3AzgynbmG8Ww==, tarball: https://npm.pkg.github.com/download/@boldmindng/ui/25.0.0/84898d6a39dd98c2c06d47ac45495ae2357f7e02}
     peerDependencies:
       '@boldmindng/analytics': 13.0.0
       '@boldmindng/auth': 22.0.0
@@ -2465,7 +2465,7 @@ snapshots:
       - debug
       - supports-color
 
-  '@boldmindng/ui@24.0.0(@boldmindng/analytics@13.0.0(@boldmindng/utils@10.1.0(react@19.2.0))(react@19.2.0))(@boldmindng/auth@22.0.0(@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0)))(@boldmindng/utils@10.1.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0))(@boldmindng/utils@10.1.0(react@19.2.0))(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.3.2)':
+  '@boldmindng/ui@25.0.0(@boldmindng/analytics@13.0.0(@boldmindng/utils@10.1.0(react@19.2.0))(react@19.2.0))(@boldmindng/auth@22.0.0(@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0)))(@boldmindng/utils@10.1.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0))(@boldmindng/utils@10.1.0(react@19.2.0))(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.3.2)':
     dependencies:
       '@boldmindng/analytics': 13.0.0(@boldmindng/utils@10.1.0(react@19.2.0))(react@19.2.0)
       '@boldmindng/auth': 22.0.0(@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0)))(@boldmindng/utils@10.1.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)

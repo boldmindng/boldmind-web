@@ -4,7 +4,8 @@
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { Rocket, GraduationCap, PenLine, Laptop2 } from "lucide-react";
 import { authAPI } from "@boldmindng/auth";
 import { useAuthStore } from "@boldmindng/auth";
 import { setAccessToken } from "@boldmindng/api-client";
@@ -18,34 +19,36 @@ import { isSafeBoldMindUrl } from "@boldmindng/auth";
 import type { EcosystemRole } from "@boldmindng/auth";
 import { toast } from "sonner";
 
+// Icons were emoji (🚀🎓✍️💻); swapped for lucide-react to match the rest
+// of the ecosystem's move away from emoji-as-iconography.
 const ECOSYSTEM_ROLES = [
   {
     value: "founder",
-    emoji: "🚀",
+    Icon: Rocket,
     label: "Founder / Builder",
     sub: "PlanAI tools for your business",
   },
   {
     value: "student",
-    emoji: "🎓",
+    Icon: GraduationCap,
     label: "Student",
     sub: "JAMB/WAEC prep on EduCenter",
   },
   {
     value: "creator",
-    emoji: "✍️",
+    Icon: PenLine,
     label: "Creator / Writer",
     sub: "Write on AmeboGist",
   },
   {
     value: "vibe_coder",
-    emoji: "💻",
+    Icon: Laptop2,
     label: "Vibe Coder",
     sub: "Apply to Vibe Coders cohort",
   },
 ] as const satisfies readonly {
   value: EcosystemRole;
-  emoji: string;
+  Icon: React.ComponentType<{ className?: string }>;
   label: string;
   sub: string;
 }[];
@@ -63,6 +66,7 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setSession } = useAuthStore();
+  const prefersReducedMotion = useReducedMotion();
 
   // FIX (TS18047): useSearchParams() types as ReadonlyURLSearchParams | null.
   const returnUrl = searchParams?.get("return_url") ?? "/dashboard";
@@ -162,9 +166,9 @@ function RegisterForm() {
       style={{ backgroundColor: "var(--product-background)" }}
     >
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
@@ -309,7 +313,11 @@ function RegisterForm() {
                           : "transparent",
                     }}
                   >
-                    <div className="text-2xl mb-2">{role.emoji}</div>
+                    <role.Icon
+                      className="w-6 h-6 mb-2"
+                      style={{ color: "var(--product-primary)" }}
+                      aria-hidden="true"
+                    />
                     <div
                       className="text-sm font-bold"
                       style={{ color: "var(--product-foreground)" }}
@@ -344,9 +352,16 @@ function RegisterForm() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={loading || !form.ecosystemRole}
-                  className="auth-btn-primary flex-1"
+                  className="auth-btn-primary flex-1 flex items-center justify-center gap-2"
                 >
-                  {loading ? "Creating…" : "Create Account 🚀"}
+                  {loading ? (
+                    "Creating…"
+                  ) : (
+                    <>
+                      Create Account{" "}
+                      <Rocket className="w-4 h-4" aria-hidden="true" />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
