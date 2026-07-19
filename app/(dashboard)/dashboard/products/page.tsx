@@ -3,38 +3,58 @@
 
 import { useMySubscriptions } from "../../../../lib/hooks";
 import { subscriptionApi } from "../../../../lib/api";
-import { BOLDMIND_PRODUCTS } from "@boldmindng/utils";
+import { BOLDMIND_PRODUCTS, getColorScheme } from "@boldmindng/utils";
+import {
+  Newspaper,
+  Sprout,
+  GraduationCap,
+  Zap,
+  ExternalLink,
+  type LucideIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 
-const PILLAR_PRODUCTS = [
+// Colors were previously hand-typed hex literals per pillar (#065F46, #3B1F0A,
+// #1E40AF, #5B21B6) — the exact anti-pattern the design system flags, since
+// they silently drift the moment colors.ts changes. Deriving from
+// getColorScheme(slug) ties this list back to the single source of truth,
+// and swaps the bare emoji for real lucide icons (📰/🌱/🎓/⚡ → Newspaper/
+// Sprout/GraduationCap/Zap) to match BoldmindLayout's icon convention.
+const PILLAR_PRODUCTS: Array<{
+  slug: string;
+  Icon: LucideIcon;
+  name: string;
+  href: string;
+  color: string;
+}> = [
   {
     slug: "amebogist",
-    icon: "📰",
+    Icon: Newspaper,
     name: "AmeboGist",
     href: "https://amebogist.ng",
-    color: "#065F46",
+    color: getColorScheme("amebogist").primary,
   },
   {
     slug: "villagecircle",
-    icon: "🌱",
+    Icon: Sprout,
     name: "VillageCircle",
     href: "https://villagecircle.ng",
-    color: "#3B1F0A",
+    color: getColorScheme("villagecircle").primary,
   },
   {
     slug: "educenter",
-    icon: "🎓",
+    Icon: GraduationCap,
     name: "EduCenter",
     href: "https://educenter.com.ng",
-    color: "#1E40AF",
+    color: getColorScheme("educenter").primary,
   },
   {
     slug: "planai",
-    icon: "⚡",
+    Icon: Zap,
     name: "PlanAI",
     href: "https://planai.boldmind.ng",
-    color: "#5B21B6",
+    color: getColorScheme("planai").primary,
   },
 ];
 
@@ -130,7 +150,7 @@ export default function ProductsPage() {
                       {product?.name ?? sub.productSlug}
                     </p>
                     <p
-                      className="text-xs"
+                      className="text-xs tabular-nums"
                       style={{
                         color: "var(--product-foreground)",
                         opacity: 0.5,
@@ -188,10 +208,10 @@ export default function ProductsPage() {
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
                     style={{ backgroundColor: p.color }}
                   >
-                    {p.icon}
+                    <p.Icon className="w-5 h-5 text-white" aria-hidden="true" />
                   </div>
                   <div>
                     <p
@@ -225,10 +245,11 @@ export default function ProductsPage() {
                     href={p.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 text-center py-2 rounded-xl text-sm font-bold border-2 transition-all hover:opacity-80"
+                    className="flex-1 flex items-center justify-center gap-1.5 text-center py-2 rounded-xl text-sm font-bold border-2 transition-all hover:opacity-80"
                     style={{ borderColor: p.color, color: p.color }}
                   >
-                    Open ↗
+                    Open{" "}
+                    <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                   </a>
                   {!activeSub && (
                     <button

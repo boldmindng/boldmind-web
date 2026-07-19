@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@source "../node_modules/@boldmindng/ui/**/*.{js,mjs,ts,tsx}";
+@source "../node_modules/@boldmindng/auth/**/*.{js,mjs,ts,tsx}";
+
 /* ── Font modes ──────────────────────────────────────────────────────────── */
 :root,
 [data-font="dyslexic"],

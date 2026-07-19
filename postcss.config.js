@@ -11,7 +11,7 @@
 const config = {
   plugins: {
     // Tailwind CSS v4 PostCSS plugin — handles everything including @import
-    '@tailwindcss/postcss': {},
+    "@tailwindcss/postcss": {},
     // Autoprefixer for browser vendor prefixes (-webkit-, etc.)
     autoprefixer: {},
   },

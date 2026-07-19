@@ -1,5 +1,6 @@
 ```
 boldmind-web
+├─ .npmrc
 ├─ README.md
 ├─ app
 │  ├─ (admin)
@@ -51,6 +52,8 @@ boldmind-web
 │  │  │  ├─ page.tsx
 │  │  │  ├─ products
 │  │  │  │  └─ page.tsx
+│  │  │  ├─ referrals
+│  │  │  │  └─ page.tsx
 │  │  │  ├─ revenue
 │  │  │  │  └─ page.tsx
 │  │  │  ├─ roadmap
@@ -61,7 +64,7 @@ boldmind-web
 │  │  │  │  └─ page.tsx
 │  │  │  └─ wallet
 │  │  │     └─ page.tsx
-│  │  └─ referral
+│  │  └─ settings
 │  │     └─ page.tsx
 │  ├─ (public)
 │  │  ├─ HomeContent.tsx
@@ -94,7 +97,6 @@ boldmind-web
 │  │  ├─ AnalyticsInit.tsx
 │  │  ├─ ClientAuthProvider.tsx
 │  │  └─ ClientErrorBoundary.tsx
-│  ├─ example.tsx
 │  ├─ globals.css
 │  ├─ layout.tsx
 │  ├─ manifest.ts

@@ -77,6 +77,17 @@ const FOOTER_SECTIONS = [
     ],
   },
   {
+    title: "Developers",
+    links: [
+      { href: "/developers", label: "Overview" },
+      { href: "/developers/docs", label: "API Documentation" },
+      { href: "/developers/keys", label: "API Keys" },
+      { href: "/developers/webhooks", label: "Webhooks" },
+      { href: "/changelog", label: "Changelog" },
+      { href: "/status", label: "System Status" },
+    ],
+  },
+  {
     title: "Support",
     links: [
       { href: "mailto:hello@boldmind.ng", label: "Email Us", icon: "📧" },

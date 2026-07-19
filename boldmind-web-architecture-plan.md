@@ -24,18 +24,18 @@ Sources checked: `project-tree.md`, `boldmind-system-design-v2.md`,
 
 ## 1. Current State Snapshot (from `project-tree.md`)
 
-| Area | Status | Notes |
-|---|---|---|
-| Route groups `(public)`, `(auth)`, `(dashboard)`, `(admin)` | ✅ present | Correct App Router convention — groups don't affect URL |
-| `app/sso/route.ts`, `app/api/auth/*` | ✅ present | Inbound + outbound SSO relay scaffolding exists |
-| `middleware.ts` | ❌ **missing** | v2 §B5 requires this for `/dashboard/*`, `/admin/*` — currently nothing enforces it |
-| `tailwind.config.ts` | ⚠️ present | Conflicts with memory note "Tailwind v4 — no `tailwind.config.ts`". Needs reconciling (see §3) |
-| `next.config.mjs`, `postcss.config.js` | ⚠️ present, in-progress | Need Tailwind v4 PostCSS plugin wiring |
-| `proxy.ts` (root) | ❓ unknown purpose | Flagged in §6 |
-| `system.md` (root) | ❓ unknown purpose | Likely AI-assistant context for "Ask BoldmindNG" — flagged in §6 |
-| `app/example.tsx` | 🧹 cleanup candidate | Looks like a scaffold leftover |
-| `app/(dashboard)/dashboard/wallet/page.tsx` | ✅ present, but **blocked** | `@boldmindng/api-client` has no `wallet.ts` yet (canonical ref §6) |
-| Changelog / Status / Ecosystem / Developer portal pages | ❌ missing | v2 §9 and §8.5 say these belong in `boldmind-web` |
+| Area                                                        | Status                      | Notes                                                                                          |
+| ----------------------------------------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------- |
+| Route groups `(public)`, `(auth)`, `(dashboard)`, `(admin)` | ✅ present                  | Correct App Router convention — groups don't affect URL                                        |
+| `app/sso/route.ts`, `app/api/auth/*`                        | ✅ present                  | Inbound + outbound SSO relay scaffolding exists                                                |
+| `middleware.ts`                                             | ❌ **missing**              | v2 §B5 requires this for `/dashboard/*`, `/admin/*` — currently nothing enforces it            |
+| `tailwind.config.ts`                                        | ⚠️ present                  | Conflicts with memory note "Tailwind v4 — no `tailwind.config.ts`". Needs reconciling (see §3) |
+| `next.config.mjs`, `postcss.config.js`                      | ⚠️ present, in-progress     | Need Tailwind v4 PostCSS plugin wiring                                                         |
+| `proxy.ts` (root)                                           | ❓ unknown purpose          | Flagged in §6                                                                                  |
+| `system.md` (root)                                          | ❓ unknown purpose          | Likely AI-assistant context for "Ask BoldmindNG" — flagged in §6                               |
+| `app/example.tsx`                                           | 🧹 cleanup candidate        | Looks like a scaffold leftover                                                                 |
+| `app/(dashboard)/dashboard/wallet/page.tsx`                 | ✅ present, but **blocked** | `@boldmindng/api-client` has no `wallet.ts` yet (canonical ref §6)                             |
+| Changelog / Status / Ecosystem / Developer portal pages     | ❌ missing                  | v2 §9 and §8.5 say these belong in `boldmind-web`                                              |
 
 ---
 
@@ -81,7 +81,7 @@ boldmind-web/
 │   │   │   ├── page.tsx                         🆕 NEW — v2 §9.2
 │   │   │   └── [version]/page.tsx               🆕 NEW
 │   │   ├── status/page.tsx                      🆕 NEW — v2 §9.3, polls GET /health
-│   │   └── developers/                          🔜 FUTURE — depends on backend `api/` module (Wave 4, not built yet)
+│   │   └── developers/
 │   │       ├── page.tsx
 │   │       ├── docs/page.tsx
 │   │       ├── keys/page.tsx
@@ -146,20 +146,20 @@ const nextConfig = {
 
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: '**.r2.cloudflarestorage.com' }, // media uploads
-      { protocol: 'https', hostname: 'imagedelivery.net' },           // Cloudflare Images/Stream thumbs
-      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },   // Google OAuth avatars
+      { protocol: "https", hostname: "**.r2.cloudflarestorage.com" }, // media uploads
+      { protocol: "https", hostname: "imagedelivery.net" }, // Cloudflare Images/Stream thumbs
+      { protocol: "https", hostname: "lh3.googleusercontent.com" }, // Google OAuth avatars
     ],
   },
 
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },
     ];
@@ -178,7 +178,7 @@ export default nextConfig;
 ```js
 const config = {
   plugins: {
-    '@tailwindcss/postcss': {},
+    "@tailwindcss/postcss": {},
   },
 };
 
@@ -195,22 +195,22 @@ and `products.ts` (`BOLDMIND_FONT_CONFIG`, override for `boldmind-hub`).
 
 @theme {
   /* Brand palette — colors.ts: BOLDMIND_COLOR_SCHEMES['boldmind-hub'] */
-  --color-primary: #2B4D87;
-  --color-primary-dark: #1E3A6E;
-  --color-secondary: #E9A825;
-  --color-accent: #5B8ADE;
-  --color-background: #FAFAF9;
-  --color-foreground: #1A202C;
-  --color-muted: #E7E5E4;
-  --color-success: #38A169;
-  --color-warning: #DD6B20;
-  --color-error: #C53030;
-  --color-info: #3182CE;
+  --color-primary: #2b4d87;
+  --color-primary-dark: #1e3a6e;
+  --color-secondary: #e9a825;
+  --color-accent: #5b8ade;
+  --color-background: #fafaf9;
+  --color-foreground: #1a202c;
+  --color-muted: #e7e5e4;
+  --color-success: #38a169;
+  --color-warning: #dd6b20;
+  --color-error: #c53030;
+  --color-info: #3182ce;
 
   /* Typography — products.ts: BOLDMIND_FONT_CONFIG.overrides['boldmind-hub'] */
-  --font-body: 'OpenDyslexic', 'Plus Jakarta Sans', sans-serif;
-  --font-heading: 'OpenDyslexic', 'Plus Jakarta Sans', 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-body: "OpenDyslexic", "Plus Jakarta Sans", sans-serif;
+  --font-heading: "OpenDyslexic", "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
 /* Dyslexia-friendly mode — toggled by @boldmindng/ui <DyslexiaToggle/>,
@@ -228,11 +228,17 @@ body {
   color: var(--color-foreground);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
 }
 
-code, pre {
+code,
+pre {
   font-family: var(--font-mono);
 }
 ```
@@ -255,7 +261,7 @@ which represent the Hub's own brand identity.
 ### 3.4 `middleware.ts` (new file)
 
 ```ts
-import { createAuthMiddleware } from '@boldmindng/auth';
+import { createAuthMiddleware } from "@boldmindng/auth";
 
 /**
  * Route protection for boldmind-web.
@@ -263,17 +269,17 @@ import { createAuthMiddleware } from '@boldmindng/auth';
  * which currently live at top-level routes, not under /dashboard).
  */
 export const middleware = createAuthMiddleware({
-  ssoCookieName: 'boldmind_sso',
-  loginPath: '/login',
-  protectedPaths: ['/dashboard', '/admin', '/account', '/referral'],
+  ssoCookieName: "boldmind_sso",
+  loginPath: "/login",
+  protectedPaths: ["/dashboard", "/admin", "/account", "/referral"],
 });
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/admin/:path*',
-    '/account/:path*',
-    '/referral/:path*',
+    "/dashboard/:path*",
+    "/admin/:path*",
+    "/account/:path*",
+    "/referral/:path*",
   ],
 };
 ```
@@ -285,13 +291,17 @@ export const config = {
 ### 3.5 `app/layout.tsx` — font + provider wiring (sketch)
 
 ```tsx
-import './globals.css';
-import { FontProvider } from '@boldmindng/ui';
-import { ClientErrorBoundary } from './components/ClientErrorBoundary';
-import { ClientAuthProvider } from './components/ClientAuthProvider';
-import { AnalyticsInit } from './components/AnalyticsInit';
+import "./globals.css";
+import { FontProvider } from "@boldmindng/ui";
+import { ClientErrorBoundary } from "./components/ClientErrorBoundary";
+import { ClientAuthProvider } from "./components/ClientAuthProvider";
+import { AnalyticsInit } from "./components/AnalyticsInit";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>
@@ -319,16 +329,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ### 4.1 Public Routes
 
-| Route | Backend source | Design notes |
-|---|---|---|
-| `/` (`HomeContent.tsx`) | `products.ts` (pillar metadata) | Hero + 4-pillar flywheel summary, links to each pillar domain |
-| `/about`, `/contact`, `/privacy`, `/terms` | static | No change |
-| `/pricing` | `pricing.ts` → `BOLDMIND_PRICING` | Render via `@boldmindng/ui` `PricingContent`, filtered to `pillar: 'enablement'` for Hub-native tiers, with `CrossLink` cards to other pillar pricing pages |
-| `/start` | — | Existing onboarding CTA funnel; no structural change |
-| `/ecosystem` 🆕 | `GET /hub/ecosystem` | Renders the full `BOLDMIND_PRODUCTS` map grouped by `PILLAR_METADATA` — 4 pillar cards (awareness/conviction/education/enablement), each linking to its domain. Use `getPillarSummary()` shape client-side as fallback while API loads |
-| `/changelog`, `/changelog/[version]` 🆕 | `packages/api-docs` changelog data (per v2 §9.2) | Static RSC, `revalidate: 3600`. **Blocked** until `packages/api-docs/src/changelog.ts` exists — see §6 |
-| `/status` 🆕 | `GET /health` | Simple uptime/incident page per v2 §9.3 |
-| `/developers/*` 🔜 | `boldmind-service /developer/*`, `/public/*` | Entire backend `api/` module is listed MISSING in canonical ref §2 (Wave 4). Defer until that module exists |
+| Route                                      | Backend source                                   | Design notes                                                                                                                                                                                                                           |
+| ------------------------------------------ | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/` (`HomeContent.tsx`)                    | `products.ts` (pillar metadata)                  | Hero + 4-pillar flywheel summary, links to each pillar domain                                                                                                                                                                          |
+| `/about`, `/contact`, `/privacy`, `/terms` | static                                           | No change                                                                                                                                                                                                                              |
+| `/pricing`                                 | `pricing.ts` → `BOLDMIND_PRICING`                | Render via `@boldmindng/ui` `PricingContent`, filtered to `pillar: 'enablement'` for Hub-native tiers, with `CrossLink` cards to other pillar pricing pages                                                                            |
+| `/start`                                   | —                                                | Existing onboarding CTA funnel; no structural change                                                                                                                                                                                   |
+| `/ecosystem` 🆕                            | `GET /hub/ecosystem`                             | Renders the full `BOLDMIND_PRODUCTS` map grouped by `PILLAR_METADATA` — 4 pillar cards (awareness/conviction/education/enablement), each linking to its domain. Use `getPillarSummary()` shape client-side as fallback while API loads |
+| `/changelog`, `/changelog/[version]` 🆕    | `packages/api-docs` changelog data (per v2 §9.2) | Static RSC, `revalidate: 3600`. **Blocked** until `packages/api-docs/src/changelog.ts` exists — see §6                                                                                                                                 |
+| `/status` 🆕                               | `GET /health`                                    | Simple uptime/incident page per v2 §9.3                                                                                                                                                                                                |
+| `/developers/*` 🔜                         | `boldmind-service /developer/*`, `/public/*`     | Entire backend `api/` module is listed MISSING in canonical ref §2 (Wave 4). Defer until that module exists                                                                                                                            |
 
 ### 4.2 `dashboard/products/page.tsx`
 
@@ -345,6 +355,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ### 4.3 `account/page.tsx` — add 2FA section
 
 Add a "Security" tab/section that calls:
+
 - `POST /auth/enable-2fa` → show QR code (`secret`, `qrCode` from response)
 - `POST /auth/verify-2fa` → confirm enrollment
 - `POST /auth/send-phone-otp` + `POST /auth/verify-phone` for phone verification (WhatsApp-first per v2 §5)
@@ -376,21 +387,24 @@ relay token before redirecting." On the **frontend** side, this route's job is:
    include `?relay=TOKEN` if `return_url` was external).
 
 ```ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const { search } = new URL(req.url);
 
-  const backendRes = await fetch(`${process.env.API_BASE_URL}/auth/google/callback${search}`, {
-    headers: { cookie: req.headers.get('cookie') ?? '' },
-    redirect: 'manual',
-  });
+  const backendRes = await fetch(
+    `${process.env.API_BASE_URL}/auth/google/callback${search}`,
+    {
+      headers: { cookie: req.headers.get("cookie") ?? "" },
+      redirect: "manual",
+    },
+  );
 
-  const location = backendRes.headers.get('location') ?? '/dashboard';
+  const location = backendRes.headers.get("location") ?? "/dashboard";
   const response = NextResponse.redirect(location);
 
-  const setCookie = backendRes.headers.get('set-cookie');
-  if (setCookie) response.headers.set('set-cookie', setCookie);
+  const setCookie = backendRes.headers.get("set-cookie");
+  if (setCookie) response.headers.set("set-cookie", setCookie);
 
   return response;
 }
@@ -415,29 +429,41 @@ lib/
 **`lib/api/index.ts`** — proposed shape:
 
 ```ts
-import { createClient } from '@boldmindng/api-client';
+import { createClient } from "@boldmindng/api-client";
 
 export const apiClient = createClient(process.env.NEXT_PUBLIC_API_URL!, {
-  mode: 'jwt',
+  mode: "jwt",
   // token resolved at call time from @boldmindng/auth store
 });
 
-export * from '@boldmindng/api-client/api/hub';
-export * from '@boldmindng/api-client/api/payment';
-export * from '@boldmindng/api-client/api/users';
-export * from '@boldmindng/api-client/api/admin';
+export * from "@boldmindng/api-client/api/hub";
+export * from "@boldmindng/api-client/api/payment";
+export * from "@boldmindng/api-client/api/users";
+export * from "@boldmindng/api-client/api/admin";
 // export * from '@boldmindng/api-client/api/wallet';  // ⛔ add once it exists — see §6
 ```
 
 **`lib/hooks/index.ts`** — one React Query hook per page above, e.g.:
 
 ```ts
-export const useHubDashboard   = () => useQuery({ queryKey: ['hub','dashboard'],  queryFn: hubApi.getDashboard });
-export const useHubProducts    = () => useQuery({ queryKey: ['hub','products'],   queryFn: hubApi.getProducts });
-export const useHubEcosystem   = () => useQuery({ queryKey: ['hub','ecosystem'],  queryFn: hubApi.getEcosystem });
-export const useReferralStats  = () => useQuery({ queryKey: ['hub','referral'],   queryFn: hubApi.getReferralStats });
-export const useChangelog      = (page = 1) => useQuery({ queryKey: ['hub','changelog',page], queryFn: () => hubApi.getChangelog(page) });
-export const useNotifications  = () => useQuery({ queryKey: ['user','notifications'], queryFn: usersApi.getNotifications });
+export const useHubDashboard = () =>
+  useQuery({ queryKey: ["hub", "dashboard"], queryFn: hubApi.getDashboard });
+export const useHubProducts = () =>
+  useQuery({ queryKey: ["hub", "products"], queryFn: hubApi.getProducts });
+export const useHubEcosystem = () =>
+  useQuery({ queryKey: ["hub", "ecosystem"], queryFn: hubApi.getEcosystem });
+export const useReferralStats = () =>
+  useQuery({ queryKey: ["hub", "referral"], queryFn: hubApi.getReferralStats });
+export const useChangelog = (page = 1) =>
+  useQuery({
+    queryKey: ["hub", "changelog", page],
+    queryFn: () => hubApi.getChangelog(page),
+  });
+export const useNotifications = () =>
+  useQuery({
+    queryKey: ["user", "notifications"],
+    queryFn: usersApi.getNotifications,
+  });
 // useWallet — add once wallet.ts exists in api-client
 ```
 
@@ -450,6 +476,7 @@ so `ProtectedLayout`, `FontProvider`/`DyslexiaToggle`, and `IdentitySection` all
 ## 6. Confirmations Needed (you check these, then update context)
 
 ### `@boldmindng/auth`
+
 - Confirm exact export + option names for the route-protection middleware helper used in §3.4
   (`createAuthMiddleware` is assumed per v2 §B5 wording).
 - Confirm `use-user.ts` return shape (`user`, `isLoading`, `ecosystemRole`, etc.) and
@@ -457,6 +484,7 @@ so `ProtectedLayout`, `FontProvider`/`DyslexiaToggle`, and `IdentitySection` all
 - Confirm the SSO cookie name is `boldmind_sso` (used in middleware + relay routes).
 
 ### `@boldmindng/api-client`
+
 - Confirm `api/hub.ts` exposes: `getDashboard`, `getProducts`, `getEcosystem`,
   `generateReferral`, `getReferralStats`, `getChangelog`, `getStatus`.
 - `api/wallet.ts` is listed **MISSING** in the canonical reference (§6) — `dashboard/wallet/page.tsx`
@@ -465,6 +493,7 @@ so `ProtectedLayout`, `FontProvider`/`DyslexiaToggle`, and `IdentitySection` all
 - Confirm `createClient(baseUrl, { mode, token })` signature matches §5.
 
 ### `@boldmindng/ui`
+
 - Confirm component list/props for: `SuperNavbar`, `SuperFooter`, `PricingContent`,
   `StatusBadge`, `DyslexiaToggle`, `FontProvider`, `CrossLink`, `Logo`, `SocialLinks`.
   In particular: does `PricingContent` accept a `ProductPricing` object straight from
@@ -473,23 +502,28 @@ so `ProtectedLayout`, `FontProvider`/`DyslexiaToggle`, and `IdentitySection` all
   vs. setting a CSS variable directly.
 
 ### `@boldmindng/utils`
+
 - Confirm `formatNaira(kobo)` and `formatLagosDate(date)` exist with these names
   (used across wallet, ledger, changelog dates).
 
 ### `@boldmindng/analytics`
+
 - Confirm `tracker.ts` exposes an `init()`/default export consumed by `AnalyticsInit.tsx`.
 
 ### `packages/api-docs` (for `/changelog`)
+
 - Confirm whether `packages/api-docs/src/changelog.ts` exists yet (v2 §6.3 lists it as a
   package to add). `/changelog` and `/changelog/[version]` are blocked until it does.
 
 ### `boldmind-service`
+
 - Confirm `/auth/google/callback` response shape (302 redirect w/ `Location` + `Set-Cookie`,
   per §4.5) — needed to finalize the relay-token fix on this side.
 - Confirm `GET /hub/ecosystem`, `GET /hub/changelog`, `GET /health` are live (canonical
   reference §4.4 and §4.16 list them as existing, just confirming no signature drift).
 
 ### Root-level files
+
 - `proxy.ts` — purpose unclear. If it's a local-dev API proxy, it may be replaceable by
   `next.config.mjs` `rewrites()` (§3.1) — or it may need to stay for another reason. Please clarify.
 - `system.md` — appears to be AI-assistant context (possibly for the "Ask BoldmindNG"
@@ -514,9 +548,9 @@ so `ProtectedLayout`, `FontProvider`/`DyslexiaToggle`, and `IdentitySection` all
    shows `app/sso/route.ts`.
 
 3. **Update §A1 (Master Checklist — Stack Versions).** Add a Tailwind v4 standard:
-   *"No `tailwind.config.ts`. Brand tokens defined via `@theme` in `app/globals.css`,
+   _"No `tailwind.config.ts`. Brand tokens defined via `@theme` in `app/globals.css`,
    sourced from `colors.ts` / `products.ts`. Per-product color overrides applied via
-   scoped `generateCSSVariables()` inline styles, never global token overrides."*
+   scoped `generateCSSVariables()` inline styles, never global token overrides."_
 
 4. **Update §B5 (Protected Routes).** Replace the generic `middleware.ts` bullet with the
    confirmed matcher list for `boldmind-web`: `/dashboard/*`, `/admin/*`, `/account/*`,
