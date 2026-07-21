@@ -119,7 +119,17 @@ const DASHBOARD_TOOLS = [
     Icon: GraduationCap,
     color: getColorScheme("educenter").primary,
   },
-  { label: "Vibe Coders", status: "Week 4", Icon: Laptop2, color: "#1D4ED8" },
+  {
+    label: "Vibe Coders",
+    status: "Week 4",
+    Icon: Laptop2,
+    // Was a bare "#1D4ED8" literal — the one entry in this array not going
+    // through getColorScheme(), so it silently drifts from colors.ts the
+    // moment vibe-coders' palette changes there. It happens to match
+    // globals.css's [data-product="vibe-coders"] block today, but "happens
+    // to match" is exactly the drift risk the other three entries avoid.
+    color: getColorScheme("vibe-coders").primary,
+  },
   {
     label: "AmeboGist",
     status: "Reading",
