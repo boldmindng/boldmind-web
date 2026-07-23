@@ -1,8 +1,5 @@
 @import "tailwindcss";
 
-@source "../node_modules/@boldmindng/ui/**/*.{js,mjs,ts,tsx}";
-@source "../node_modules/@boldmindng/auth/**/*.{js,mjs,ts,tsx}";
-
 /* ── Font modes ──────────────────────────────────────────────────────────── */
 :root,
 [data-font="dyslexic"],
@@ -114,25 +111,22 @@ button {
 /*
  * These blocks duplicate packages/utils/src/constants/colors.ts (the
  * source of truth) as static CSS rather than generating from it. Since
- * theme-provider.tsx's ThemeProvider now calls generateCSSVariables() and
- * sets these same custom properties via root.style.setProperty() at
- * runtime (inline style, which wins over these stylesheet rules), these
- * blocks only matter for the very first paint before React hydrates —
- * but a first-paint value that disagrees with the runtime one still
- * causes a flash of the wrong color. Two disagreements worth checking
- * against the live colors.ts before they cause exactly that:
- *   - villagecircle.secondary here is #CA8A04; apps/*'s own theme docs
- *     (and this same value, previously, in AppLayout.tsx's now-removed
- *     TOAST_ACCENT map) list #E9A825 for villagecircle's secondary.
- *     background/foreground/muted below also don't match that doc,
- *     though they read as an intentional warm/editorial palette rather
- *     than a copy-paste slip — worth confirming which is current.
- *   - vibe-coders below (#1D4ED8/#7C3AED/#06B6D4) doesn't match what
- *     utils.ts's getProductThemeColors() used to hardcode for the same
- *     slug (#1E40AF/#F59E0B/#0EA5E9, i.e. educenter's palette) — that
- *     function has been changed to delegate to getProductColors()
- *     instead, so it'll follow whatever colors.ts actually says; this
- *     file's static vibe-coders block should match the same source.
+ * theme-provider.tsx's ThemeProvider now injects a <style> tag from
+ * generateCSSVariables() at runtime (which wins over these stylesheet
+ * rules via later cascade order/specificity ties resolved by source order),
+ * these blocks only matter for the very first paint before React hydrates.
+ *
+ * Checked against the real colors.ts (BOLDMIND_COLOR_SCHEMES) and
+ * corrected in this pass — three products had drifted:
+ *   - villagecircle.secondary was #CA8A04 here (also previously in
+ *     AppLayout.tsx's now-removed TOAST_ACCENT map); colors.ts says
+ *     #E9A825. background/foreground/muted here were also off.
+ *   - educenter.accent/background/foreground/muted didn't match colors.ts.
+ *   - vibe-coders was an entirely different, seemingly hand-invented
+ *     scheme; colors.ts has it reusing educenter's scheme exactly.
+ * All four blocks below now match colors.ts as of this pass — re-check
+ * this file the same way if colors.ts changes again, since nothing keeps
+ * these two in sync automatically.
  */
 [data-product="boldmind-hub"] {
   --product-primary: #2b4d87;
@@ -146,38 +140,34 @@ button {
 }
 
 [data-product="amebogist"] {
-  /* accent (#0891B2) and muted (#FEF3C7) — worth confirming against the
-     live colors.ts; other references to this scheme use #0EA5E9 / #FEF3CF
-     respectively (the muted difference is a single-character transposition,
-     easy to miss). */
   --product-primary: #065f46;
   --product-secondary: #dc2626;
-  --product-accent: #0891b2;
+  --product-accent: #0ea5e9;
   --product-background: #fffbeb;
   --product-foreground: #1c1917;
-  --product-muted: #fef3c7;
+  --product-muted: #fef3cf;
   --product-highlight: rgba(220, 38, 38, 0.12);
   --product-glow: rgba(220, 38, 38, 0.25);
 }
 
 [data-product="villagecircle"] {
   --product-primary: #3b1f0a;
-  --product-secondary: #ca8a04;
+  --product-secondary: #e9a825;
   --product-accent: #166534;
-  --product-background: #fdfaf6;
-  --product-foreground: #1c1917;
-  --product-muted: #f0e6d3;
-  --product-highlight: rgba(202, 138, 4, 0.12);
-  --product-glow: rgba(202, 138, 4, 0.25);
+  --product-background: #fafaf9;
+  --product-foreground: #1a202c;
+  --product-muted: #e7e5e4;
+  --product-highlight: rgba(233, 168, 37, 0.12);
+  --product-glow: rgba(233, 168, 37, 0.25);
 }
 
 [data-product="educenter"] {
   --product-primary: #1e40af;
   --product-secondary: #f59e0b;
-  --product-accent: #7c3aed;
-  --product-background: #f8fafc;
-  --product-foreground: #0f172a;
-  --product-muted: #e2e8f0;
+  --product-accent: #0ea5e9;
+  --product-background: #fafaf9;
+  --product-foreground: #1a202c;
+  --product-muted: #e7e5e4;
   --product-highlight: rgba(245, 158, 11, 0.12);
   --product-glow: rgba(245, 158, 11, 0.25);
 }
@@ -185,23 +175,27 @@ button {
 [data-product="planai"] {
   --product-primary: #5b21b6;
   --product-secondary: #059669;
-  --product-accent: #8b5cf6;
+  --product-accent: #0ea5e9;
   --product-background: #f5f3ff;
   --product-foreground: #1f2937;
-  --product-muted: #ede9fe;
+  --product-muted: #e7e5e4;
   --product-highlight: rgba(5, 150, 105, 0.12);
   --product-glow: rgba(5, 150, 105, 0.25);
 }
 
+/* vibe-coders reuses educenter's exact scheme in colors.ts (both are
+   '#1E40AF' / '#F59E0B' / '#0EA5E9' / '#FAFAF9' / '#1A202C' / '#E7E5E4') —
+   this used to be a completely different, seemingly hand-invented blue/
+   purple/cyan scheme with no match anywhere else in the codebase. */
 [data-product="vibe-coders"] {
-  --product-primary: #1d4ed8;
-  --product-secondary: #7c3aed;
-  --product-accent: #06b6d4;
-  --product-background: #eff6ff;
-  --product-foreground: #1e3a8a;
-  --product-muted: #dbeafe;
-  --product-highlight: rgba(124, 58, 237, 0.12);
-  --product-glow: rgba(124, 58, 237, 0.25);
+  --product-primary: #1e40af;
+  --product-secondary: #f59e0b;
+  --product-accent: #0ea5e9;
+  --product-background: #fafaf9;
+  --product-foreground: #1a202c;
+  --product-muted: #e7e5e4;
+  --product-highlight: rgba(245, 158, 11, 0.12);
+  --product-glow: rgba(245, 158, 11, 0.25);
 }
 
 /* ── Dark mode ───────────────────────────────────────────────────────────── */
