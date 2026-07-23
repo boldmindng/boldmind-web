@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -18,6 +19,8 @@ import {
   GraduationCap,
   LogOut,
   ExternalLink,
+  Menu,
+  X,
 } from "lucide-react";
 import { useAuth } from "../../../../lib/hooks";
 import { authAPI, useAuthStore } from "@boldmindng/auth";
@@ -48,7 +51,228 @@ const ECOSYSTEM_LINKS = [
   { href: "https://planai.boldmind.ng", Icon: Zap, label: "PlanAI" },
 ];
 
+interface SidebarContentProps {
+  currentPath: string;
+  displayName: string;
+  roleLabel: string;
+  canSeeAdminPanel: boolean;
+  onLogout: () => void;
+  onNavigate?: () => void;
+  onClose?: () => void;
+}
+
+// Shared between the desktop <aside> and the mobile drawer, so the two
+// surfaces can't drift out of sync with each other the way they had
+// (desktop-only nav with no mobile equivalent at all).
+function SidebarContent({
+  currentPath,
+  displayName,
+  roleLabel,
+  canSeeAdminPanel,
+  onLogout,
+  onNavigate,
+  onClose,
+}: SidebarContentProps) {
+  return (
+    <div
+      className="flex flex-col h-full"
+      style={{ backgroundColor: "var(--product-background)" }}
+    >
+      <div
+        className="p-5 border-b flex items-center justify-between"
+        style={{ borderColor: "var(--product-muted)" }}
+      >
+        <Link
+          href="/dashboard"
+          onClick={onNavigate}
+          className="flex items-center gap-3"
+        >
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm"
+            style={{
+              backgroundColor: "var(--product-primary)",
+              color: "var(--product-on-primary, #FFFFFF)",
+            }}
+          >
+            B
+          </div>
+          <div>
+            <div
+              className="font-black text-sm"
+              style={{ color: "var(--product-foreground)" }}
+            >
+              BoldmindNG
+            </div>
+            <div
+              className="text-[10px] font-semibold uppercase tracking-widest"
+              style={{ color: "var(--product-secondary)" }}
+            >
+              Hub
+            </div>
+          </div>
+        </Link>
+        {onClose && (
+          <button
+            onClick={onClose}
+            aria-label="Close sidebar"
+            className="lg:hidden flex items-center justify-center rounded-lg"
+            style={{
+              minWidth: "44px",
+              minHeight: "44px",
+              color: "var(--product-foreground)",
+              opacity: 0.6,
+            }}
+          >
+            <X size={18} />
+          </button>
+        )}
+      </div>
+
+      <div
+        className="p-4 border-b"
+        style={{ borderColor: "var(--product-muted)" }}
+      >
+        <div
+          className="flex items-center gap-3 p-3 rounded-xl"
+          style={{ backgroundColor: "var(--product-highlight)" }}
+        >
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black shrink-0"
+            style={{
+              backgroundColor: "var(--product-primary)",
+              color: "var(--product-on-primary, #FFFFFF)",
+            }}
+          >
+            {displayName[0]?.toUpperCase() ?? "B"}
+          </div>
+          <div className="min-w-0">
+            <div
+              className="text-sm font-bold truncate"
+              style={{ color: "var(--product-foreground)" }}
+            >
+              {displayName}
+            </div>
+            <div
+              className="text-[11px] truncate"
+              style={{ color: "var(--product-foreground)", opacity: 0.5 }}
+            >
+              {roleLabel}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
+        <p
+          className="text-[10px] font-black uppercase tracking-widest px-3 py-2"
+          style={{ color: "var(--product-foreground)", opacity: 0.35 }}
+        >
+          Hub
+        </p>
+        {NAV_ITEMS.map((item) => {
+          const active =
+            currentPath === item.href ||
+            (item.href !== "/dashboard" && currentPath.startsWith(item.href));
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              aria-current={active ? "page" : undefined}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
+              style={{
+                backgroundColor: active
+                  ? "var(--product-primary)"
+                  : "transparent",
+                color: active
+                  ? "var(--product-on-primary, #FFFFFF)"
+                  : "var(--product-foreground)",
+                opacity: active ? 1 : 0.7,
+              }}
+            >
+              <item.Icon className="w-4.5 h-4.5 shrink-0" aria-hidden="true" />
+              {item.label}
+            </Link>
+          );
+        })}
+
+        {canSeeAdminPanel && (
+          <>
+            <p
+              className="text-[10px] font-black uppercase tracking-widest px-3 py-2 mt-4"
+              style={{ color: "var(--product-foreground)", opacity: 0.35 }}
+            >
+              Admin
+            </p>
+            <Link
+              href="/admin"
+              onClick={onNavigate}
+              aria-current={
+                currentPath.startsWith("/admin") ? "page" : undefined
+              }
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
+              style={{
+                backgroundColor: currentPath.startsWith("/admin")
+                  ? "var(--product-primary)"
+                  : "transparent",
+                color: currentPath.startsWith("/admin")
+                  ? "var(--product-on-primary, #FFFFFF)"
+                  : "var(--product-foreground)",
+                opacity: currentPath.startsWith("/admin") ? 1 : 0.7,
+              }}
+            >
+              <ShieldCheck
+                className="w-4.5 h-4.5 shrink-0"
+                aria-hidden="true"
+              />
+              Admin Panel
+            </Link>
+          </>
+        )}
+
+        <p
+          className="text-[10px] font-black uppercase tracking-widest px-3 py-2 mt-4"
+          style={{ color: "var(--product-foreground)", opacity: 0.35 }}
+        >
+          Ecosystem
+        </p>
+        {ECOSYSTEM_LINKS.map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
+            style={{ color: "var(--product-foreground)", opacity: 0.6 }}
+          >
+            <item.Icon className="w-4.5 h-4.5 shrink-0" aria-hidden="true" />
+            {item.label}
+            <ExternalLink
+              className="w-3 h-3 ml-auto opacity-40"
+              aria-hidden="true"
+            />
+          </a>
+        ))}
+      </nav>
+
+      <div
+        className="p-4 border-t"
+        style={{ borderColor: "var(--product-muted)" }}
+      >
+        <button
+          onClick={onLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80 min-h-11"
+          style={{ color: "var(--color-error)" }}
+        >
+          <LogOut className="w-4.5 h-4.5" aria-hidden="true" /> Sign out
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const currentPath = pathname ?? "";
   const router = useRouter();
@@ -73,191 +297,70 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const roleLabel = user?.role ? getUserRoleDisplay(user.role) : "Builder";
   const canSeeAdminPanel = hasAdminPermission(user, "users:read");
 
+  const sidebarProps = {
+    currentPath,
+    displayName,
+    roleLabel,
+    canSeeAdminPanel,
+    onLogout: handleLogout,
+  };
+
   return (
     <div
       className="flex min-h-screen"
       style={{ backgroundColor: "var(--product-background)" }}
     >
+      {/* Desktop sidebar — unchanged visually, still hidden below lg */}
       <aside
-        className="hidden lg:flex flex-col w-64 shrink-0 border-r"
-        style={{
-          borderColor: "var(--product-muted)",
-          backgroundColor: "var(--product-background)",
-        }}
+        className="hidden lg:flex lg:flex-col lg:w-64 lg:shrink-0 border-r"
+        style={{ borderColor: "var(--product-muted)" }}
       >
-        <div
-          className="p-5 border-b"
-          style={{ borderColor: "var(--product-muted)" }}
-        >
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-white text-sm"
-              style={{ backgroundColor: "var(--product-primary)" }}
-            >
-              B
-            </div>
-            <div>
-              <div
-                className="font-black text-sm"
-                style={{ color: "var(--product-foreground)" }}
-              >
-                BoldmindNG
-              </div>
-              <div
-                className="text-[10px] font-semibold uppercase tracking-widest"
-                style={{ color: "var(--product-secondary)" }}
-              >
-                Hub
-              </div>
-            </div>
-          </Link>
-        </div>
-
-        <div
-          className="p-4 border-b"
-          style={{ borderColor: "var(--product-muted)" }}
-        >
-          <div
-            className="flex items-center gap-3 p-3 rounded-xl"
-            style={{ backgroundColor: "var(--product-highlight)" }}
-          >
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white shrink-0"
-              style={{ backgroundColor: "var(--product-primary)" }}
-            >
-              {displayName[0]?.toUpperCase() ?? "B"}
-            </div>
-            <div className="min-w-0">
-              <div
-                className="text-sm font-bold truncate"
-                style={{ color: "var(--product-foreground)" }}
-              >
-                {displayName}
-              </div>
-              <div
-                className="text-[11px] truncate"
-                style={{ color: "var(--product-foreground)", opacity: 0.5 }}
-              >
-                {roleLabel}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
-          <p
-            className="text-[10px] font-black uppercase tracking-widest px-3 py-2"
-            style={{ color: "var(--product-foreground)", opacity: 0.35 }}
-          >
-            Hub
-          </p>
-          {NAV_ITEMS.map((item) => {
-            const active =
-              currentPath === item.href ||
-              (item.href !== "/dashboard" && currentPath.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
-                style={{
-                  backgroundColor: active
-                    ? "var(--product-primary)"
-                    : "transparent",
-                  color: active ? "white" : "var(--product-foreground)",
-                  opacity: active ? 1 : 0.7,
-                }}
-              >
-                <item.Icon
-                  className="w-4.5 h-4.5 shrink-0"
-                  aria-hidden="true"
-                />
-                {item.label}
-              </Link>
-            );
-          })}
-
-          {canSeeAdminPanel && (
-            <>
-              <p
-                className="text-[10px] font-black uppercase tracking-widest px-3 py-2 mt-4"
-                style={{ color: "var(--product-foreground)", opacity: 0.35 }}
-              >
-                Admin
-              </p>
-              <Link
-                href="/admin"
-                aria-current={
-                  currentPath.startsWith("/admin") ? "page" : undefined
-                }
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
-                style={{
-                  backgroundColor: currentPath.startsWith("/admin")
-                    ? "var(--product-primary)"
-                    : "transparent",
-                  color: currentPath.startsWith("/admin")
-                    ? "white"
-                    : "var(--product-foreground)",
-                  opacity: currentPath.startsWith("/admin") ? 1 : 0.7,
-                }}
-              >
-                <ShieldCheck
-                  className="w-4.5 h-4.5 shrink-0"
-                  aria-hidden="true"
-                />
-                Admin Panel
-              </Link>
-            </>
-          )}
-
-          <p
-            className="text-[10px] font-black uppercase tracking-widest px-3 py-2 mt-4"
-            style={{ color: "var(--product-foreground)", opacity: 0.35 }}
-          >
-            Ecosystem
-          </p>
-          {ECOSYSTEM_LINKS.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
-              style={{ color: "var(--product-foreground)", opacity: 0.6 }}
-            >
-              <item.Icon className="w-4.5 h-4.5 shrink-0" aria-hidden="true" />
-              {item.label}
-              <ExternalLink
-                className="w-3 h-3 ml-auto opacity-40"
-                aria-hidden="true"
-              />
-            </a>
-          ))}
-        </nav>
-
-        <div
-          className="p-4 border-t"
-          style={{ borderColor: "var(--product-muted)" }}
-        >
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80 min-h-11"
-            style={{ color: "var(--color-error)" }}
-          >
-            <LogOut className="w-4.5 h-4.5" aria-hidden="true" /> Sign out
-          </button>
-        </div>
+        <SidebarContent {...sidebarProps} />
       </aside>
+
+      {/* Mobile drawer — THE fix. Previously there was no way to reach the
+          sidebar at all below the lg breakpoint: no hamburger, no drawer,
+          nothing. Every nav item (Products, Revenue, Wallet, Settings,
+          Admin, Ecosystem) was simply unreachable on phone/tablet. */}
+      {sidebarOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="fixed inset-y-0 left-0 z-50 w-72 shadow-2xl lg:hidden">
+            <SidebarContent
+              {...sidebarProps}
+              onNavigate={() => setSidebarOpen(false)}
+              onClose={() => setSidebarOpen(false)}
+            />
+          </div>
+        </>
+      )}
 
       <div className="flex-1 flex flex-col min-w-0">
         <header
-          className="sticky top-0 z-30 h-16 flex items-center gap-4 px-6 border-b"
+          className="sticky top-0 z-30 h-16 flex items-center gap-2 px-4 sm:px-6 border-b"
           style={{
             borderColor: "var(--product-muted)",
             backgroundColor: "var(--product-background)",
           }}
         >
+          {/* Mobile hamburger — opens the drawer above. */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open sidebar"
+            className="lg:hidden flex items-center justify-center rounded-lg -ml-1"
+            style={{
+              minWidth: "44px",
+              minHeight: "44px",
+              color: "var(--product-foreground)",
+            }}
+          >
+            <Menu size={20} />
+          </button>
+
           <Link
             href="/dashboard"
             className="lg:hidden font-black text-sm"
@@ -266,12 +369,15 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
             BoldmindNG
           </Link>
           <div className="flex-1" />
-          {/* Was w-9 h-9 (36px) — under the 44px minimum touch target. */}
           <Link
             href="/dashboard/notifications"
             aria-label="Notifications"
-            className="w-11 h-11 rounded-xl flex items-center justify-center"
-            style={{ backgroundColor: "var(--product-highlight)" }}
+            className="rounded-xl flex items-center justify-center"
+            style={{
+              minWidth: "44px",
+              minHeight: "44px",
+              backgroundColor: "var(--product-highlight)",
+            }}
           >
             <Bell
               className="w-4.5 h-4.5"
@@ -279,17 +385,24 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
               aria-hidden="true"
             />
           </Link>
-          <Link href="/account" className="flex items-center gap-2">
+          <Link
+            href="/account"
+            className="flex items-center justify-center"
+            style={{ minWidth: "44px", minHeight: "44px" }}
+          >
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black text-white"
-              style={{ backgroundColor: "var(--product-primary)" }}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black"
+              style={{
+                backgroundColor: "var(--product-primary)",
+                color: "var(--product-on-primary, #FFFFFF)",
+              }}
             >
               {displayName[0]?.toUpperCase() ?? "B"}
             </div>
           </Link>
         </header>
 
-        <main className="flex-1 p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>
