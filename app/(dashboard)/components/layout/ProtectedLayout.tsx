@@ -27,11 +27,8 @@ import { authAPI, useAuthStore } from "@boldmindng/auth";
 import { getUserRoleDisplay, hasAdminPermission } from "@boldmindng/utils";
 import { toast } from "sonner";
 import type { ReactNode } from "react";
+import { style } from "framer-motion/client";
 
-// Icons were emoji (⚡📦💰🔗👛👥🔔👤⚙️🛡️🚪) — swapped for lucide-react to
-// match BoldmindLayout, the newer sidebar, which already made this move.
-// This file is otherwise a duplicate of that layout; consider retiring it
-// in favor of BoldmindLayout rather than maintaining both long-term.
 const NAV_ITEMS = [
   { href: "/dashboard", Icon: Zap, label: "Overview" },
   { href: "/dashboard/products", Icon: Package, label: "Products" },
@@ -61,9 +58,6 @@ interface SidebarContentProps {
   onClose?: () => void;
 }
 
-// Shared between the desktop <aside> and the mobile drawer, so the two
-// surfaces can't drift out of sync with each other the way they had
-// (desktop-only nav with no mobile equivalent at all).
 function SidebarContent({
   currentPath,
   displayName,
@@ -123,7 +117,7 @@ function SidebarContent({
               opacity: 0.6,
             }}
           >
-            <X size={18} />
+            <X size={18} aria-hidden="true" />
           </button>
         )}
       </div>
@@ -179,7 +173,7 @@ function SidebarContent({
               href={item.href}
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150 min-h-11"
               style={{
                 backgroundColor: active
                   ? "var(--product-primary)"
@@ -190,7 +184,7 @@ function SidebarContent({
                 opacity: active ? 1 : 0.7,
               }}
             >
-              <item.Icon className="w-4.5 h-4.5 shrink-0" aria-hidden="true" />
+              <item.Icon size={18} className="shrink-0" aria-hidden="true" />
               {item.label}
             </Link>
           );
@@ -210,7 +204,7 @@ function SidebarContent({
               aria-current={
                 currentPath.startsWith("/admin") ? "page" : undefined
               }
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150 min-h-11"
               style={{
                 backgroundColor: currentPath.startsWith("/admin")
                   ? "var(--product-primary)"
@@ -221,10 +215,7 @@ function SidebarContent({
                 opacity: currentPath.startsWith("/admin") ? 1 : 0.7,
               }}
             >
-              <ShieldCheck
-                className="w-4.5 h-4.5 shrink-0"
-                aria-hidden="true"
-              />
+              <ShieldCheck size={18} className="shrink-0" aria-hidden="true" />
               Admin Panel
             </Link>
           </>
@@ -242,13 +233,14 @@ function SidebarContent({
             href={item.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-11"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150 min-h-11"
             style={{ color: "var(--product-foreground)", opacity: 0.6 }}
           >
-            <item.Icon className="w-4.5 h-4.5 shrink-0" aria-hidden="true" />
+            <item.Icon size={18} className="shrink-0" aria-hidden="true" />
             {item.label}
             <ExternalLink
-              className="w-3 h-3 ml-auto opacity-40"
+              size={12}
+              className="ml-auto opacity-40"
               aria-hidden="true"
             />
           </a>
@@ -261,10 +253,10 @@ function SidebarContent({
       >
         <button
           onClick={onLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80 min-h-11"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150 hover:opacity-80 min-h-11"
           style={{ color: "var(--color-error)" }}
         >
-          <LogOut className="w-4.5 h-4.5" aria-hidden="true" /> Sign out
+          <LogOut size={18} aria-hidden="true" /> Sign out
         </button>
       </div>
     </div>
@@ -290,9 +282,6 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
     router.push("/");
   };
 
-  // AuthUser only ever has `name` (register/login take a single `name`
-  // field, not firstName/lastName) — the previous `(user as any)?.firstName`
-  // reached for a field that doesn't exist on the real shape.
   const displayName = user?.name ?? user?.email?.split("@")[0] ?? "Builder";
   const roleLabel = user?.role ? getUserRoleDisplay(user.role) : "Builder";
   const canSeeAdminPanel = hasAdminPermission(user, "users:read");
@@ -310,7 +299,6 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
       className="flex min-h-screen"
       style={{ backgroundColor: "var(--product-background)" }}
     >
-      {/* Desktop sidebar — unchanged visually, still hidden below lg */}
       <aside
         className="hidden lg:flex lg:flex-col lg:w-64 lg:shrink-0 border-r"
         style={{ borderColor: "var(--product-muted)" }}
@@ -318,10 +306,6 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
         <SidebarContent {...sidebarProps} />
       </aside>
 
-      {/* Mobile drawer — THE fix. Previously there was no way to reach the
-          sidebar at all below the lg breakpoint: no hamburger, no drawer,
-          nothing. Every nav item (Products, Revenue, Wallet, Settings,
-          Admin, Ecosystem) was simply unreachable on phone/tablet. */}
       {sidebarOpen && (
         <>
           <div
@@ -347,7 +331,6 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
             backgroundColor: "var(--product-background)",
           }}
         >
-          {/* Mobile hamburger — opens the drawer above. */}
           <button
             onClick={() => setSidebarOpen(true)}
             aria-label="Open sidebar"
@@ -358,7 +341,7 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
               color: "var(--product-foreground)",
             }}
           >
-            <Menu size={20} />
+            <Menu size={20} aria-hidden="true" />
           </button>
 
           <Link
@@ -380,7 +363,7 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
             }}
           >
             <Bell
-              className="w-4.5 h-4.5"
+              size={18}
               style={{ color: "var(--product-primary)" }}
               aria-hidden="true"
             />
