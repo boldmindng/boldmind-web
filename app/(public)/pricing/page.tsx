@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import PublicLayout from "../PublicLayout";
 import Link from "next/link";
-import { BOLDMIND_PRICING, getColorScheme } from "@boldmindng/utils";
+import {
+  BOLDMIND_PRICING,
+  getColorScheme,
+  getProductPricing,
+} from "@boldmindng/utils";
 import {
   Newspaper,
   Sprout,
   GraduationCap,
   Zap,
+  Check,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,63 +26,76 @@ export const metadata: Metadata = {
 // emoji as the only iconography). Deriving from getColorScheme(slug) keeps
 // this list honest against colors.ts, and lucide icons match the rest of the
 // app's dashboard/nav iconography.
-const PILLAR_PRICING: Array<{
+//
+// UPDATED: the `paid` price string used to be hand-typed too (e.g.
+// "₦1,500/month") — coincidentally correct against pricing.ts at the time,
+// but with nothing keeping it that way. Every price on this page is now
+// read live from BOLDMIND_PRICING via getProductPricing(slug), so a change
+// in pricing.ts shows up here automatically instead of silently drifting.
+const PILLAR_META: Array<{
   slug: string;
   name: string;
   Icon: LucideIcon;
-  color: string;
   href: string;
-  free: boolean;
-  paid: string;
   highlight: string;
 }> = [
   {
     slug: "amebogist",
     name: "AmeboGist",
     Icon: Newspaper,
-    color: getColorScheme("amebogist").primary,
     href: "https://amebogist.ng",
-    free: true,
-    paid: "₦1,500/month",
     highlight: "Ad-free reading + Creator dashboard",
   },
   {
     slug: "villagecircle",
     name: "VillageCircle",
     Icon: Sprout,
-    color: getColorScheme("villagecircle").primary,
     href: "https://villagecircle.ng",
-    free: true,
-    paid: "₦5,000/month",
     highlight: "Patron tier — exclusive drops + community",
   },
   {
     slug: "educenter",
     name: "EduCenter",
     Icon: GraduationCap,
-    color: getColorScheme("educenter").primary,
     href: "https://educenter.com.ng",
-    free: true,
-    paid: "₦2,500/month",
     highlight: "10K+ past questions, CBT sim, AI tutor",
   },
   {
     slug: "planai",
     name: "PlanAI Suite",
     Icon: Zap,
-    color: getColorScheme("planai").primary,
     href: "https://planai.boldmind.ng",
-    free: false,
-    paid: "₦9,500/month",
     highlight: "13 AI-powered business tools",
   },
 ];
+
+const nairaFormat = (amount: number) => `₦${amount.toLocaleString("en-NG")}`;
+
+function buildPillarPricing() {
+  return PILLAR_META.map((meta) => {
+    const pricing = getProductPricing(meta.slug);
+    const basicTier = pricing?.tiers.find((t) => t.name === "basic");
+    const hasFreeTier = pricing?.tiers.some((t) => t.name === "free") ?? false;
+    return {
+      ...meta,
+      color: getColorScheme(meta.slug).primary,
+      free: hasFreeTier,
+      // Fall back only if a product is somehow missing from pricing.ts —
+      // this should never actually render for the four pillars above.
+      paid: basicTier
+        ? `${nairaFormat(basicTier.priceMonthly.NGN)}/month`
+        : "Contact us",
+    };
+  });
+}
 
 export default function PricingPage() {
   const hubPricing = BOLDMIND_PRICING.find(
     (p) => p.productSlug === "boldmind-hub",
   );
   const proTier = hubPricing?.tiers.find((t) => t.name === "pro");
+  const freeTier = hubPricing?.tiers.find((t) => t.name === "free");
+  const pillarPricing = buildPillarPricing();
 
   return (
     <PublicLayout>
@@ -138,7 +156,7 @@ export default function PricingPage() {
                   className="text-4xl font-black mb-1 tabular-nums"
                   style={{ color: "var(--product-foreground)" }}
                 >
-                  ₦0
+                  {nairaFormat(freeTier?.priceMonthly.NGN ?? 0)}
                 </div>
                 <p
                   className="text-sm mb-6"
@@ -147,22 +165,27 @@ export default function PricingPage() {
                   Forever free
                 </p>
                 <ul className="space-y-2 mb-8">
-                  {[
-                    "SSO — one account across all pillars",
-                    "Community feed access",
-                    "Referral tracking",
-                    "Basic dashboard",
-                  ].map((f) => (
+                  {(
+                    freeTier?.features ?? [
+                      "SSO — one account across all pillars",
+                      "Community feed access",
+                      "Referral tracking",
+                      "Basic dashboard",
+                    ]
+                  ).map((f) => (
                     <li
                       key={f}
                       className="flex items-center gap-2 text-sm"
                       style={{ color: "var(--product-foreground)" }}
                     >
                       <span
-                        className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-white shrink-0"
+                        className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
                         style={{ backgroundColor: "var(--product-primary)" }}
                       >
-                        ✓
+                        <Check
+                          className="w-2.5 h-2.5 text-white"
+                          aria-hidden="true"
+                        />
                       </span>
                       {f}
                     </li>
@@ -207,33 +230,38 @@ export default function PricingPage() {
                   className="text-4xl font-black mb-1 tabular-nums"
                   style={{ color: "var(--product-foreground)" }}
                 >
-                  ₦{(proTier?.priceMonthly.NGN ?? 5000).toLocaleString()}
+                  {nairaFormat(proTier?.priceMonthly.NGN ?? 5000)}
                 </div>
                 <p
                   className="text-sm mb-6 tabular-nums"
                   style={{ color: "var(--product-foreground)", opacity: 0.5 }}
                 >
-                  per month · ₦
-                  {(proTier?.priceYearly.NGN ?? 50000).toLocaleString()}/year
+                  per month · {nairaFormat(proTier?.priceYearly.NGN ?? 50000)}
+                  /year
                 </p>
                 <ul className="space-y-2 mb-8">
-                  {[
-                    "Everything in Free",
-                    "Priority community access",
-                    "Wallet & payout system",
-                    "Extended referral dashboard",
-                    "Cross-pillar subscription management",
-                  ].map((f) => (
+                  {(
+                    proTier?.features ?? [
+                      "Everything in Free",
+                      "Priority community access",
+                      "Wallet & payout system",
+                      "Extended referral dashboard",
+                      "Cross-pillar subscription management",
+                    ]
+                  ).map((f) => (
                     <li
                       key={f}
                       className="flex items-center gap-2 text-sm"
                       style={{ color: "var(--product-foreground)" }}
                     >
                       <span
-                        className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-white shrink-0"
+                        className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
                         style={{ backgroundColor: "var(--product-primary)" }}
                       >
-                        ✓
+                        <Check
+                          className="w-2.5 h-2.5 text-white"
+                          aria-hidden="true"
+                        />
                       </span>
                       {f}
                     </li>
@@ -265,7 +293,7 @@ export default function PricingPage() {
               </p>
             </div>
             <div className="grid sm:grid-cols-2 gap-5">
-              {PILLAR_PRICING.map((p) => (
+              {pillarPricing.map((p) => (
                 <div
                   key={p.name}
                   className="rounded-2xl border-2 p-5 flex items-start gap-4"
