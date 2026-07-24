@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+/* Tailwind v4 auto-detects source files, but that detection doesn't
+   reliably follow pnpm's symlinked workspace packages in node_modules —
+   a known v4 + monorepo gotcha. tailwind.config.ts's `content` array
+   tried to cover this with a literal "@boldmindng/ui/src/**" glob, but
+   that's a bare package specifier, not a resolvable filesystem path, so
+   it silently matched nothing. Any utility class used ONLY inside these
+   packages (SuperNavbar's `md:flex`/`md:hidden` breakpoint, ThemeToggle's
+   `sr-only`) was never generated as a result — hence the navbar showing
+   its mobile icon cluster at every viewport width, and the "Theme: light"
+   label rendering visibly instead of being screen-reader-only. */
+@source "../node_modules/@boldmindng/ui";
+@source "../node_modules/@boldmindng/auth";
+
 /* ── Font modes ──────────────────────────────────────────────────────────── */
 :root,
 [data-font="dyslexic"],

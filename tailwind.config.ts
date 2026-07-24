@@ -1,28 +1,37 @@
 // tailwind.config.ts
 //
-// Tailwind CSS v4 moves almost all configuration into CSS using @theme.
-// This TypeScript config file is now minimal — primarily used for:
-//   • content paths (what files to scan for class names)
-//   • darkMode strategy
-//   • plugins (if any third-party Tailwind plugins are needed)
+// Tailwind CSS v4 moves almost all configuration into CSS. This TypeScript
+// config file is now minimal — primarily used for darkMode strategy and
+// plugins. Content scanning is handled by globals.css's @source directives
+// (see the note there) — v4's content array below is kept as a defensive
+// fallback in case anything in this build pipeline still reads it, but
+// @source is the authoritative fix.
 //
-// Design tokens (colors, spacing, fonts, radii, etc.) live in globals.css
-// under the @theme directive, not here. This keeps the CSS variables and
-// Tailwind tokens in sync with a single source of truth.
+// Design tokens (colors, spacing, radii, etc.) live in globals.css as plain
+// :root custom properties — NOT under an @theme block, despite what an
+// earlier version of this comment claimed. Keep that in mind if you go
+// looking for an @theme block that isn't there.
 
 import type { Config } from "tailwindcss";
 
 const config: Config = {
   // ─── Content paths ────────────────────────────────────────────────────────
-  // Tailwind v4 can auto-detect in many cases, but explicit paths are more
-  // reliable in a Next.js project with nested app directory.
+  // The two @boldmindng/* entries previously read
+  // "@boldmindng/ui/src/**/*.{js,ts,jsx,tsx}" — a bare package-import
+  // specifier, not a path Tailwind's glob resolver can actually reach from
+  // this file's location. It silently matched nothing, so any utility class
+  // used ONLY inside those packages (e.g. SuperNavbar's `md:flex`/`md:hidden`
+  // breakpoint, ThemeToggle's `sr-only`) was never generated — the navbar
+  // showed its mobile icon cluster at every screen width, and "Theme: light"
+  // rendered as visible text instead of being screen-reader-only. Pointing
+  // through node_modules follows pnpm's workspace symlink to the real
+  // package source.
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./lib/**/*.{js,ts,jsx,tsx}",
-    // Scan GitHub packages for any Tailwind classes they export
-    "@boldmindng/ui/src/**/*.{js,ts,jsx,tsx}",
-    "@boldmindng/auth/src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@boldmindng/ui/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@boldmindng/auth/**/*.{js,ts,jsx,tsx}",
   ],
 
   // ─── Dark mode ────────────────────────────────────────────────────────────
