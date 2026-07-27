@@ -110,7 +110,7 @@ boldmind-web/
 │   │   └── dashboard/
 │   │       ├── layout.tsx                       🔄 UPDATE — wraps ProtectedLayout
 │   │       ├── page.tsx                         ✅ keep — renders HubDashboardPage
-│   │       ├── products/page.tsx                🔄 UPDATE — GET /hub/products + ProductCard render (see §4.2)
+│   │       ├── products/page.tsx                🔄 UPDATE — GET /hub/products + ProductCard render
 │   │       ├── subscriptions/page.tsx           ✅ keep — GET /subscriptions
 │   │       ├── wallet/page.tsx                  ⛔ BLOCKED — needs api-client `wallet.ts` (see §6)
 │   │       ├── revenue/page.tsx                 🔄 UPDATE — cross-product revenue rollup

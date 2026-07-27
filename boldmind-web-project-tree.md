@@ -71,7 +71,20 @@ boldmind-web
 │  │  ├─ PublicLayout.tsx
 │  │  ├─ about
 │  │  │  └─ page.tsx
+│  │  ├─ changelog
+│  │  │  ├─ [version]
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ data.ts
+│  │  │  └─ page.tsx
 │  │  ├─ contact
+│  │  │  └─ page.tsx
+│  │  ├─ developers
+│  │  │  └─ page.tsx
+│  │  ├─ docs
+│  │  │  └─ page.tsx
+│  │  ├─ ecosystem
+│  │  │  └─ page.tsx
+│  │  ├─ keys
 │  │  │  └─ page.tsx
 │  │  ├─ page.tsx
 │  │  ├─ pricing
@@ -80,7 +93,11 @@ boldmind-web
 │  │  │  └─ page.tsx
 │  │  ├─ start
 │  │  │  └─ page.tsx
-│  │  └─ terms
+│  │  ├─ status
+│  │  │  └─ page.tsx
+│  │  ├─ terms
+│  │  │  └─ page.tsx
+│  │  └─ webhooks
 │  │     └─ page.tsx
 │  ├─ api
 │  │  └─ auth

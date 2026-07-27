@@ -1,6 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ExternalLink, ArrowRight } from "lucide-react";
+import {
+  ExternalLink,
+  ArrowRight,
+  Lightbulb,
+  Share2,
+  Megaphone,
+  Palette,
+  BarChart3,
+  TrendingUp,
+  Zap,
+  Search,
+  Bot,
+  ClipboardList,
+  Users,
+  Briefcase,
+  Dumbbell,
+  ShoppingCart,
+  type LucideIcon,
+} from "lucide-react";
 import { BOLDMIND_PRODUCTS, BOLDMIND_COLOR_SCHEMES } from "@boldmindng/utils";
 import PublicLayout from "../PublicLayout";
 
@@ -10,13 +28,26 @@ export const metadata: Metadata = {
     "One account, four pillars: AmeboGist NG, VillageCircle NG, Boldmind EduCenter, and PlanAI by BoldmindNG.",
 };
 
-// The 13 tools PlanAI's own product description calls out as "13 AI-powered
-// tools" — there's no single boolean field on Product for "is a core PlanAI
-// tool" (boldmind-marketplace's subdomain is 'marketplace', polymind and the
-// TWA variants share subdomain 'planai' but aren't part of the 13), so this
-// is an explicit slug list rather than a filter. Everything else about each
-// tool (name, description, status, icon) still comes from BOLDMIND_PRODUCTS —
-// only the *selection* is hardcoded here.
+/**
+ * NOTE ON THIS PASS
+ * ─────────────────
+ * This page was already in good shape — it's a server component with a real
+ * `metadata` export and no unnecessary "use client"/motion, which is exactly
+ * the SEO-friendly pattern the rest of the public site should follow. Two
+ * things were fixed:
+ *
+ * 1. `tool.icon` / `concept.icon` were rendered directly as emoji — that's
+ *    `Product.icon` from products.ts, which is emoji for internal
+ *    data-modeling convenience, not a UI icon spec (same issue flagged on
+ *    colors.ts's `icon` field). Mapped the fixed 13 PlanAI tool slugs to
+ *    real lucide icons; concepts (a dynamic, filtered list, not a fixed
+ *    enumerable set) get one shared Lightbulb mark instead, fitting for a
+ *    'pre-build idea' rather than a specific product identity.
+ * 2. `var(--product-on-primary, #FFFFFF)` referenced a token that doesn't
+ *    exist anywhere in globals.css — the fallback always fired, so it was
+ *    just white text wearing a CSS-variable costume. Using white directly.
+ */
+
 const PLANAI_TOOL_SLUGS = [
   "social-media-manager",
   "ads-center",
@@ -32,6 +63,22 @@ const PLANAI_TOOL_SLUGS = [
   "boldmind-fitness",
   "boldmind-marketplace",
 ];
+
+const PLANAI_TOOL_ICON: Record<string, LucideIcon> = {
+  "social-media-manager": Share2,
+  "ads-center": Megaphone,
+  "brand-digital-home": Palette,
+  "business-intelligence": BarChart3,
+  "investor-readiness": TrendingUp,
+  "marketing-automation": Zap,
+  "business-discovery": Search,
+  "ai-business-agent": Bot,
+  "project-manager": ClipboardList,
+  crm: Users,
+  "hr-payroll": Briefcase,
+  "boldmind-fitness": Dumbbell,
+  "boldmind-marketplace": ShoppingCart,
+};
 
 const STATUS_LABEL: Record<string, string> = {
   LIVE: "Live",
@@ -96,18 +143,19 @@ function PillarCard({
 }
 
 function ToolCard({
-  icon,
+  slug,
   name,
   description,
   status,
   tint,
 }: {
-  icon: string;
+  slug: string;
   name: string;
   description: string;
   status: string;
   tint: string;
 }) {
+  const Icon = PLANAI_TOOL_ICON[slug] ?? Zap;
   return (
     <div
       className="rounded-2xl border-2 p-5"
@@ -118,11 +166,14 @@ function ToolCard({
     >
       <div className="flex items-start justify-between gap-2 mb-3">
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0"
+          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
           style={{ backgroundColor: `${tint}1A` }}
-          aria-hidden="true"
         >
-          {icon}
+          <Icon
+            className="w-5 h-5"
+            style={{ color: tint }}
+            aria-hidden="true"
+          />
         </div>
         <StatusPill status={status} tint={tint} />
       </div>
@@ -143,12 +194,10 @@ function ToolCard({
 }
 
 function ConceptChip({
-  icon,
   name,
   status,
   tint,
 }: {
-  icon: string;
   name: string;
   status: string;
   tint: string;
@@ -159,11 +208,14 @@ function ConceptChip({
       style={{ borderColor: "var(--product-muted)" }}
     >
       <span
-        className="w-8 h-8 rounded-lg flex items-center justify-center text-base shrink-0"
+        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
         style={{ backgroundColor: `${tint}1A` }}
-        aria-hidden="true"
       >
-        {icon}
+        <Lightbulb
+          className="w-4 h-4"
+          style={{ color: tint }}
+          aria-hidden="true"
+        />
       </span>
       <span
         className="text-sm font-bold flex-1 min-w-0 truncate"
@@ -288,7 +340,7 @@ export default function EcosystemPage() {
             {planaiTools.map((tool) => (
               <ToolCard
                 key={tool.slug}
-                icon={tool.icon}
+                slug={tool.slug}
                 name={tool.name}
                 description={tool.description}
                 status={tool.status}
@@ -329,7 +381,6 @@ export default function EcosystemPage() {
             {villagecircleConcepts.map((concept) => (
               <ConceptChip
                 key={concept.slug}
-                icon={concept.icon}
                 name={concept.shortName ?? concept.name}
                 status={concept.status}
                 tint={villagecircleTint}
@@ -414,18 +465,12 @@ export default function EcosystemPage() {
           className="mt-20 rounded-2xl p-8 sm:p-10 text-center"
           style={{ backgroundColor: "var(--product-primary)" }}
         >
-          <h2
-            className="text-2xl font-black mb-2"
-            style={{ color: "var(--product-on-primary, #FFFFFF)" }}
-          >
+          <h2 className="text-2xl font-black mb-2" style={{ color: "#FFFFFF" }}>
             One account. Four pillars.
           </h2>
           <p
             className="text-sm mb-6 max-w-md mx-auto"
-            style={{
-              color: "var(--product-on-primary, #FFFFFF)",
-              opacity: 0.85,
-            }}
+            style={{ color: "#FFFFFF", opacity: 0.85 }}
           >
             Sign up once on BoldmindNG and move through the whole ecosystem with
             a single login.

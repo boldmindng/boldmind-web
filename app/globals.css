@@ -92,7 +92,15 @@ button {
   --product-highlight: rgba(233, 168, 37, 0.12);
   --product-glow: rgba(233, 168, 37, 0.25);
 
-  --font-active: "OpenDyslexic", "Comic Sans MS", "Arial", sans-serif;
+  /* --font-active is intentionally NOT redeclared here. It's already set
+     conditionally by the font-modes block above ([data-font="dyslexic"]
+     vs [data-font="standard"]). Both of those selectors tie in specificity
+     with a plain `:root` (0,1,0 each), so whichever rule comes LAST in
+     source order wins ties — redeclaring --font-active on a later :root
+     here would unconditionally win over [data-font="standard"] and pin
+     the whole app to OpenDyslexic regardless of the toggle. That's
+     exactly what this file used to do. --font-serif/--font-mono aren't
+     toggled anywhere, so they're safe to keep here. */
   --font-serif: "Lora", Georgia, serif;
   --font-mono: "JetBrains Mono", "Courier New", monospace;
 

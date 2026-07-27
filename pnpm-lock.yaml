@@ -9,23 +9,23 @@ importers:
   .:
     dependencies:
       '@boldmindng/analytics':
-        specifier: 13.0.0
-        version: 13.0.0(@boldmindng/utils@10.1.0(react@19.2.0))(react@19.2.0)
+        specifier: 14.0.0
+        version: 14.0.0(@boldmindng/utils@11.0.0(react@19.2.0))(react@19.2.0)
       '@boldmindng/api-client':
-        specifier: 16.0.0
-        version: 16.0.0(@boldmindng/utils@10.1.0(react@19.2.0))
+        specifier: 17.0.0
+        version: 17.0.0(@boldmindng/utils@11.0.0(react@19.2.0))
       '@boldmindng/auth':
-        specifier: 22.0.0
-        version: 22.0.0(@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0)))(@boldmindng/utils@10.1.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
+        specifier: 23.0.0
+        version: 23.0.0(@boldmindng/api-client@17.0.0(@boldmindng/utils@11.0.0(react@19.2.0)))(@boldmindng/utils@11.0.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
       '@boldmindng/pwa':
-        specifier: 2.1.6
-        version: 2.1.6(react@19.2.0)
+        specifier: 2.1.7
+        version: 2.1.7(react@19.2.0)
       '@boldmindng/ui':
-        specifier: 25.2.0
-        version: 25.2.0(@boldmindng/analytics@13.0.0(@boldmindng/utils@10.1.0(react@19.2.0))(react@19.2.0))(@boldmindng/auth@22.0.0(@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0)))(@boldmindng/utils@10.1.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0))(@boldmindng/utils@10.1.0(react@19.2.0))(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.3.2)
+        specifier: 26.0.0
+        version: 26.0.0(@boldmindng/analytics@14.0.0(@boldmindng/utils@11.0.0(react@19.2.0))(react@19.2.0))(@boldmindng/auth@23.0.0(@boldmindng/api-client@17.0.0(@boldmindng/utils@11.0.0(react@19.2.0)))(@boldmindng/utils@11.0.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0))(@boldmindng/utils@11.0.0(react@19.2.0))(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.3.2)
       '@boldmindng/utils':
-        specifier: 10.1.0
-        version: 10.1.0(react@19.2.0)
+        specifier: 11.0.0
+        version: 11.0.0(react@19.2.0)
       '@types/node':
         specifier: 24.10.0
         version: 24.10.0
@@ -164,53 +164,47 @@ packages:
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
-  '@boldmindng/analytics@13.0.0':
-    resolution: {integrity: sha512-UlGNAVJReTrObdEAViPgmZkBsKBjwN5iBqo1bzVMfkAbJtdL3G0erb+dazd48WDXFOzvjvUjj8E3VVcoLB0vWQ==, tarball: https://npm.pkg.github.com/download/@boldmindng/analytics/13.0.0/f9e63e12575d8c6a853bd2c46410c1e286a41ae4}
+  '@boldmindng/analytics@14.0.0':
+    resolution: {integrity: sha512-wyDVYT5Oe4qmBoLudEHeSSLebYHESijeuPAtDr8cO72YnFdEzq8t+uMQW+AdyaKsQZIfgFKiLUefsL991S6h2Q==, tarball: https://npm.pkg.github.com/download/@boldmindng/analytics/14.0.0/0f26f4e398d893600bf57e8e3cedb0c9576a6b39}
     peerDependencies:
-      '@boldmindng/utils': 10.1.0
+      '@boldmindng/utils': 11.0.0
       react: 19.2.0
-    peerDependenciesMeta:
-      react:
-        optional: true
 
-  '@boldmindng/api-client@16.0.0':
-    resolution: {integrity: sha512-Zo5XqvsUr4wvW6YpeIoOF2QOomygpYCTQC42uhFds0X8Lmr/PD4Nlfkas7YtvJUBwAinqkRq/kMu0Pp5sWxUGA==, tarball: https://npm.pkg.github.com/download/@boldmindng/api-client/16.0.0/4a3306818cf4e3763788591daff3acf6b36aad5f}
+  '@boldmindng/api-client@17.0.0':
+    resolution: {integrity: sha512-wmAxOXZQleGETx9qpvr2pEFOeJJWI8Y4jbZJM4fx2I/Lgme/uxLsyeAw1wpTXJ8XdIyX42L+QRI5kzVcS0Sr3Q==, tarball: https://npm.pkg.github.com/download/@boldmindng/api-client/17.0.0/2005370e7bfec2aea1b3ad2ebd03a9a55a470e63}
     engines: {node: 22.22.3, pnpm: 10.34.1}
     peerDependencies:
-      '@boldmindng/utils': 10.1.0
+      '@boldmindng/utils': 11.0.0
 
-  '@boldmindng/auth@22.0.0':
-    resolution: {integrity: sha512-hi9iXWli+sOjbM6+ozQXxHCHxm1cq/dgo14Tma+nWDxNcKjNLYN9nDUlBTCxZzEzA7BMPIyKHYc+eioGXyH04g==, tarball: https://npm.pkg.github.com/download/@boldmindng/auth/22.0.0/070157f9d31d27adb8fe8a5aef8b016e3434f253}
+  '@boldmindng/auth@23.0.0':
+    resolution: {integrity: sha512-++SXvlsQSkH0iFQlsU8W/WFgd9bAPhxG42RF2w+WIcmNPf6YqVcw6Y3FkGL1t/xCrIXT3qamxAmgVsw7CRLVsQ==, tarball: https://npm.pkg.github.com/download/@boldmindng/auth/23.0.0/742e6abd291a1f4548dc3e763ba5a4ac94642bc7}
     peerDependencies:
-      '@boldmindng/api-client': 16.0.0
-      '@boldmindng/utils': 10.1.0
+      '@boldmindng/api-client': 17.0.0
+      '@boldmindng/utils': 11.0.0
       next: 16.2.0
       react: 19.2.0
 
-  '@boldmindng/pwa@2.1.6':
-    resolution: {integrity: sha512-TCG52CMIZEGfHWH47RGkRd/vL2gpH5xWu68oilenzYG9ETY9p1VIbdo+goAaNcAMbap/ED8Zagtm1EkT9HsugA==, tarball: https://npm.pkg.github.com/download/@boldmindng/pwa/2.1.6/1ec697731ad76bdf52791253c5dbb3e0f9dc2f61}
+  '@boldmindng/pwa@2.1.7':
+    resolution: {integrity: sha512-c8/Mrxyf6ZKp3myoWi6M5O3SGXNMgCuUGYrpb97YxgRVWlKa6bvKabUibJvcOZY3uapwyW55Z48xYmYv24ahPA==, tarball: https://npm.pkg.github.com/download/@boldmindng/pwa/2.1.7/f5455f456e1d495e4caf628d8f9b34097c834ff0}
     peerDependencies:
       react: '>=19.2.0'
 
-  '@boldmindng/ui@25.2.0':
-    resolution: {integrity: sha512-NweeULv1jvn/7bcygylZQZp88cuc5jVilQn7oeFSJBKGOutnGWCBaOR9YvSvO4JdDeiFH2C7UAWMUeoFJQ1Yig==, tarball: https://npm.pkg.github.com/download/@boldmindng/ui/25.2.0/61474be4f0a9b2f22259210dbf9be3fa900e8f8f}
+  '@boldmindng/ui@26.0.0':
+    resolution: {integrity: sha512-WHNOMiU93jYXcxsvwNm0lJS30Mas1RWFfiv5Xkjl2upz9Reh3VCeKfMkLgvpvl+eJq/evU81nberZb00hGxoBg==, tarball: https://npm.pkg.github.com/download/@boldmindng/ui/26.0.0/614d13a272b44b277f4cbe7cddf641aa66699879}
     peerDependencies:
-      '@boldmindng/analytics': 13.0.0
-      '@boldmindng/auth': 22.0.0
-      '@boldmindng/utils': 10.1.0
+      '@boldmindng/analytics': 14.0.0
+      '@boldmindng/auth': 23.0.0
+      '@boldmindng/utils': 11.0.0
       next: 16.2.0
       react: 19.2.0
       react-dom: 19.2.0
       tailwindcss: ^4.1.0
 
-  '@boldmindng/utils@10.1.0':
-    resolution: {integrity: sha512-7MmnZiczbVbptnff/2I7vr4RyPgjqI61O8CK5SgqPxMjrsB0wC9AfUkoSPB39/JcmX1GoX0Q8NgffB7d0A/ZnA==, tarball: https://npm.pkg.github.com/download/@boldmindng/utils/10.1.0/022c27c79fb3776c311675baab3f4a2290d10d56}
+  '@boldmindng/utils@11.0.0':
+    resolution: {integrity: sha512-BJfmpeOTo9jcxiiR5i5wIFrlq+a7lQa7awx7uNUicWc7Xopu3zbvsnsI8D48R6iChk6mTiaBo8SDm53ZsOa8YA==, tarball: https://npm.pkg.github.com/download/@boldmindng/utils/11.0.0/a45eba3859707dd06c21824dff8a3541d4155067}
     engines: {node: '>=22.22.3'}
     peerDependencies:
       react: 19.2.0
-    peerDependenciesMeta:
-      react:
-        optional: true
 
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
@@ -2424,28 +2418,27 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@boldmindng/analytics@13.0.0(@boldmindng/utils@10.1.0(react@19.2.0))(react@19.2.0)':
+  '@boldmindng/analytics@14.0.0(@boldmindng/utils@11.0.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@boldmindng/utils': 10.1.0(react@19.2.0)
+      '@boldmindng/utils': 11.0.0(react@19.2.0)
       mixpanel-browser: 2.81.0
       posthog-js: 1.400.0
-    optionalDependencies:
       react: 19.2.0
     transitivePeerDependencies:
       - preact-render-to-string
 
-  '@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0))':
+  '@boldmindng/api-client@17.0.0(@boldmindng/utils@11.0.0(react@19.2.0))':
     dependencies:
-      '@boldmindng/utils': 10.1.0(react@19.2.0)
+      '@boldmindng/utils': 11.0.0(react@19.2.0)
       axios: 1.18.1
     transitivePeerDependencies:
       - debug
       - supports-color
 
-  '@boldmindng/auth@22.0.0(@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0)))(@boldmindng/utils@10.1.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)':
+  '@boldmindng/auth@23.0.0(@boldmindng/api-client@17.0.0(@boldmindng/utils@11.0.0(react@19.2.0)))(@boldmindng/utils@11.0.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@boldmindng/api-client': 16.0.0(@boldmindng/utils@10.1.0(react@19.2.0))
-      '@boldmindng/utils': 10.1.0(react@19.2.0)
+      '@boldmindng/api-client': 17.0.0(@boldmindng/utils@11.0.0(react@19.2.0))
+      '@boldmindng/utils': 11.0.0(react@19.2.0)
       '@types/node': 22.20.1
       jose: 5.10.0
       next: 16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -2455,21 +2448,21 @@ snapshots:
       - '@types/react'
       - immer
 
-  '@boldmindng/pwa@2.1.6(react@19.2.0)':
+  '@boldmindng/pwa@2.1.7(react@19.2.0)':
     dependencies:
-      '@boldmindng/api-client': 16.0.0(@boldmindng/utils@10.1.0(react@19.2.0))
-      '@boldmindng/utils': 10.1.0(react@19.2.0)
+      '@boldmindng/api-client': 17.0.0(@boldmindng/utils@11.0.0(react@19.2.0))
+      '@boldmindng/utils': 11.0.0(react@19.2.0)
       '@types/node': 22.20.1
       react: 19.2.0
     transitivePeerDependencies:
       - debug
       - supports-color
 
-  '@boldmindng/ui@25.2.0(@boldmindng/analytics@13.0.0(@boldmindng/utils@10.1.0(react@19.2.0))(react@19.2.0))(@boldmindng/auth@22.0.0(@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0)))(@boldmindng/utils@10.1.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0))(@boldmindng/utils@10.1.0(react@19.2.0))(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.3.2)':
+  '@boldmindng/ui@26.0.0(@boldmindng/analytics@14.0.0(@boldmindng/utils@11.0.0(react@19.2.0))(react@19.2.0))(@boldmindng/auth@23.0.0(@boldmindng/api-client@17.0.0(@boldmindng/utils@11.0.0(react@19.2.0)))(@boldmindng/utils@11.0.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0))(@boldmindng/utils@11.0.0(react@19.2.0))(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.3.2)':
     dependencies:
-      '@boldmindng/analytics': 13.0.0(@boldmindng/utils@10.1.0(react@19.2.0))(react@19.2.0)
-      '@boldmindng/auth': 22.0.0(@boldmindng/api-client@16.0.0(@boldmindng/utils@10.1.0(react@19.2.0)))(@boldmindng/utils@10.1.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
-      '@boldmindng/utils': 10.1.0(react@19.2.0)
+      '@boldmindng/analytics': 14.0.0(@boldmindng/utils@11.0.0(react@19.2.0))(react@19.2.0)
+      '@boldmindng/auth': 23.0.0(@boldmindng/api-client@17.0.0(@boldmindng/utils@11.0.0(react@19.2.0)))(@boldmindng/utils@11.0.0(react@19.2.0))(@types/react@19.2.2)(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
+      '@boldmindng/utils': 11.0.0(react@19.2.0)
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       framer-motion: 12.42.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -2484,12 +2477,11 @@ snapshots:
     transitivePeerDependencies:
       - '@emotion/is-prop-valid'
 
-  '@boldmindng/utils@10.1.0(react@19.2.0)':
+  '@boldmindng/utils@11.0.0(react@19.2.0)':
     dependencies:
       '@types/node': 22.20.1
       date-fns: 3.6.0
       date-fns-tz: 3.2.0(date-fns@3.6.0)
-    optionalDependencies:
       react: 19.2.0
 
   '@emnapi/core@1.10.0':

@@ -1,6 +1,4 @@
-# boldmind-web
-
-```text
+```
 boldmind-web
 ├─ .npmrc
 ├─ README.md
