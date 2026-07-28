@@ -52,8 +52,6 @@ boldmind-web
 │  │  │  ├─ page.tsx
 │  │  │  ├─ products
 │  │  │  │  └─ page.tsx
-│  │  │  ├─ referrals
-│  │  │  │  └─ page.tsx
 │  │  │  ├─ revenue
 │  │  │  │  └─ page.tsx
 │  │  │  ├─ roadmap
@@ -64,6 +62,8 @@ boldmind-web
 │  │  │  │  └─ page.tsx
 │  │  │  └─ wallet
 │  │  │     └─ page.tsx
+│  │  ├─ referrals
+│  │  │  └─ page.tsx
 │  │  └─ settings
 │  │     └─ page.tsx
 │  ├─ (public)
@@ -79,12 +79,14 @@ boldmind-web
 │  │  ├─ contact
 │  │  │  └─ page.tsx
 │  │  ├─ developers
-│  │  │  └─ page.tsx
-│  │  ├─ docs
-│  │  │  └─ page.tsx
+│  │  │  ├─ docs
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ keys
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ webhooks
+│  │  │     └─ page.tsx
 │  │  ├─ ecosystem
-│  │  │  └─ page.tsx
-│  │  ├─ keys
 │  │  │  └─ page.tsx
 │  │  ├─ page.tsx
 │  │  ├─ pricing
@@ -95,9 +97,7 @@ boldmind-web
 │  │  │  └─ page.tsx
 │  │  ├─ status
 │  │  │  └─ page.tsx
-│  │  ├─ terms
-│  │  │  └─ page.tsx
-│  │  └─ webhooks
+│  │  └─ terms
 │  │     └─ page.tsx
 │  ├─ api
 │  │  └─ auth
@@ -121,7 +121,6 @@ boldmind-web
 │  ├─ sitemap.ts
 │  └─ sso
 │     └─ route.ts
-├─ boldmind-web-architecture-plan.md
 ├─ boldmind-web-project-tree.md
 ├─ eslint.config.mjs
 ├─ global.d.ts

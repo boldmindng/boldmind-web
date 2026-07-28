@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import PublicLayout from "../PublicLayout";
+import PublicLayout from "../../PublicLayout";
 import { ArrowLeft, Lock, Unlock } from "lucide-react";
 
 export const metadata: Metadata = {
