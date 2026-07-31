@@ -180,3 +180,29 @@ Touch targets ≥44px throughout. Wallet top-up modal → bottom sheet on mobile
 | P1       | Developer key scope explainer                             | `/developers/keys`         | 1d     | Frontend (blocked on `api` module) |
 | P2       | PWA install banner                                        | `/`, `/dashboard`          | 1d     | Frontend                           |
 | P2       | Accessibility + skeleton pass                             | all                        | 2d     | Frontend                           |
+
+### Frontend Design Docs — Addendum v1
+
+**Applies to:** `boldmind-web`, `planai-suite`, `amebogist-web`, `villagecircle-web` design docs.
+**Not applied here:** `educenter-web` — see the full v2 rewrite (`educenter-web-design-doc-v2.md`), which got the larger LMS/School Portal priority update.
+
+**Purpose of this addendum:** two things came out of reconciling the individual app docs against `boldmind-service-canonical.md` v1.3 and `boldmind-shared-monorepo-v1.1.md`: (1) a couple of route/module references had drifted or were left as open flags, and (2) none of the four docs below had an explicit "room for future pages" convention the way `/study-hub/*` implicitly has one in educenter — this addendum adds that pattern to each app, plus flags anything newly confirmed or newly gapped by the v1.3 service doc.
+
+---
+
+## boldmind-web
+
+### Reconciliation against `boldmind-service-canonical.md` v1.3
+
+- §2/§8's `/developers/keys` and `/dashboard/wallet` were flagged as blocked on "⚡-missing" `api`/`wallet` modules in the original doc. **Both are now confirmed live** per canonical v1.3 §2.2 (`WalletController` at `/wallet`, `ApiKeyController`/`EnterpriseController`/`WebhookController` under `/developer/*`/`/public/*`). Unblock these two implementation-plan items — the P0 wallet quick top-up task and the P1 developer key scope explainer no longer need to wait on backend.
+- No new gaps introduced by the v1.3 Redis/queue hardening or the Social Media Management work (§27/Wave 7 of the master design) — those don't touch this app directly.
+
+### Extensibility — reserving room for future pages
+
+`app/(dashboard)/` currently has a flat list of ~10 routes (`analytics`, `announcements`, `features`, `notifications`, `products`, `revenue`, `roadmap`, `subscriptions`, `team`, `wallet`) plus `/account`, `/referrals`, `/settings`. Going forward:
+
+- New dashboard widgets/sections should nest under an existing route (e.g. `/dashboard/wallet/upgrade` for the Tier-2 BVN upgrade flow) rather than adding new flat top-level routes, unless the feature is genuinely a peer of "wallet" or "team" in scope.
+- Reserve `/dashboard/developers` as a likely future in-app mirror of the public `/developers/*` pages (key management without leaving the dashboard shell) — don't name anything else into that slot.
+- `/admin/*` is thin (`/admin`, `/admin/dashboard`, `/admin/users`) relative to the admin surface implied by the master design (revenue, vibecoder applicants, logs — Master Design §6.2's Admin group). Reserve `/admin/vibecoders`, `/admin/revenue`, `/admin/logs` as the next additions rather than overloading `/admin/dashboard` with unrelated tables.
+
+---
